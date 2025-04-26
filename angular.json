@@ -63,6 +63,9 @@
               "projects/law-portal/src/assets"
             ],
             "styles": [
+              "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/primeicons/primeicons.css",
               "projects/law-portal/src/styles.scss"
             ],
             "scripts": [],

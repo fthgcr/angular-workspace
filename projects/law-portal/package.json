@@ -1,0 +1,7 @@
+{
+  "name": "law-portal",
+  "version": "0.0.1",
+  "dependencies": {
+    "shared-lib": "0.0.1"
+  }
+}

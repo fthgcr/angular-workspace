@@ -18,7 +18,7 @@
     "importHelpers": true,
     "paths": {
       "shared-lib": [
-        "./dist/shared-lib"
+        "./projects/shared-lib/src/public-api"
       ]
     },
     "target": "ES2022",
