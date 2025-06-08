@@ -2,15 +2,18 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent, RegisterComponent } from 'shared-lib';
 import { AuthGuard } from './guards/auth.guard';
+import { AuthRedirectGuard } from './guards/auth-redirect.guard';
 
 export const routes: Routes = [
   {
     path: 'login',
-    component: LoginComponent
+    component: LoginComponent,
+    canActivate: [AuthRedirectGuard]
   },
   {
     path: 'register',
-    component: RegisterComponent
+    component: RegisterComponent,
+    canActivate: [AuthRedirectGuard]
   },
   {
     path: '',
@@ -31,5 +34,11 @@ export const routes: Routes = [
     redirectTo: ''
   }
 ];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
 
 

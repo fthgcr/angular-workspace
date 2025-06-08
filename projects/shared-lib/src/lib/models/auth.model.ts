@@ -4,7 +4,11 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string;
+  success: boolean;
+  message: string;
+  accessToken: string;
+  refreshToken?: string;
+  tokenType: string;
   user: User;
 }
 

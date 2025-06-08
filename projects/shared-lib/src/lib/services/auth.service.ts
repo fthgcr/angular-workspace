@@ -9,7 +9,8 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly TOKEN_KEY = 'auth_token';
+  private readonly ACCESS_TOKEN_KEY = 'access_token';
+  private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private readonly USER_KEY = 'current_user';
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser$: Observable<User | null>;
@@ -30,10 +31,13 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${environment.infraCoreUrl}/api/auth/login`, credentials)
       .pipe(
         tap(response => {
-          if (response.token) {
+          if (response.success && response.accessToken) {
             const storage = this.getStorage();
             if (storage) {
-              storage.setItem(this.TOKEN_KEY, response.token);
+              storage.setItem(this.ACCESS_TOKEN_KEY, response.accessToken);
+              if (response.refreshToken) {
+                storage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+              }
               storage.setItem(this.USER_KEY, JSON.stringify(response.user));
             }
             this.currentUserSubject.next(response.user);
@@ -58,15 +62,26 @@ export class AuthService {
   logout(): void {
     const storage = this.getStorage();
     if (storage) {
-      storage.removeItem(this.TOKEN_KEY);
+      storage.removeItem(this.ACCESS_TOKEN_KEY);
+      storage.removeItem(this.REFRESH_TOKEN_KEY);
       storage.removeItem(this.USER_KEY);
     }
     this.currentUserSubject.next(null);
   }
 
-  getToken(): string | null {
+  getAccessToken(): string | null {
     const storage = this.getStorage();
-    return storage ? storage.getItem(this.TOKEN_KEY) : null;
+    return storage ? storage.getItem(this.ACCESS_TOKEN_KEY) : null;
+  }
+
+  getRefreshToken(): string | null {
+    const storage = this.getStorage();
+    return storage ? storage.getItem(this.REFRESH_TOKEN_KEY) : null;
+  }
+
+  // For backward compatibility
+  getToken(): string | null {
+    return this.getAccessToken();
   }
 
   getCurrentUser(): User | null {

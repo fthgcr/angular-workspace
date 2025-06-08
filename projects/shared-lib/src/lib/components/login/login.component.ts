@@ -28,6 +28,19 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Check if user is already authenticated
+    if (this.authService.isAuthenticated()) {
+      const currentUser = this.authService.getCurrentUser();
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Already Logged In',
+        detail: `You are already logged in as ${currentUser?.firstName}. Redirecting to dashboard...`
+      });
+      
+      setTimeout(() => {
+        this.router.navigate(['/']);
+      }, 2000);
+    }
   }
 
   navigateToRegister(): void {
@@ -44,9 +57,13 @@ export class LoginComponent implements OnInit {
           this.messageService.add({
             severity: 'success',
             summary: 'Success',
-            detail: 'Login successful'
+            detail: `Welcome back, ${response.user.firstName}! Redirecting to dashboard...`
           });
-          this.router.navigate(['/']);
+          
+          // Navigate to dashboard after a short delay for user to see the message
+          setTimeout(() => {
+            this.router.navigate(['/']);
+          }, 1500);
         },
         error: (error) => {
           this.messageService.add({
@@ -57,7 +74,7 @@ export class LoginComponent implements OnInit {
           this.loading = false;
         },
         complete: () => {
-          this.loading = false;
+          // Don't set loading to false here since we're navigating
         }
       });
     } else {
