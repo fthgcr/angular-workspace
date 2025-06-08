@@ -1,0 +1,97 @@
+<div class="surface-card p-4 shadow-2 border-round w-full lg:w-6">
+  <div class="text-center mb-5">
+    <div class="text-900 text-3xl font-medium mb-3">Create an Account</div>
+    <span class="text-600 font-medium">Already have an account?</span>
+    <a class="font-medium text-blue-500 no-underline ml-2 cursor-pointer" (click)="navigateToLogin()">Sign In</a>
+  </div>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <div class="flex flex-column gap-3">
+      <!-- Personal Information Section -->
+      <div class="mb-3">
+        <div class="text-xl text-900 mb-2">Personal Information</div>
+        <div class="flex gap-3">
+          <div class="flex-1">
+            <label for="firstName" class="block text-900 font-medium mb-2">First Name</label>
+            <input id="firstName" type="text" pInputText class="w-full" [ngClass]="{'ng-invalid ng-dirty': formErrors['firstName']}" formControlName="firstName">
+            <small class="text-red-500" *ngIf="formErrors['firstName']">
+              {{ formErrors['firstName'] }}
+            </small>
+          </div>
+          <div class="flex-1">
+            <label for="lastName" class="block text-900 font-medium mb-2">Last Name</label>
+            <input id="lastName" type="text" pInputText class="w-full" [ngClass]="{'ng-invalid ng-dirty': formErrors['lastName']}" formControlName="lastName">
+            <small class="text-red-500" *ngIf="formErrors['lastName']">
+              {{ formErrors['lastName'] }}
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Information Section -->
+      <div class="mb-3">
+        <div class="text-xl text-900 mb-2">Account Information</div>
+        <div class="flex flex-column gap-3">
+          <div>
+            <label for="email" class="block text-900 font-medium mb-2">Email</label>
+            <input id="email" type="email" pInputText class="w-full" [ngClass]="{'ng-invalid ng-dirty': formErrors['email']}" formControlName="email">
+            <small class="text-red-500" *ngIf="formErrors['email']">
+              {{ formErrors['email'] }}
+            </small>
+          </div>
+
+          <div>
+            <label for="username" class="block text-900 font-medium mb-2">Username</label>
+            <input id="username" type="text" pInputText class="w-full" [ngClass]="{'ng-invalid ng-dirty': formErrors['username']}" formControlName="username">
+            <small class="text-red-500" *ngIf="formErrors['username']">
+              {{ formErrors['username'] }}
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Password Section -->
+      <div class="mb-3">
+        <div class="text-xl text-900 mb-2">Set Password</div>
+        <div class="flex flex-column gap-3">
+          <div>
+            <label for="password" class="block text-900 font-medium mb-2">Password</label>
+            <p-password id="password" [feedback]="false" [toggleMask]="true" class="w-full" formControlName="password" 
+              [ngClass]="{'ng-invalid ng-dirty': formErrors['password']}">
+
+            </p-password>
+            <small class="text-red-500" *ngIf="formErrors['password']">
+              {{ formErrors['password'] }}
+            </small>
+          </div>
+
+          <div>
+            <label for="confirmPassword" class="block text-900 font-medium mb-2">Confirm Password</label>
+            <p-password id="confirmPassword" [feedback]="false" [toggleMask]="true" class="w-full" 
+              formControlName="confirmPassword" 
+              [ngClass]="{'ng-invalid ng-dirty': formErrors['confirmPassword']}"></p-password>
+            <small class="text-red-500" *ngIf="formErrors['confirmPassword']">
+              {{ formErrors['confirmPassword'] }}
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terms and Conditions -->
+      <div class="mb-3">
+        <div class="flex align-items-center">
+          <p-checkbox formControlName="termsAccepted" [binary]="true" inputId="termsAccepted"></p-checkbox>
+          <label for="termsAccepted" class="ml-2 text-900">
+            I agree to the <a href="#" class="text-primary font-medium">Terms and Conditions</a>
+          </label>
+        </div>
+        <small class="text-red-500" *ngIf="formErrors['termsAccepted']">
+          {{ formErrors['termsAccepted'] }}
+        </small>
+      </div>
+
+      <!-- Submit Button -->
+      <p-button [loading]="loading" type="submit" label="Create Account" styleClass="w-full"></p-button>
+    </div>
+  </form>
+</div>

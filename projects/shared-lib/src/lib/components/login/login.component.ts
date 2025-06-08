@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
+import { LoginRequest } from '../../models/auth.model';
 
 @Component({
   selector: 'lib-login',
@@ -28,12 +29,16 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  navigateToRegister(): void {
+    this.router.navigate(['/register']);
+  }
+
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.loading = true;
-      const { username, password } = this.loginForm.value;
+      const credentials: LoginRequest = this.loginForm.value;
       
-      this.authService.login(username, password).subscribe({
+      this.authService.login(credentials).subscribe({
         next: (response) => {
           this.messageService.add({
             severity: 'success',
