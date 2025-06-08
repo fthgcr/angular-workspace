@@ -1,40 +1,107 @@
 <div class="login-container">
   <div class="login-card">
-    <h2>Welcome Back</h2>
-    <p>Please sign in to continue</p>
+    <!-- Header Section -->
+    <div class="login-header">
+      <div class="logo-section">
+        <i class="pi pi-balance-scale logo-icon"></i>
+        <h1 class="app-title">LawPortal</h1>
+      </div>
+      <h2 class="welcome-title">Welcome Back</h2>
+      <p class="welcome-subtitle">Sign in to access your legal workspace</p>
+    </div>
 
+    <!-- Form Section -->
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <div class="form-field">
-        <span class="p-float-label">
-          <input id="username" type="text" pInputText formControlName="username">
-          <label for="username">Username</label>
-        </span>
-        <small class="p-error" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+      <div class="form-group">
+        <div class="input-wrapper">
+          <i class="pi pi-user input-icon"></i>
+          <span class="p-float-label">
+            <input 
+              id="username" 
+              type="text" 
+              pInputText 
+              formControlName="username"
+              class="modern-input"
+              placeholder=" "
+            >
+            <label for="username">Username or Email</label>
+          </span>
+        </div>
+        <small class="error-message" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+          <i class="pi pi-exclamation-circle"></i>
           Username is required
         </small>
       </div>
 
-      <div class="form-field">
-        <span class="p-float-label">
-          <p-password id="password" formControlName="password" [feedback]="false" [toggleMask]="true">
-          </p-password>
-          <label for="password">Password</label>
-        </span>
-        <small class="p-error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+      <div class="form-group">
+        <div class="input-wrapper">
+          <i class="pi pi-lock input-icon"></i>
+          <span class="p-float-label">
+            <p-password 
+              id="password" 
+              formControlName="password" 
+              [feedback]="false" 
+              [toggleMask]="true"
+              styleClass="modern-password"
+              placeholder=" "
+            ></p-password>
+            <label for="password">Password</label>
+          </span>
+        </div>
+        <small class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          <i class="pi pi-exclamation-circle"></i>
           Password is required
         </small>
       </div>
 
+      <!-- Additional Options -->
+      <div class="form-options">
+        <div class="remember-me">
+          <p-checkbox 
+            formControlName="rememberMe" 
+            [binary]="true" 
+            inputId="rememberMe"
+            styleClass="custom-checkbox"
+          ></p-checkbox>
+          <label for="rememberMe">Remember me</label>
+        </div>
+        <a href="#" class="forgot-password">Forgot password?</a>
+      </div>
+
+      <!-- Submit Button -->
       <div class="form-actions">
-        <p-button type="submit" [loading]="loading" label="Sign In" styleClass="w-full"></p-button>
+        <p-button 
+          type="submit" 
+          [loading]="loading" 
+          label="Sign In" 
+          icon="pi pi-sign-in"
+          styleClass="login-button w-full"
+          [disabled]="loginForm.invalid"
+        ></p-button>
       </div>
     </form>
     
-    <div class="mt-4 text-center">
-      <span class="text-600">Don't have an account?</span>
-      <a class="font-medium text-blue-500 no-underline ml-2 cursor-pointer" (click)="navigateToRegister()">Sign Up</a>
+    <!-- Footer Section -->
+    <div class="login-footer">
+      <div class="divider">
+        <span>or</span>
+      </div>
+      <div class="register-prompt">
+        <span>Don't have an account?</span>
+        <a class="register-link" (click)="navigateToRegister()">
+          Create Account
+          <i class="pi pi-arrow-right"></i>
+        </a>
+      </div>
     </div>
+  </div>
+
+  <!-- Background Elements -->
+  <div class="bg-decoration">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
   </div>
 </div>
 
-<p-toast></p-toast>
+<p-toast position="top-right"></p-toast>

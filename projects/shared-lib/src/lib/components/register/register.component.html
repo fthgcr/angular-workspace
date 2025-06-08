@@ -1,97 +1,301 @@
-<div class="surface-card p-4 shadow-2 border-round w-full lg:w-6">
-  <div class="text-center mb-5">
-    <div class="text-900 text-3xl font-medium mb-3">Create an Account</div>
-    <span class="text-600 font-medium">Already have an account?</span>
-    <a class="font-medium text-blue-500 no-underline ml-2 cursor-pointer" (click)="navigateToLogin()">Sign In</a>
+<div class="register-container">
+  <div class="register-card">
+    <!-- Header Section -->
+    <div class="register-header">
+      <div class="logo-section">
+        <i class="pi pi-balance-scale logo-icon"></i>
+        <h1 class="app-title">LawPortal</h1>
+      </div>
+      <h2 class="welcome-title">Create Account</h2>
+      <p class="welcome-subtitle">Join our legal workspace today</p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="progress-steps">
+      <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+        <div class="step-number">1</div>
+        <span>Personal</span>
+      </div>
+      <div class="step-line" [class.active]="currentStep > 1"></div>
+      <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+        <div class="step-number">2</div>
+        <span>Account</span>
+      </div>
+      <div class="step-line" [class.active]="currentStep > 2"></div>
+      <div class="step" [class.active]="currentStep >= 3">
+        <div class="step-number">3</div>
+        <span>Complete</span>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      
+      <!-- Step 1: Personal Information -->
+      <div class="form-step" *ngIf="currentStep === 1">
+        <h3 class="step-title">
+          <i class="pi pi-user-plus"></i>
+          Personal Information
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <div class="input-wrapper">
+              <i class="pi pi-user input-icon"></i>
+              <span class="p-float-label">
+                <input 
+                  id="firstName" 
+                  type="text" 
+                  pInputText 
+                  formControlName="firstName"
+                  class="modern-input"
+                  placeholder=" "
+                >
+                <label for="firstName">First Name</label>
+              </span>
+            </div>
+            <small class="error-message" *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched">
+              <i class="pi pi-exclamation-circle"></i>
+              First name is required
+            </small>
+          </div>
+
+          <div class="form-group">
+            <div class="input-wrapper">
+              <i class="pi pi-user input-icon"></i>
+              <span class="p-float-label">
+                <input 
+                  id="lastName" 
+                  type="text" 
+                  pInputText 
+                  formControlName="lastName"
+                  class="modern-input"
+                  placeholder=" "
+                >
+                <label for="lastName">Last Name</label>
+              </span>
+            </div>
+            <small class="error-message" *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched">
+              <i class="pi pi-exclamation-circle"></i>
+              Last name is required
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="input-wrapper">
+            <i class="pi pi-envelope input-icon"></i>
+            <span class="p-float-label">
+              <input 
+                id="email" 
+                type="email" 
+                pInputText 
+                formControlName="email"
+                class="modern-input"
+                placeholder=" "
+              >
+              <label for="email">Email Address</label>
+            </span>
+          </div>
+          <small class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+            <i class="pi pi-exclamation-circle"></i>
+            <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+          </small>
+        </div>
+
+        <div class="form-group">
+          <div class="input-wrapper">
+            <i class="pi pi-phone input-icon"></i>
+            <span class="p-float-label">
+              <input 
+                id="phoneNumber" 
+                type="tel" 
+                pInputText 
+                formControlName="phoneNumber"
+                class="modern-input"
+                placeholder=" "
+              >
+              <label for="phoneNumber">Phone Number</label>
+            </span>
+          </div>
+          <small class="error-message" *ngIf="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched">
+            <i class="pi pi-exclamation-circle"></i>
+            Phone number is required
+          </small>
+        </div>
+      </div>
+
+      <!-- Step 2: Account Information -->
+      <div class="form-step" *ngIf="currentStep === 2">
+        <h3 class="step-title">
+          <i class="pi pi-key"></i>
+          Account Setup
+        </h3>
+        
+        <div class="form-group">
+          <div class="input-wrapper">
+            <i class="pi pi-at input-icon"></i>
+            <span class="p-float-label">
+              <input 
+                id="username" 
+                type="text" 
+                pInputText 
+                formControlName="username"
+                class="modern-input"
+                placeholder=" "
+              >
+              <label for="username">Username</label>
+            </span>
+          </div>
+          <small class="error-message" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
+            <i class="pi pi-exclamation-circle"></i>
+            Username is required
+          </small>
+        </div>
+
+        <div class="form-group">
+          <div class="input-wrapper">
+            <i class="pi pi-lock input-icon"></i>
+            <span class="p-float-label">
+              <p-password 
+                id="password" 
+                formControlName="password" 
+                [feedback]="true" 
+                [toggleMask]="true"
+                styleClass="modern-password"
+                placeholder=" "
+              ></p-password>
+              <label for="password">Password</label>
+            </span>
+          </div>
+          <small class="error-message" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+            <i class="pi pi-exclamation-circle"></i>
+            Password is required
+          </small>
+        </div>
+
+        <div class="form-group">
+          <div class="input-wrapper">
+            <i class="pi pi-lock input-icon"></i>
+            <span class="p-float-label">
+              <p-password 
+                id="confirmPassword" 
+                formControlName="confirmPassword" 
+                [feedback]="false" 
+                [toggleMask]="true"
+                styleClass="modern-password"
+                placeholder=" "
+              ></p-password>
+              <label for="confirmPassword">Confirm Password</label>
+            </span>
+          </div>
+          <small class="error-message" *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
+            <i class="pi pi-exclamation-circle"></i>
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match</span>
+          </small>
+        </div>
+      </div>
+
+      <!-- Step 3: Terms and Final -->
+      <div class="form-step" *ngIf="currentStep === 3">
+        <h3 class="step-title">
+          <i class="pi pi-check-circle"></i>
+          Terms & Conditions
+        </h3>
+        
+        <div class="terms-section">
+          <div class="terms-text">
+            <p>By creating an account, you agree to our:</p>
+            <ul>
+              <li><a href="#" class="terms-link">Terms of Service</a></li>
+              <li><a href="#" class="terms-link">Privacy Policy</a></li>
+              <li><a href="#" class="terms-link">Cookie Policy</a></li>
+            </ul>
+          </div>
+          
+          <div class="checkbox-group">
+            <p-checkbox 
+              formControlName="acceptTerms" 
+              [binary]="true" 
+              inputId="acceptTerms"
+              styleClass="custom-checkbox"
+            ></p-checkbox>
+            <label for="acceptTerms">I accept the Terms and Conditions</label>
+          </div>
+          <small class="error-message" *ngIf="registerForm.get('acceptTerms')?.invalid && registerForm.get('acceptTerms')?.touched">
+            <i class="pi pi-exclamation-circle"></i>
+            You must accept the terms and conditions
+          </small>
+
+          <div class="checkbox-group">
+            <p-checkbox 
+              formControlName="subscribeNewsletter" 
+              [binary]="true" 
+              inputId="newsletter"
+              styleClass="custom-checkbox"
+            ></p-checkbox>
+            <label for="newsletter">Subscribe to newsletter (optional)</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <p-button 
+          *ngIf="currentStep > 1"
+          type="button" 
+          label="Previous" 
+          icon="pi pi-chevron-left"
+          styleClass="previous-button"
+          (click)="previousStep()"
+        ></p-button>
+        
+        <p-button 
+          *ngIf="currentStep < 3"
+          type="button" 
+          label="Next" 
+          icon="pi pi-chevron-right"
+          iconPos="right"
+          styleClass="next-button w-full"
+          [disabled]="!isCurrentStepValid()"
+          (click)="nextStep()"
+        ></p-button>
+        
+        <p-button 
+          *ngIf="currentStep === 3"
+          type="submit" 
+          [loading]="loading" 
+          label="Create Account" 
+          icon="pi pi-user-plus"
+          styleClass="register-button w-full"
+          [disabled]="registerForm.invalid"
+        ></p-button>
+      </div>
+    </form>
+    
+    <!-- Footer Section -->
+    <div class="register-footer">
+      <div class="divider">
+        <span>or</span>
+      </div>
+      <div class="login-prompt">
+        <span>Already have an account?</span>
+        <a class="login-link" (click)="navigateToLogin()">
+          Sign In
+          <i class="pi pi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
   </div>
 
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-    <div class="flex flex-column gap-3">
-      <!-- Personal Information Section -->
-      <div class="mb-3">
-        <div class="text-xl text-900 mb-2">Personal Information</div>
-        <div class="flex gap-3">
-          <div class="flex-1">
-            <label for="firstName" class="block text-900 font-medium mb-2">First Name</label>
-            <input id="firstName" type="text" pInputText class="w-full" [ngClass]="{'ng-invalid ng-dirty': formErrors['firstName']}" formControlName="firstName">
-            <small class="text-red-500" *ngIf="formErrors['firstName']">
-              {{ formErrors['firstName'] }}
-            </small>
-          </div>
-          <div class="flex-1">
-            <label for="lastName" class="block text-900 font-medium mb-2">Last Name</label>
-            <input id="lastName" type="text" pInputText class="w-full" [ngClass]="{'ng-invalid ng-dirty': formErrors['lastName']}" formControlName="lastName">
-            <small class="text-red-500" *ngIf="formErrors['lastName']">
-              {{ formErrors['lastName'] }}
-            </small>
-          </div>
-        </div>
-      </div>
-
-      <!-- Account Information Section -->
-      <div class="mb-3">
-        <div class="text-xl text-900 mb-2">Account Information</div>
-        <div class="flex flex-column gap-3">
-          <div>
-            <label for="email" class="block text-900 font-medium mb-2">Email</label>
-            <input id="email" type="email" pInputText class="w-full" [ngClass]="{'ng-invalid ng-dirty': formErrors['email']}" formControlName="email">
-            <small class="text-red-500" *ngIf="formErrors['email']">
-              {{ formErrors['email'] }}
-            </small>
-          </div>
-
-          <div>
-            <label for="username" class="block text-900 font-medium mb-2">Username</label>
-            <input id="username" type="text" pInputText class="w-full" [ngClass]="{'ng-invalid ng-dirty': formErrors['username']}" formControlName="username">
-            <small class="text-red-500" *ngIf="formErrors['username']">
-              {{ formErrors['username'] }}
-            </small>
-          </div>
-        </div>
-      </div>
-
-      <!-- Password Section -->
-      <div class="mb-3">
-        <div class="text-xl text-900 mb-2">Set Password</div>
-        <div class="flex flex-column gap-3">
-          <div>
-            <label for="password" class="block text-900 font-medium mb-2">Password</label>
-            <p-password id="password" [feedback]="false" [toggleMask]="true" class="w-full" formControlName="password" 
-              [ngClass]="{'ng-invalid ng-dirty': formErrors['password']}">
-
-            </p-password>
-            <small class="text-red-500" *ngIf="formErrors['password']">
-              {{ formErrors['password'] }}
-            </small>
-          </div>
-
-          <div>
-            <label for="confirmPassword" class="block text-900 font-medium mb-2">Confirm Password</label>
-            <p-password id="confirmPassword" [feedback]="false" [toggleMask]="true" class="w-full" 
-              formControlName="confirmPassword" 
-              [ngClass]="{'ng-invalid ng-dirty': formErrors['confirmPassword']}"></p-password>
-            <small class="text-red-500" *ngIf="formErrors['confirmPassword']">
-              {{ formErrors['confirmPassword'] }}
-            </small>
-          </div>
-        </div>
-      </div>
-
-      <!-- Terms and Conditions -->
-      <div class="mb-3">
-        <div class="flex align-items-center">
-          <p-checkbox formControlName="termsAccepted" [binary]="true" inputId="termsAccepted"></p-checkbox>
-          <label for="termsAccepted" class="ml-2 text-900">
-            I agree to the <a href="#" class="text-primary font-medium">Terms and Conditions</a>
-          </label>
-        </div>
-        <small class="text-red-500" *ngIf="formErrors['termsAccepted']">
-          {{ formErrors['termsAccepted'] }}
-        </small>
-      </div>
-
-      <!-- Submit Button -->
-      <p-button [loading]="loading" type="submit" label="Create Account" styleClass="w-full"></p-button>
-    </div>
-  </form>
+  <!-- Background Elements -->
+  <div class="bg-decoration">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+  </div>
 </div>
+
+<p-toast position="top-right"></p-toast>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
@@ -10,96 +10,102 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
-  registerForm: FormGroup;
+  registerForm!: FormGroup;
   loading = false;
-
+  currentStep = 1;
   formErrors: { [key: string]: string } = {};
 
   constructor(
-    private formBuilder: FormBuilder,
+    private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
-    private messageService: MessageService
-  ) {
-    this.registerForm = this.formBuilder.group({
-      firstName: ['', [Validators.required, Validators.pattern('^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]*$')]],
-      lastName: ['', [Validators.required, Validators.pattern('^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]*$')]],
+    private messageService: MessageService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.registerForm = this.fb.group({
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      username: ['', [
-        Validators.required,
-        Validators.minLength(4),
-        Validators.pattern('^[a-zA-Z0-9._-]*$')
-      ]],
-      password: ['', [
-        Validators.required,
-        Validators.minLength(6)
-      ]],
+      phoneNumber: ['', [Validators.required]],
+      username: ['', [Validators.required]],
+      password: ['', [Validators.required]],
       confirmPassword: ['', [Validators.required]],
-      termsAccepted: [false, [Validators.requiredTrue]]
-    }, {
-      validators: this.passwordMatchValidator
-    });
-
-    // Subscribe to form changes to show validation messages in real-time
-    this.registerForm.valueChanges.subscribe(() => {
-      this.onFormValuesChanged();
-    });
+      acceptTerms: [false, [Validators.requiredTrue]],
+      subscribeNewsletter: [false]
+    }, { validators: this.passwordMatchValidator });
   }
 
-  private passwordMatchValidator(g: FormGroup) {
-    const password = g.get('password');
-    const confirmPassword = g.get('confirmPassword');
-    if (!password || !confirmPassword) return null;
+  passwordMatchValidator(g: AbstractControl) {
+    return g.get('password')?.value === g.get('confirmPassword')?.value ? null : { passwordMismatch: true };
+  }
+
+  nextStep() {
+    if (this.isCurrentStepValid() && this.currentStep < 3) {
+      this.currentStep++;
+    }
+  }
+
+  previousStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  isCurrentStepValid(): boolean {
+    let fieldsToCheck: string[] = [];
     
-    return password.value === confirmPassword.value
-      ? null
-      : { passwordMismatch: true };
-  }
-
-  ngOnInit(): void {
-    this.onFormValuesChanged();
-  }
-
-  onSubmit(): void {
-    const formValue = { ...this.registerForm.value };
-    delete formValue.confirmPassword;
-    delete formValue.termsAccepted;
-
-    if (this.registerForm.invalid) {
-      Object.keys(this.registerForm.controls).forEach(key => {
-        const control = this.registerForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
-        }
-      });
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Validation Error',
-        detail: 'Please check the form for errors'
-      });
-      return;
+    switch (this.currentStep) {
+      case 1:
+        fieldsToCheck = ['firstName', 'lastName', 'email', 'phoneNumber'];
+        break;
+      case 2:
+        fieldsToCheck = ['username', 'password', 'confirmPassword'];
+        break;
+      case 3:
+        fieldsToCheck = ['acceptTerms'];
+        break;
     }
 
-    this.loading = true;
-    this.authService.register(this.registerForm.value)
-      .subscribe({
+    const stepValid = fieldsToCheck.every(field => {
+      const control = this.registerForm.get(field);
+      return control && control.valid;
+    });
+
+    // For step 2, also check password match
+    if (this.currentStep === 2) {
+      return stepValid && !this.registerForm.errors?.['passwordMismatch'];
+    }
+
+    return stepValid;
+  }
+
+  onSubmit() {
+    if (this.registerForm.valid) {
+      this.loading = true;
+      const formData = { ...this.registerForm.value };
+      delete formData.confirmPassword; // Remove confirmPassword from submission
+      
+      this.authService.register(formData).subscribe({
         next: (response) => {
           this.messageService.add({
             severity: 'success',
-            summary: 'Registration Successful',
-            detail: 'Please login with your credentials'
+            summary: 'Success',
+            detail: 'Account created successfully! Please check your email for verification.'
           });
-          this.router.navigate(['/login']);
+          this.loading = false;
+          this.navigateToLogin();
         },
         error: (error) => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Registration Failed',
-            detail: error.error?.message || 'An error occurred during registration'
+            summary: 'Error',
+            detail: error.error?.message || 'Registration failed'
           });
           this.loading = false;
         }
       });
+    }
   }
 
   navigateToLogin(): void {
