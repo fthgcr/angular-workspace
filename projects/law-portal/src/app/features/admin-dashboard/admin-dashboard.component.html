@@ -1,0 +1,67 @@
+<div class="admin-dashboard">
+  <div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <div class="user-info">
+      <span>Welcome, {{ currentUser?.username }}!</span>
+      <button type="button" class="btn btn-outline-secondary" (click)="logout()">Logout</button>
+    </div>
+  </div>
+  
+  <div class="dashboard-content">
+    <div class="row">
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title">Total Users</h5>
+            <h2 class="text-primary">1,234</h2>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title">Active Cases</h5>
+            <h2 class="text-success">89</h2>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title">Lawyers</h5>
+            <h2 class="text-info">45</h2>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title">Clients</h5>
+            <h2 class="text-warning">567</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5>Admin Actions</h5>
+          </div>
+          <div class="card-body">
+            <div class="btn-group-vertical w-100" role="group">
+              <button type="button" class="btn btn-primary mb-2">Manage Users</button>
+              <button type="button" class="btn btn-secondary mb-2">System Settings</button>
+              <button type="button" class="btn btn-info mb-2">View Reports</button>
+              <button type="button" class="btn btn-success mb-2">Backup Data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

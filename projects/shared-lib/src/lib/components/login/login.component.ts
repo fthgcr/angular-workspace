@@ -34,17 +34,37 @@ export class LoginComponent implements OnInit {
       this.messageService.add({
         severity: 'info',
         summary: 'Already Logged In',
-        detail: `You are already logged in as ${currentUser?.firstName}. Redirecting to dashboard...`
+        detail: `You are already logged in as ${currentUser?.username}. Redirecting...`
       });
       
       setTimeout(() => {
-        this.router.navigate(['/']);
+        this.redirectBasedOnRole();
       }, 2000);
     }
   }
 
   navigateToRegister(): void {
     this.router.navigate(['/register']);
+  }
+
+  private redirectBasedOnRole(): void {
+    const role = this.authService.getCurrentRole();
+    
+    switch (role) {
+      case 'ADMIN':
+        this.router.navigate(['/admin-dashboard']);
+        break;
+      case 'LAWYER':
+        this.router.navigate(['/lawyer-dashboard']);
+        break;
+      case 'CLIENT':
+        this.router.navigate(['/client-dashboard']);
+        break;
+      case 'USER':
+      default:
+        this.router.navigate(['/dashboard']);
+        break;
+    }
   }
 
   onSubmit(): void {
@@ -54,22 +74,25 @@ export class LoginComponent implements OnInit {
       
       this.authService.login(credentials).subscribe({
         next: (response) => {
+          const username = this.authService.getCurrentUser()?.username || 'User';
+          const role = response.role;
+          
           this.messageService.add({
             severity: 'success',
-            summary: 'Success',
-            detail: `Welcome back, ${response.user.firstName}! Redirecting to dashboard...`
+            summary: 'Login Successful',
+            detail: `Welcome back, ${username}! Logged in as ${role}. Redirecting...`
           });
           
-          // Navigate to dashboard after a short delay for user to see the message
+          // Navigate based on role after a short delay
           setTimeout(() => {
-            this.router.navigate(['/']);
+            this.redirectBasedOnRole();
           }, 1500);
         },
         error: (error) => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: error.error?.message || 'Login failed'
+            summary: 'Login Failed',
+            detail: error.error?.message || 'Invalid username or password'
           });
           this.loading = false;
         },
@@ -80,7 +103,7 @@ export class LoginComponent implements OnInit {
     } else {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Warning',
+        summary: 'Validation Error',
         detail: 'Please fill in all required fields'
       });
     }

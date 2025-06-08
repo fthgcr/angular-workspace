@@ -106,7 +106,8 @@
               "buildTarget": "law-portal:build:production"
             },
             "development": {
-              "buildTarget": "law-portal:build:development"
+              "buildTarget": "law-portal:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

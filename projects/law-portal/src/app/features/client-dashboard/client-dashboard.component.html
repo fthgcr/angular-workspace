@@ -1,0 +1,67 @@
+<div class="client-dashboard">
+  <div class="dashboard-header">
+    <h1>Client Dashboard</h1>
+    <div class="user-info">
+      <span>Welcome, {{ currentUser?.username }}!</span>
+      <button type="button" class="btn btn-outline-secondary" (click)="logout()">Logout</button>
+    </div>
+  </div>
+  
+  <div class="dashboard-content">
+    <div class="row">
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title">My Cases</h5>
+            <h2 class="text-primary">3</h2>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title">Active Cases</h5>
+            <h2 class="text-success">2</h2>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title">Appointments</h5>
+            <h2 class="text-warning">1</h2>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title">Documents</h5>
+            <h2 class="text-info">12</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5>Client Actions</h5>
+          </div>
+          <div class="card-body">
+            <div class="btn-group-vertical w-100" role="group">
+              <button type="button" class="btn btn-primary mb-2">View My Cases</button>
+              <button type="button" class="btn btn-secondary mb-2">Schedule Appointment</button>
+              <button type="button" class="btn btn-info mb-2">Upload Documents</button>
+              <button type="button" class="btn btn-success mb-2">Contact Lawyer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
