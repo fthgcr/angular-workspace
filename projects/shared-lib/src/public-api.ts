@@ -9,3 +9,4 @@ export * from './lib/services/auth.service';
 export * from './lib/models/auth.model';
 export * from './lib/interceptors/auth.interceptor';
 export * from './lib/environments/environment';
+export * from './lib/tokens/navigation.token';

@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { LoginRequest } from '../../models/auth.model';
+import { NavigationConfig, NAVIGATION_CONFIG } from '../../tokens/navigation.token';
 
 @Component({
   selector: 'lib-login',
@@ -18,7 +19,8 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    @Optional() @Inject(NAVIGATION_CONFIG) private navigationConfig: NavigationConfig | null
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
@@ -50,19 +52,27 @@ export class LoginComponent implements OnInit {
   private redirectBasedOnRole(): void {
     const role = this.authService.getCurrentRole();
     
+    // Use injected navigation config if available, otherwise use defaults
+    const routes = this.navigationConfig || {
+      adminDashboard: '/admin-dashboard',
+      lawyerDashboard: '/lawyer-dashboard', 
+      clientDashboard: '/client-dashboard',
+      userDashboard: '/dashboard'
+    };
+    
     switch (role) {
       case 'ADMIN':
-        this.router.navigate(['/admin-dashboard']);
+        this.router.navigate([routes.adminDashboard]);
         break;
       case 'LAWYER':
-        this.router.navigate(['/lawyer-dashboard']);
+        this.router.navigate([routes.lawyerDashboard]);
         break;
       case 'CLIENT':
-        this.router.navigate(['/client-dashboard']);
+        this.router.navigate([routes.clientDashboard]);
         break;
       case 'USER':
       default:
-        this.router.navigate(['/dashboard']);
+        this.router.navigate([routes.userDashboard || routes.defaultRoute || '/dashboard']);
         break;
     }
   }
