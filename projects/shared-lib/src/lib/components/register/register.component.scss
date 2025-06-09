@@ -1,17 +1,29 @@
 :host {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: var(--surface-ground);
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  overflow: hidden;
+  
+  /* Global scrollbar gizleme */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Firefox için */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .register-container {
-  min-height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 2rem;
   position: relative;
   overflow: hidden;
@@ -565,12 +577,15 @@
 @media (max-width: 768px) {
   .register-container {
     padding: 1rem;
+    overflow: hidden;
   }
   
   .register-card {
     padding: 2rem 1.5rem;
     border-radius: 16px;
-    max-width: 100%;
+    max-width: none;
+    width: 100%;
+    margin: 0;
   }
   
   .app-title {
@@ -611,6 +626,59 @@
     
     .next-button, .register-button {
       order: 1;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .register-container {
+    padding: 0.5rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+    /* Sadece scroll gerektiğinde görünsün */
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.5);
+      }
+    }
+  }
+  
+  .register-card {
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+  }
+  
+  .app-title {
+    font-size: 1.5rem;
+  }
+  
+  .welcome-title {
+    font-size: 1.25rem;
+  }
+  
+  .logo-icon {
+    font-size: 2rem;
+  }
+  
+  .progress-steps {
+    margin-bottom: 2rem;
+    
+    .step-number {
+      width: 35px;
+      height: 35px;
+      font-size: 0.75rem;
     }
   }
 }
