@@ -21,8 +21,8 @@ export const appConfig: ApplicationConfig = {
         adminDashboard: '/admin-dashboard',
         lawyerDashboard: '/lawyer-dashboard',
         clientDashboard: '/client-dashboard',
-        userDashboard: '/dashboard',
-        defaultRoute: '/dashboard'
+        userDashboard: '/client',
+        defaultRoute: '/client'
       }
     }
   ]

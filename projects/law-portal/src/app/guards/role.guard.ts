@@ -18,40 +18,41 @@ export class RoleGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    const expectedRole = route.data['expectedRole'];
+    const requiredRoles = route.data['roles'];
     const currentRole = this.authService.getCurrentRole();
 
-    if (this.authService.isAuthenticated() && currentRole === expectedRole) {
+    // Check if user is authenticated
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login']);
+      return false;
+    }
+
+    // Check if user has required role
+    if (requiredRoles && Array.isArray(requiredRoles) && requiredRoles.includes(currentRole)) {
       return true;
     }
 
-    // If user has a different role, redirect to appropriate dashboard
-    if (this.authService.isAuthenticated()) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Access Denied',
-        detail: 'You do not have permission to access this page.'
-      });
+    // Access denied - redirect based on current role
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Erişim Reddedildi',
+      detail: 'Bu sayfaya erişim yetkiniz bulunmamaktadır.'
+    });
 
-      // Redirect to appropriate dashboard based on current role
-      switch (currentRole) {
-        case 'ADMIN':
-          this.router.navigate(['/admin-dashboard']);
-          break;
-        case 'LAWYER':
-          this.router.navigate(['/lawyer-dashboard']);
-          break;
-        case 'CLIENT':
-          this.router.navigate(['/client-dashboard']);
-          break;
-        case 'USER':
-        default:
-          this.router.navigate(['/dashboard']);
-          break;
-      }
-    } else {
-      // User is not authenticated, redirect to login
-      this.router.navigate(['/login']);
+    // Redirect to appropriate dashboard based on current role
+    switch (currentRole) {
+      case 'ADMIN':
+        this.router.navigate(['/admin']);
+        break;
+      case 'LAWYER':
+        this.router.navigate(['/lawyer']);
+        break;
+      case 'USER':
+        this.router.navigate(['/client']); // USER sadece /client'e erişebilir
+        break;
+      default:
+        this.router.navigate(['/login']);
+        break;
     }
 
     return false;

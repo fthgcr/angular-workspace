@@ -1,0 +1,380 @@
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.topbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+// Logo Section
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  i {
+    font-size: 1.5rem;
+    color: white;
+  }
+}
+
+.logo-text {
+  .app-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .app-subtitle {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Navigation Menu
+.nav-menu {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin: 0 2rem;
+}
+
+.nav-list {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-item {
+  position: relative;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  position: relative;
+  backdrop-filter: blur(5px);
+  border: 1px solid transparent;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 2px;
+      background: white;
+      border-radius: 1px;
+    }
+  }
+}
+
+.nav-icon {
+  font-size: 1.1rem;
+}
+
+.nav-label {
+  font-weight: 600;
+}
+
+// User Section
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logout-section {
+  margin-left: 1rem;
+}
+
+.user-profile {
+  position: relative;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  i {
+    font-size: 1.1rem;
+    color: white;
+  }
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+    line-height: 1.2;
+  }
+
+  .user-role {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.dropdown-icon {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  transition: transform 0.3s ease;
+}
+
+.user-info:hover .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+// PrimeNG Overrides
+:host ::ng-deep {
+  .logout-btn {
+    .p-button {
+      background: linear-gradient(135deg, #ff4757, #ff3742);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      
+      &:hover {
+        background: linear-gradient(135deg, #ff3742, #ff2531);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      .p-button-label {
+        font-weight: 600;
+      }
+    }
+  }
+
+  .p-menu {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+
+    .p-menuitem-link {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin: 0.25rem;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+      }
+
+      .p-menuitem-icon {
+        color: #667eea;
+        margin-right: 0.75rem;
+      }
+
+      .p-menuitem-text {
+        font-weight: 500;
+      }
+    }
+
+    .p-menu-separator {
+      border-color: rgba(0, 0, 0, 0.1);
+      margin: 0.5rem 0;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .topbar-container {
+    padding: 0 1.5rem;
+  }
+
+  .nav-menu {
+    margin: 0 1rem;
+  }
+
+  .nav-link {
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .logo-text .app-subtitle {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    height: 60px;
+  }
+
+  .topbar-container {
+    padding: 0 1rem;
+  }
+
+  .logo-text .app-title {
+    font-size: 1.3rem;
+  }
+
+  .nav-menu {
+    display: none; // Mobile'da menüyü gizle, hamburger menü eklenebilir
+  }
+
+  .user-details .user-name {
+    display: none;
+  }
+
+  .user-details .user-role {
+    display: none;
+  }
+
+  .dropdown-icon {
+    display: none;
+  }
+
+  .user-info {
+    padding: 0.5rem;
+  }
+
+  .logout-section {
+    margin-left: 0.5rem;
+    
+    :host ::ng-deep .logout-btn .p-button {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      
+      .p-button-label {
+        display: none; // Mobile'da sadece icon göster
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text .app-title {
+    font-size: 1.1rem;
+  }
+
+  .logo-icon {
+    width: 35px;
+    height: 35px;
+
+    i {
+      font-size: 1.2rem;
+    }
+  }
+
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+
+    i {
+      font-size: 1rem;
+    }
+  }
+} 

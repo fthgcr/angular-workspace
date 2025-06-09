@@ -1,3 +1,4 @@
-<main>
+<app-topbar *ngIf="showTopbar"></app-topbar>
+<main [class.with-topbar]="showTopbar">
   <router-outlet></router-outlet>
 </main>

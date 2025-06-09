@@ -1,0 +1,61 @@
+<header class="topbar">
+  <div class="topbar-container">
+    <!-- Logo Section -->
+    <div class="logo-section" (click)="navigateTo(getDashboardRoute())">
+      <div class="logo-icon">
+        <i class="pi pi-balance-scale"></i>
+      </div>
+      <div class="logo-text">
+        <h1 class="app-title">LawPortal</h1>
+        <p class="app-subtitle">Legal Management System</p>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="nav-menu">
+      <ul class="nav-list">
+        <li class="nav-item" *ngFor="let item of menuItems">
+          <a 
+            class="nav-link" 
+            [routerLink]="item.route" 
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: item.route === getDashboardRoute()}"
+          >
+            <i class="nav-icon" [ngClass]="item.icon"></i>
+            <span class="nav-label">{{ item.label }}</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- User Section -->
+    <div class="user-section">
+      <!-- User Profile Dropdown -->
+      <div class="user-profile">
+        <p-menu #userMenu [model]="userMenuItems" [popup]="true"></p-menu>
+        <div class="user-info" (click)="userMenu.toggle($event)">
+          <div class="user-avatar">
+            <i class="pi pi-user"></i>
+          </div>
+          <div class="user-details">
+            <span class="user-name">{{ getUserDisplayName() }}</span>
+            <span class="user-role">{{ getRoleDisplayName() }}</span>
+          </div>
+          <i class="pi pi-chevron-down dropdown-icon"></i>
+        </div>
+      </div>
+
+      <!-- Direct Logout Button -->
+      <div class="logout-section">
+        <p-button 
+          icon="pi pi-sign-out" 
+          label="Logout"
+          styleClass="logout-btn"
+          (click)="logout()"
+          pTooltip="Sign out"
+          tooltipPosition="bottom"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+</header> 

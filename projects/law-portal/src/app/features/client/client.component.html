@@ -1,0 +1,146 @@
+<div class="client-dashboard">
+  <div class="header">
+    <h1>Müvekkil Paneli</h1>
+    <p>Dava ve dosya bilgilerinizi buradan takip edebilirsiniz.</p>
+  </div>
+
+  <div class="accordion-container">
+    
+    <!-- 1. Akordiyon - Davalarım -->
+    <div class="accordion-item">
+      <div class="accordion-header" (click)="toggleAccordion(1)">
+        <h3>📊 Davalarım</h3>
+        <span class="toggle-icon" [class.open]="accordionStates[1]">▼</span>
+      </div>
+      <div class="accordion-content" [class.open]="accordionStates[1]">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Dava No</th>
+                <th>Dava Başlığı</th>
+                <th>Durum</th>
+                <th>Başlangıç Tarihi</th>
+                <th>Açıklama</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let case of cases">
+                <td>{{case.id}}</td>
+                <td>{{case.title}}</td>
+                <td>
+                  <span [class]="getStatusClass(case.status)">
+                    {{case.status}}
+                  </span>
+                </td>
+                <td>{{formatDate(case.createdDate)}}</td>
+                <td>{{case.description}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Akordiyon - Dosyalarım -->
+    <div class="accordion-item">
+      <div class="accordion-header" (click)="toggleAccordion(2)">
+        <h3>📁 Dosyalarım</h3>
+        <span class="toggle-icon" [class.open]="accordionStates[2]">▼</span>
+      </div>
+      <div class="accordion-content" [class.open]="accordionStates[2]">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Dosya ID</th>
+                <th>Dosya Adı</th>
+                <th>Tür</th>
+                <th>Yükleme Tarihi</th>
+                <th>Boyut</th>
+                <th>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let document of documents">
+                <td>{{document.id}}</td>
+                <td>{{document.name}}</td>
+                <td>
+                  <span class="file-type-tag">{{document.type}}</span>
+                </td>
+                <td>{{formatDate(document.uploadDate)}}</td>
+                <td>{{document.size}}</td>
+                <td>
+                  <button class="download-btn" title="İndir">⬇</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Akordiyon - Gelecek İçin Rezerve -->
+    <div class="accordion-item">
+      <div class="accordion-header" (click)="toggleAccordion(3)">
+        <h3>⚖️ Üçüncü Akordiyon</h3>
+        <span class="toggle-icon" [class.open]="accordionStates[3]">▼</span>
+      </div>
+      <div class="accordion-content" [class.open]="accordionStates[3]">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Kolon 1</th>
+                <th>Kolon 2</th>
+                <th>Kolon 3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="thirdAccordionData.length === 0">
+                <td colspan="3" class="empty-message">Bu bölüm henüz hazır değil</td>
+              </tr>
+              <tr *ngFor="let item of thirdAccordionData">
+                <td>{{item.col1}}</td>
+                <td>{{item.col2}}</td>
+                <td>{{item.col3}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Akordiyon - Gelecek İçin Rezerve -->
+    <div class="accordion-item">
+      <div class="accordion-header" (click)="toggleAccordion(4)">
+        <h3>📋 Dördüncü Akordiyon</h3>
+        <span class="toggle-icon" [class.open]="accordionStates[4]">▼</span>
+      </div>
+      <div class="accordion-content" [class.open]="accordionStates[4]">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Kolon A</th>
+                <th>Kolon B</th>
+                <th>Kolon C</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="fourthAccordionData.length === 0">
+                <td colspan="3" class="empty-message">Bu bölüm henüz hazir değil</td>
+              </tr>
+              <tr *ngFor="let item of fourthAccordionData">
+                <td>{{item.colA}}</td>
+                <td>{{item.colB}}</td>
+                <td>{{item.colC}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div> 

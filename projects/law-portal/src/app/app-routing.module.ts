@@ -2,69 +2,59 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent, RegisterComponent } from 'shared-lib';
 import { AuthGuard } from './guards/auth.guard';
-import { AuthRedirectGuard } from './guards/auth-redirect.guard';
+import { NoAuthGuard } from './guards/no-auth.guard';
 import { RoleGuard } from './guards/role.guard';
+import { RedirectGuard } from './guards/redirect.guard';
+import { ClientComponent } from './features/client/client.component';
 
 export const routes: Routes = [
-  {
-    path: 'login',
-    component: LoginComponent,
-    canActivate: [AuthRedirectGuard]
+  // Ana sayfa - Kullanıcı girişi yapıp yapmadığına göre yönlendir
+  { path: '', canActivate: [RedirectGuard], children: [] },
+  
+  // Kimlik doğrulama sayfaları - Giriş yapmış kullanıcılar erişemez
+  { path: 'login', component: LoginComponent, canActivate: [NoAuthGuard] },
+  { path: 'register', component: RegisterComponent, canActivate: [NoAuthGuard] },
+  
+  // Client Component - Sadece USER rolü erişebilir
+  { 
+    path: 'client', 
+    component: ClientComponent, 
+    canActivate: [AuthGuard, RoleGuard], 
+    data: { roles: ['USER'] } 
   },
-  {
-    path: 'register',
-    component: RegisterComponent,
-    canActivate: [AuthRedirectGuard]
+  
+  // Admin Dashboard - Sadece ADMIN rolü erişebilir
+  { 
+    path: 'admin', 
+    loadChildren: () => import('./features/admin-dashboard/admin-dashboard.module').then(m => m.AdminDashboardModule),
+    canActivate: [AuthGuard, RoleGuard], 
+    data: { roles: ['ADMIN'] } 
   },
-  // Admin Dashboard
-  {
-    path: 'admin-dashboard',
-    canActivate: [AuthGuard, RoleGuard],
-    data: { expectedRole: 'ADMIN' },
-    loadChildren: () => import('./features/admin-dashboard/admin-dashboard.module').then(m => m.AdminDashboardModule)
+  
+  // Lawyer Dashboard - Sadece LAWYER rolü erişebilir
+  { 
+    path: 'lawyer', 
+    loadChildren: () => import('./features/lawyer-dashboard/lawyer-dashboard.module').then(m => m.LawyerDashboardModule),
+    canActivate: [AuthGuard, RoleGuard], 
+    data: { roles: ['LAWYER'] } 
   },
-  // Lawyer Dashboard
-  {
-    path: 'lawyer-dashboard',
-    canActivate: [AuthGuard, RoleGuard],
-    data: { expectedRole: 'LAWYER' },
-    loadChildren: () => import('./features/lawyer-dashboard/lawyer-dashboard.module').then(m => m.LawyerDashboardModule)
+  
+  // User Dashboard - USER rolü için (Client component'ine redirect edecek)
+  { 
+    path: 'dashboard', 
+    redirectTo: '/client', 
+    pathMatch: 'full'
   },
-  // Client Dashboard
-  {
-    path: 'client-dashboard',
-    canActivate: [AuthGuard, RoleGuard],
-    data: { expectedRole: 'CLIENT' },
-    loadChildren: () => import('./features/client-dashboard/client-dashboard.module').then(m => m.ClientDashboardModule)
+  
+  // Cases - Tüm kullanıcılar erişebilir (AuthGuard ile korunuyor)
+  { 
+    path: 'cases', 
+    loadChildren: () => import('./features/cases/cases.module').then(m => m.CasesModule),
+    canActivate: [AuthGuard] 
   },
-  // Default User Dashboard
-  {
-    path: 'dashboard',
-    canActivate: [AuthGuard, RoleGuard],
-    data: { expectedRole: 'USER' },
-    loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule)
-  },
-  // Cases (accessible by all authenticated users)
-  {
-    path: 'cases',
-    canActivate: [AuthGuard],
-    loadChildren: () => import('./features/cases/cases.module').then(m => m.CasesModule)
-  },
-  // Default route - redirect based on role
-  {
-    path: '',
-    canActivate: [AuthGuard],
-    children: [
-      {
-        path: '',
-        loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule)
-      }
-    ]
-  },
-  {
-    path: '**',
-    redirectTo: ''
-  }
+  
+  // Bilinmeyen route'lar için fallback
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({

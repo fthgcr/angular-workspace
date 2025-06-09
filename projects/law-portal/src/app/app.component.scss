@@ -1,0 +1,14 @@
+main {
+  min-height: 100vh;
+  
+  &.with-topbar {
+    padding-top: 70px; // Topbar yüksekliği kadar padding
+  }
+}
+
+// Global topbar responsive adjustment
+@media (max-width: 768px) {
+  main.with-topbar {
+    padding-top: 60px; // Mobile'da topbar daha kısa
+  }
+}
