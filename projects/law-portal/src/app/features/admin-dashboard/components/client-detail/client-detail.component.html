@@ -1,0 +1,155 @@
+<div class="client-detail-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="breadcrumb">
+      <button 
+        pButton 
+        class="p-button-text p-button-secondary"
+        icon="pi pi-arrow-left"
+        (click)="goBack()"
+      >
+        Geri Dön
+      </button>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-text">Müvekkiller</span>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">{{ client?.firstName }} {{ client?.lastName }}</span>
+    </div>
+  </div>
+
+  <!-- Client Info Section -->
+  <div class="client-info-section" *ngIf="client">
+    <div class="info-card">
+      <div class="card-header">
+        <h2>Müvekkil Bilgileri</h2>
+      </div>
+      <div class="card-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Ad Soyad:</label>
+            <span>{{ client.firstName }} {{ client.lastName }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email:</label>
+            <span>{{ client.email }}</span>
+          </div>
+          <div class="info-item">
+            <label>Telefon:</label>
+            <span>{{ client.phoneNumber }}</span>
+          </div>
+          <div class="info-item">
+            <label>Durum:</label>
+            <p-tag 
+              [severity]="client.enabled ? 'success' : 'danger'" 
+              [value]="client.enabled ? 'Aktif' : 'Pasif'"
+            ></p-tag>
+          </div>
+          <div class="info-item full-width">
+            <label>Adres:</label>
+            <span>{{ client.address }}</span>
+          </div>
+          <div class="info-item full-width" *ngIf="client.notes">
+            <label>Notlar:</label>
+            <span>{{ client.notes }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cases Section -->
+  <div class="cases-section">
+    <div class="section-header">
+      <h3>Davalar</h3>
+      <span class="case-count">{{ clientCases.length }} Dava</span>
+    </div>
+
+    <div class="table-section">
+      <p-table 
+        [value]="clientCases" 
+        [loading]="loading"
+        [paginator]="true" 
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
+        styleClass="modern-table"
+        responsiveLayout="scroll"
+        [scrollable]="true"
+        scrollHeight="300px"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="caseNumber">
+              Dava No 
+              <p-sortIcon field="caseNumber"></p-sortIcon>
+            </th>
+            <th pSortableColumn="title">
+              Başlık 
+              <p-sortIcon field="title"></p-sortIcon>
+            </th>
+            <th pSortableColumn="type">
+              Tür 
+              <p-sortIcon field="type"></p-sortIcon>
+            </th>
+            <th pSortableColumn="status">
+              Durum 
+              <p-sortIcon field="status"></p-sortIcon>
+            </th>
+            <th pSortableColumn="filingDate">
+              Açılış Tarihi 
+              <p-sortIcon field="filingDate"></p-sortIcon>
+            </th>
+            <th>İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-caseItem>
+          <tr>
+            <td>{{ caseItem.caseNumber }}</td>
+            <td>
+              <div class="case-title">
+                <strong>{{ caseItem.title }}</strong>
+                <small>{{ caseItem.description }}</small>
+              </div>
+            </td>
+            <td>
+              <p-tag 
+                severity="info" 
+                [value]="getTypeLabel(caseItem.type)"
+              ></p-tag>
+            </td>
+            <td>
+              <p-tag 
+                [severity]="getStatusSeverity(caseItem.status)" 
+                [value]="getStatusLabel(caseItem.status)"
+              ></p-tag>
+            </td>
+            <td>{{ caseItem.filingDate | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button 
+                  pButton 
+                  icon="pi pi-eye" 
+                  class="p-button-text p-button-rounded p-button-info"
+                  pTooltip="Dava Detaylarını Görüntüle"
+                  (click)="viewCaseDetails(caseItem)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center">
+              <div class="empty-state">
+                <i class="pi pi-folder-open" style="font-size: 3rem; color: #ccc;"></i>
+                <p>Bu müvekkile ait dava bulunamadı</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,339 @@
+<div class="case-management-container">
+  <!-- Header -->
+  <div class="header-section">
+    <div class="title-section">
+      <h2 class="page-title">
+        <i class="pi pi-briefcase"></i>
+        Dava Yönetimi
+      </h2>
+      <p class="page-subtitle">Dava dosyalarınızı buradan yönetebilirsiniz</p>
+    </div>
+    <div class="action-section">
+      <p-button 
+        label="Yeni Dava" 
+        icon="pi pi-plus" 
+        (click)="openNewCaseDialog()"
+        styleClass="primary-btn"
+      ></p-button>
+    </div>
+  </div>
+
+  <!-- Cases Table -->
+  <div class="table-section">
+    <p-table 
+      [value]="cases" 
+      [loading]="loading"
+      [paginator]="true" 
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
+      [globalFilterFields]="['caseNumber', 'title', 'description', 'status', 'type']"
+      styleClass="modern-table"
+      responsiveLayout="scroll"
+      [scrollable]="true"
+      scrollHeight="400px"
+      #caseTable
+    >
+      <ng-template pTemplate="caption">
+        <div class="table-header">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input 
+              pInputText 
+              type="text" 
+              placeholder="Dava ara..." 
+              (input)="caseTable.filterGlobal($any($event.target).value, 'contains')"
+              class="search-input"
+            />
+          </span>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="caseNumber">
+            Dava No <p-sortIcon field="caseNumber"></p-sortIcon>
+          </th>
+          <th pSortableColumn="title">
+            Başlık <p-sortIcon field="title"></p-sortIcon>
+          </th>
+          <th pSortableColumn="type">
+            Tür <p-sortIcon field="type"></p-sortIcon>
+          </th>
+          <th pSortableColumn="status">
+            Durum <p-sortIcon field="status"></p-sortIcon>
+          </th>
+          <th>Müvekkil</th>
+          <th pSortableColumn="filingDate">
+            Açılış Tarihi <p-sortIcon field="filingDate"></p-sortIcon>
+          </th>
+          <th>İşlemler</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-case>
+        <tr>
+          <td>
+            <div class="case-number">
+              <span class="case-badge">{{ case.caseNumber }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="case-info">
+              <div class="case-title">{{ case.title }}</div>
+              <div class="case-description" *ngIf="case.description">
+                {{ case.description | slice:0:50 }}{{case.description?.length > 50 ? '...' : ''}}
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="type-badge">{{ getTypeLabel(case.type) }}</span>
+          </td>
+          <td>
+            <p-tag 
+              [value]="getStatusLabel(case.status)" 
+              [severity]="getStatusSeverity(case.status)"
+            ></p-tag>
+          </td>
+          <td>
+            <div class="client-info" *ngIf="case.assignedUserId">
+              <i class="pi pi-user"></i>
+              {{ getClientName(case.assignedUserId) }}
+            </div>
+            <div class="no-client" *ngIf="!case.assignedUserId">
+              <i class="pi pi-minus-circle"></i>
+              Atanmamış
+            </div>
+          </td>
+          <td>{{ case.filingDate | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <div class="action-buttons">
+              <p-button 
+                icon="pi pi-file-o" 
+                styleClass="p-button-rounded p-button-text p-button-info"
+                pTooltip="Dökümanları Görüntüle"
+                tooltipPosition="top"
+              ></p-button>
+              <p-button 
+                icon="pi pi-pencil" 
+                styleClass="p-button-rounded p-button-text p-button-warning"
+                (click)="editCase(case)"
+                pTooltip="Düzenle"
+                tooltipPosition="top"
+              ></p-button>
+              <p-button 
+                icon="pi pi-trash" 
+                styleClass="p-button-rounded p-button-text p-button-danger"
+                (click)="deleteCase(case)"
+                pTooltip="Sil"
+                tooltipPosition="top"
+              ></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-briefcase"></i>
+              <h3>Henüz dava eklenmemiş</h3>
+              <p>İlk davanızı eklemek için "Yeni Dava" butonuna tıklayın</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Case Dialog -->
+  <p-dialog 
+    [header]="editingCase ? 'Dava Düzenle' : 'Yeni Dava Ekle'"
+    [(visible)]="showDialog"
+    [modal]="true"
+    [responsive]="true"
+    [style]="{width: '700px'}"
+    [maximizable]="false"
+    [closable]="true"
+    styleClass="modern-dialog"
+  >
+    <form [formGroup]="caseForm" (ngSubmit)="saveCase()">
+      <div class="form-grid">
+        <!-- Case Information -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="pi pi-info-circle"></i>
+            Dava Bilgileri
+          </h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="caseNumber">Dava Numarası *</label>
+              <div class="input-group">
+                <input 
+                  id="caseNumber"
+                  type="text" 
+                  pInputText 
+                  formControlName="caseNumber"
+                  placeholder="Dava numarasını girin"
+                  class="flex-1"
+                />
+                <p-button 
+                  icon="pi pi-refresh" 
+                  (click)="generateCaseNumber()"
+                  styleClass="p-button-secondary p-button-sm"
+                  pTooltip="Otomatik oluştur"
+                  type="button"
+                ></p-button>
+              </div>
+              <small class="error-message" *ngIf="getFieldError('caseNumber')">
+                {{ getFieldError('caseNumber') }}
+              </small>
+            </div>
+            
+            <div class="form-group">
+              <label for="title">Dava Başlığı *</label>
+              <input 
+                id="title"
+                type="text" 
+                pInputText 
+                formControlName="title"
+                placeholder="Dava başlığını girin"
+                class="w-full"
+              />
+              <small class="error-message" *ngIf="getFieldError('title')">
+                {{ getFieldError('title') }}
+              </small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Açıklama</label>
+            <textarea 
+              id="description"
+              pInputTextarea 
+              formControlName="description"
+              placeholder="Dava açıklaması"
+              [rows]="4"
+              class="w-full"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Case Details -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="pi pi-cog"></i>
+            Dava Detayları
+          </h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="type">Dava Türü *</label>
+              <p-dropdown 
+                id="type"
+                formControlName="type"
+                [options]="caseTypeOptions"
+                placeholder="Dava türünü seçin"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+              ></p-dropdown>
+              <small class="error-message" *ngIf="getFieldError('type')">
+                {{ getFieldError('type') }}
+              </small>
+            </div>
+            
+            <div class="form-group">
+              <label for="status">Durum *</label>
+              <p-dropdown 
+                id="status"
+                formControlName="status"
+                [options]="caseStatusOptions"
+                placeholder="Durumu seçin"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+              ></p-dropdown>
+              <small class="error-message" *ngIf="getFieldError('status')">
+                {{ getFieldError('status') }}
+              </small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="filingDate">Açılış Tarihi *</label>
+              <p-calendar 
+                id="filingDate"
+                formControlName="filingDate"
+                placeholder="Tarihi seçin"
+                [showIcon]="true"
+                dateFormat="dd/mm/yy"
+                class="w-full"
+              ></p-calendar>
+              <small class="error-message" *ngIf="getFieldError('filingDate')">
+                {{ getFieldError('filingDate') }}
+              </small>
+            </div>
+            
+            <div class="form-group">
+              <label for="assignedUserId">Müvekkil</label>
+              <p-dropdown 
+                id="assignedUserId"
+                formControlName="assignedUserId"
+                [options]="clients"
+                placeholder="Müvekkil seçin"
+                optionLabel="firstName"
+                optionValue="id"
+                class="w-full"
+                [showClear]="true"
+              >
+                <ng-template pTemplate="selectedItem" let-selectedOption>
+                  <div class="client-option" *ngIf="selectedOption">
+                    <i class="pi pi-user"></i>
+                    {{ selectedOption.firstName }} {{ selectedOption.lastName }}
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="item" let-client>
+                  <div class="client-option">
+                    <i class="pi pi-user"></i>
+                    <div class="client-details">
+                      <div class="client-name">{{ client.firstName }} {{ client.lastName }}</div>
+                      <div class="client-email">{{ client.email }}</div>
+                    </div>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer">
+        <p-button 
+          label="İptal" 
+          icon="pi pi-times" 
+          (click)="cancelDialog()"
+          styleClass="p-button-text"
+        ></p-button>
+        <p-button 
+          [label]="editingCase ? 'Güncelle' : 'Ekle'"
+          icon="pi pi-check" 
+          (click)="saveCase()"
+          [disabled]="caseForm.invalid"
+          styleClass="primary-btn"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
+
+<!-- Toast Messages -->
+<p-toast position="top-right"></p-toast>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog> 

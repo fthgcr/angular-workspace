@@ -1,1 +1,72 @@
-/* You can add global styles to this file, and also import other style files */
+/* ===== GLOBAL STYLES - SIMPLIFIED ===== */
+
+/* Basic reset */
+* {
+  box-sizing: border-box;
+}
+
+/* Body and HTML - Basic setup */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  background: #f8fafc;
+  /* DO NOT hide scrollbar globally */
+}
+
+/* Hide scrollbar ONLY for auth pages */
+app-login, app-register {
+  overflow: hidden !important;
+  
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    
+    &::-webkit-scrollbar {
+      display: none !important;
+      width: 0px !important;
+      height: 0px !important;
+    }
+  }
+}
+
+/* FORCE scrollbar for ALL table components */
+.p-datatable-wrapper,
+.p-datatable-scrollable-wrapper,
+.p-datatable-scrollable-body {
+  scrollbar-width: auto !important;
+  -ms-overflow-style: auto !important;
+  overflow: auto !important;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar,
+.p-datatable-scrollable-wrapper::-webkit-scrollbar,
+.p-datatable-scrollable-body::-webkit-scrollbar {
+  display: block !important;
+  width: 16px !important;
+  height: 16px !important;
+  background: #f1f1f1 !important;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-track,
+.p-datatable-scrollable-wrapper::-webkit-scrollbar-track,
+.p-datatable-scrollable-body::-webkit-scrollbar-track {
+  display: block !important;
+  background: #f1f1f1 !important;
+  border-radius: 8px !important;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-thumb,
+.p-datatable-scrollable-wrapper::-webkit-scrollbar-thumb,
+.p-datatable-scrollable-body::-webkit-scrollbar-thumb {
+  display: block !important;
+  background: #888 !important;
+  border-radius: 8px !important;
+  border: 2px solid #f1f1f1 !important;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-thumb:hover,
+.p-datatable-scrollable-wrapper::-webkit-scrollbar-thumb:hover,
+.p-datatable-scrollable-body::-webkit-scrollbar-thumb:hover {
+  background: #555 !important;
+}

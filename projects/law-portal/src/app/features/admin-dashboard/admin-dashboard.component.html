@@ -1,63 +1,234 @@
-<div class="admin-dashboard">
+<div class="admin-dashboard-container">
+  <!-- Header -->
   <div class="dashboard-header">
-    <h1>Admin Dashboard</h1>
-    <div class="user-info">
-      <span>Welcome, {{ currentUser?.username }}!</span>
-      <button type="button" class="btn btn-outline-secondary" (click)="logout()">Logout</button>
+    <div class="header-content">
+      <h1 class="dashboard-title">
+        <i class="pi pi-cog"></i>
+        Admin Dashboard
+      </h1>
+      <div class="header-stats">
+        <div class="stat-item">
+          <span class="stat-value">{{ totalClients }}</span>
+          <span class="stat-label">Müvekkil</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ totalCases }}</span>
+          <span class="stat-label">Dava</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ totalDocuments }}</span>
+          <span class="stat-label">Doküman</span>
+        </div>
+      </div>
     </div>
   </div>
-  
-  <div class="dashboard-content">
-    <div class="row">
-      <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card stat-card">
-          <div class="card-body">
-            <h5 class="card-title">Total Users</h5>
-            <h2 class="text-primary">1,234</h2>
-          </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card clients">
+        <div class="stat-icon">
+          <i class="pi pi-users"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ totalClients }}</h3>
+          <p>Toplam Müvekkil</p>
+          <small>+12% bu ay</small>
         </div>
       </div>
-      
-      <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card stat-card">
-          <div class="card-body">
-            <h5 class="card-title">Active Cases</h5>
-            <h2 class="text-success">89</h2>
-          </div>
+
+      <div class="stat-card cases">
+        <div class="stat-icon">
+          <i class="pi pi-briefcase"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ totalCases }}</h3>
+          <p>Aktif Dava</p>
+          <small>+8% bu ay</small>
         </div>
       </div>
-      
-      <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card stat-card">
-          <div class="card-body">
-            <h5 class="card-title">Lawyers</h5>
-            <h2 class="text-info">45</h2>
-          </div>
+
+      <div class="stat-card documents">
+        <div class="stat-icon">
+          <i class="pi pi-file"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ totalDocuments }}</h3>
+          <p>Toplam Doküman</p>
+          <small>+25% bu ay</small>
         </div>
       </div>
-      
-      <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card stat-card">
-          <div class="card-body">
-            <h5 class="card-title">Clients</h5>
-            <h2 class="text-warning">567</h2>
-          </div>
+
+      <div class="stat-card revenue">
+        <div class="stat-icon">
+          <i class="pi pi-chart-line"></i>
+        </div>
+        <div class="stat-info">
+          <h3>₺124.5K</h3>
+          <p>Bu Ay Gelir</p>
+          <small>+15% geçen aya göre</small>
         </div>
       </div>
     </div>
-    
-    <div class="row mt-4">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h5>Admin Actions</h5>
-          </div>
-          <div class="card-body">
-            <div class="btn-group-vertical w-100" role="group">
-              <button type="button" class="btn btn-primary mb-2">Manage Users</button>
-              <button type="button" class="btn btn-secondary mb-2">System Settings</button>
-              <button type="button" class="btn btn-info mb-2">View Reports</button>
-              <button type="button" class="btn btn-success mb-2">Backup Data</button>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="management-section">
+    <!-- Custom Tab Navigation -->
+    <div class="custom-tab-menu">
+      <button 
+        *ngFor="let item of menuItems"
+        [class]="'tab-button ' + (activeTab === item.id ? 'active' : '')"
+        (click)="switchTab(item.id!)"
+        type="button"
+      >
+        <i [class]="item.icon"></i>
+        {{ item.label }}
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <!-- Client Management -->
+      <div *ngIf="activeTab === 'clients'" class="tab-panel">
+        <app-client-management></app-client-management>
+      </div>
+
+      <!-- Case Management -->
+      <div *ngIf="activeTab === 'cases'" class="tab-panel">
+        <app-case-management></app-case-management>
+      </div>
+
+      <!-- Document Management -->
+      <div *ngIf="activeTab === 'documents'" class="tab-panel">
+        <app-document-management></app-document-management>
+      </div>
+
+      <!-- Dashboard Overview -->
+      <div *ngIf="activeTab === 'overview'" class="tab-panel">
+        <div class="overview-content">
+          <div class="overview-grid">
+            <!-- Recent Activities -->
+            <div class="overview-card">
+              <h3>
+                <i class="pi pi-clock"></i>
+                Son Aktiviteler
+              </h3>
+              <div class="activity-list">
+                <div class="activity-item">
+                  <div class="activity-icon">
+                    <i class="pi pi-user-plus"></i>
+                  </div>
+                  <div class="activity-content">
+                    <p><strong>Yeni müvekkil eklendi:</strong> Ahmet Yılmaz</p>
+                    <small>2 saat önce</small>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon">
+                    <i class="pi pi-briefcase"></i>
+                  </div>
+                  <div class="activity-content">
+                    <p><strong>Dava güncellendi:</strong> CASE-2024-001</p>
+                    <small>4 saat önce</small>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon">
+                    <i class="pi pi-file-o"></i>
+                  </div>
+                  <div class="activity-content">
+                    <p><strong>Doküman yüklendi:</strong> Dava Dilekçesi</p>
+                    <small>1 gün önce</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="overview-card">
+              <h3>
+                <i class="pi pi-bolt"></i>
+                Hızlı İşlemler
+              </h3>
+              <div class="quick-actions">
+                <p-button 
+                  label="Yeni Müvekkil" 
+                  icon="pi pi-user-plus"
+                  styleClass="p-button-outlined w-100 mb-2"
+                  (click)="switchTab('clients')"
+                ></p-button>
+                <p-button 
+                  label="Yeni Dava" 
+                  icon="pi pi-plus"
+                  styleClass="p-button-outlined w-100 mb-2"
+                  (click)="switchTab('cases')"
+                ></p-button>
+                <p-button 
+                  label="Doküman Yükle" 
+                  icon="pi pi-upload"
+                  styleClass="p-button-outlined w-100 mb-2"
+                  (click)="switchTab('documents')"
+                ></p-button>
+                <p-button 
+                  label="Rapor Oluştur" 
+                  icon="pi pi-chart-bar"
+                  styleClass="p-button-outlined w-100"
+                ></p-button>
+              </div>
+            </div>
+
+            <!-- Case Status Chart -->
+            <div class="overview-card chart-card">
+              <h3>
+                <i class="pi pi-chart-pie"></i>
+                Dava Durumu Dağılımı
+              </h3>
+              <div class="chart-container">
+                <div class="chart-placeholder">
+                  <div class="chart-item">
+                    <span class="chart-dot open"></span>
+                    <span>Açık: 12</span>
+                  </div>
+                  <div class="chart-item">
+                    <span class="chart-dot progress"></span>
+                    <span>Devam Eden: 8</span>
+                  </div>
+                  <div class="chart-item">
+                    <span class="chart-dot pending"></span>
+                    <span>Beklemede: 3</span>
+                  </div>
+                  <div class="chart-item">
+                    <span class="chart-dot closed"></span>
+                    <span>Kapalı: 15</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Monthly Performance -->
+            <div class="overview-card">
+              <h3>
+                <i class="pi pi-calendar"></i>
+                Aylık Performans
+              </h3>
+              <div class="performance-stats">
+                <div class="perf-item">
+                  <div class="perf-label">Yeni Müvekkiller</div>
+                  <div class="perf-value">+12</div>
+                  <div class="perf-change positive">↑ 15%</div>
+                </div>
+                <div class="perf-item">
+                  <div class="perf-label">Tamamlanan Davalar</div>
+                  <div class="perf-value">8</div>
+                  <div class="perf-change positive">↑ 25%</div>
+                </div>
+                <div class="perf-item">
+                  <div class="perf-label">Yüklenen Dokümanlar</div>
+                  <div class="perf-value">45</div>
+                  <div class="perf-change positive">↑ 30%</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -1,0 +1,162 @@
+<div class="case-detail-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="breadcrumb">
+      <button 
+        pButton 
+        class="p-button-text p-button-secondary"
+        icon="pi pi-arrow-left"
+        (click)="goBack()"
+      >
+        Geri Dön
+      </button>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-text">{{ client?.firstName }} {{ client?.lastName }}</span>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">{{ case?.title }}</span>
+    </div>
+  </div>
+
+  <!-- Case Info Section -->
+  <div class="case-info-section" *ngIf="case">
+    <div class="info-card">
+      <div class="card-header">
+        <h2>Dava Bilgileri</h2>
+        <p-tag 
+          [severity]="getStatusSeverity(case.status)" 
+          [value]="getStatusLabel(case.status)"
+          class="status-tag"
+        ></p-tag>
+      </div>
+      <div class="card-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Dava No:</label>
+            <span>{{ case.caseNumber }}</span>
+          </div>
+          <div class="info-item">
+            <label>Müvekkil:</label>
+            <span>{{ client?.firstName }} {{ client?.lastName }}</span>
+          </div>
+          <div class="info-item">
+            <label>Dava Türü:</label>
+            <p-tag 
+              severity="info" 
+              [value]="getTypeLabel(case.type)"
+            ></p-tag>
+          </div>
+          <div class="info-item">
+            <label>Açılış Tarihi:</label>
+            <span>{{ case.filingDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item full-width">
+            <label>Başlık:</label>
+            <span class="case-title">{{ case.title }}</span>
+          </div>
+          <div class="info-item full-width">
+            <label>Açıklama:</label>
+            <span>{{ case.description }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documents Section -->
+  <div class="documents-section">
+    <div class="section-header">
+      <h3>Dokümanlar</h3>
+      <span class="document-count">{{ caseDocuments.length }} Doküman</span>
+    </div>
+
+    <div class="table-section">
+      <p-table 
+        [value]="caseDocuments" 
+        [loading]="loading"
+        [paginator]="true" 
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
+        styleClass="modern-table"
+        responsiveLayout="scroll"
+        [scrollable]="true"
+        scrollHeight="400px"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 60px">Tür</th>
+            <th pSortableColumn="title">
+              Başlık 
+              <p-sortIcon field="title"></p-sortIcon>
+            </th>
+            <th pSortableColumn="fileName">
+              Dosya Adı 
+              <p-sortIcon field="fileName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="type">
+              Kategori 
+              <p-sortIcon field="type"></p-sortIcon>
+            </th>
+            <th pSortableColumn="fileSize">
+              Boyut 
+              <p-sortIcon field="fileSize"></p-sortIcon>
+            </th>
+            <th pSortableColumn="uploadDate">
+              Yükleme Tarihi 
+              <p-sortIcon field="uploadDate"></p-sortIcon>
+            </th>
+            <th>İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-document>
+          <tr>
+            <td>
+              <i [class]="getFileIcon(document.fileName)" 
+                 style="font-size: 24px; color: #dc3545;"></i>
+            </td>
+            <td>
+              <div class="document-info">
+                <strong>{{ document.title }}</strong>
+                <small>{{ document.description }}</small>
+              </div>
+            </td>
+            <td>
+              <span class="file-name">{{ document.fileName }}</span>
+            </td>
+            <td>
+              <p-tag 
+                severity="secondary" 
+                [value]="getDocumentTypeLabel(document.type)"
+              ></p-tag>
+            </td>
+            <td>{{ formatFileSize(document.fileSize) }}</td>
+            <td>{{ document.uploadDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button 
+                  pButton 
+                  icon="pi pi-download" 
+                  class="p-button-text p-button-rounded p-button-success"
+                  pTooltip="Dosyayı İndir"
+                  (click)="downloadDocument(document)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center">
+              <div class="empty-state">
+                <i class="pi pi-file" style="font-size: 3rem; color: #ccc;"></i>
+                <p>Bu davaya ait doküman bulunamadı</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div> 

@@ -8,14 +8,29 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   overflow: hidden;
   
-  /* Global scrollbar gizleme */
-  ::-webkit-scrollbar {
-    display: none;
+  /* Sadece bu component için scrollbar gizleme */
+  &::-webkit-scrollbar {
+    display: none !important;
+    width: 0px !important;
+    height: 0px !important;
+    background: transparent !important;
   }
   
-  /* Firefox için */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  &::-webkit-scrollbar-track {
+    display: none !important;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    display: none !important;
+  }
+  
+  &::-webkit-scrollbar-corner {
+    display: none !important;
+  }
+  
+  /* Firefox ve IE için - sadece bu host */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
 .login-container {
@@ -27,6 +42,16 @@
   padding: 2rem;
   position: relative;
   overflow: hidden;
+  
+  /* Bu container için de scrollbar gizleme */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  
+  &::-webkit-scrollbar {
+    display: none !important;
+    width: 0px !important;
+    height: 0px !important;
+  }
 }
 
 .login-card {

@@ -1,0 +1,353 @@
+<div class="client-management-container">
+  <!-- Header -->
+  <div class="header-section">
+    <div class="title-section">
+      <h2 class="page-title">
+        <i class="pi pi-users"></i>
+        Müvekkil Yönetimi
+      </h2>
+      <p class="page-subtitle">Müvekkillerinizi buradan yönetebilirsiniz</p>
+    </div>
+    <div class="action-section">
+      <p-button 
+        label="Yeni Müvekkil" 
+        icon="pi pi-plus" 
+        (click)="openNewClientDialog()"
+        styleClass="primary-btn"
+      ></p-button>
+    </div>
+  </div>
+
+  <!-- Clients Table -->
+  <div class="table-section">
+    <p-table 
+      [value]="clients" 
+      [loading]="loading"
+      [paginator]="true" 
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
+      [globalFilterFields]="['firstName', 'lastName', 'email', 'username']"
+      styleClass="modern-table"
+      responsiveLayout="scroll"
+      [scrollable]="true"
+      scrollHeight="400px"
+      #clientTable
+    >
+      <ng-template pTemplate="caption">
+        <div class="table-header">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input 
+              pInputText 
+              type="text" 
+              placeholder="Müvekkil ara..." 
+              (input)="clientTable.filterGlobal($any($event.target).value, 'contains')"
+              class="search-input"
+            />
+          </span>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="firstName">
+            Ad Soyad <p-sortIcon field="firstName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="email">
+            Email <p-sortIcon field="email"></p-sortIcon>
+          </th>
+          <th pSortableColumn="username">
+            Kullanıcı Adı <p-sortIcon field="username"></p-sortIcon>
+          </th>
+          <th>İletişim</th>
+          <th pSortableColumn="enabled">
+            Durum <p-sortIcon field="enabled"></p-sortIcon>
+          </th>
+          <th pSortableColumn="createdDate">
+            Kayıt Tarihi <p-sortIcon field="createdDate"></p-sortIcon>
+          </th>
+          <th>İşlemler</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-client>
+        <tr>
+          <td>
+            <div class="user-info">
+              <div class="user-avatar">
+                <i class="pi pi-user"></i>
+              </div>
+              <div class="user-details">
+                <div class="user-name">{{ client.firstName }} {{ client.lastName }}</div>
+                <div class="user-note" *ngIf="client.notes">{{ client.notes }}</div>
+              </div>
+            </div>
+          </td>
+          <td>{{ client.email }}</td>
+          <td>
+            <span class="username-badge">{{ client.username }}</span>
+          </td>
+          <td>
+            <div class="contact-info">
+              <div *ngIf="client.phoneNumber" class="contact-item">
+                <i class="pi pi-phone"></i>
+                {{ client.phoneNumber }}
+              </div>
+              <div *ngIf="client.address" class="contact-item">
+                <i class="pi pi-map-marker"></i>
+                {{ client.address }}
+              </div>
+            </div>
+          </td>
+          <td>
+            <p-tag 
+              [value]="client.enabled ? 'Aktif' : 'Pasif'" 
+              [severity]="client.enabled ? 'success' : 'danger'"
+            ></p-tag>
+          </td>
+          <td>{{ client.createdDate | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <div class="action-buttons">
+              <p-button 
+                icon="pi pi-eye" 
+                styleClass="p-button-rounded p-button-text p-button-info"
+                (click)="viewClientDetails(client)"
+                pTooltip="Davaları Görüntüle"
+                tooltipPosition="top"
+              ></p-button>
+              <p-button 
+                icon="pi pi-pencil" 
+                styleClass="p-button-rounded p-button-text p-button-warning"
+                (click)="editClient(client)"
+                pTooltip="Düzenle"
+                tooltipPosition="top"
+              ></p-button>
+              <p-button 
+                icon="pi pi-trash" 
+                styleClass="p-button-rounded p-button-text p-button-danger"
+                (click)="deleteClient(client)"
+                pTooltip="Sil"
+                tooltipPosition="top"
+              ></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-users"></i>
+              <h3>Henüz müvekkil eklenmemiş</h3>
+              <p>İlk müvekkilinizi eklemek için "Yeni Müvekkil" butonuna tıklayın</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Client Dialog -->
+  <p-dialog 
+    [header]="editingClient ? 'Müvekkil Düzenle' : 'Yeni Müvekkil Ekle'"
+    [(visible)]="showDialog"
+    [modal]="true"
+    [responsive]="true"
+    [style]="{width: '600px'}"
+    [maximizable]="false"
+    [closable]="true"
+    styleClass="modern-dialog"
+  >
+    <form [formGroup]="clientForm" (ngSubmit)="saveClient()">
+      <div class="form-grid">
+        <!-- Personal Information -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="pi pi-user"></i>
+            Kişisel Bilgiler
+          </h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">Ad *</label>
+              <input 
+                id="firstName"
+                type="text" 
+                pInputText 
+                formControlName="firstName"
+                placeholder="Adını girin"
+                class="w-full"
+              />
+              <small class="error-message" *ngIf="getFieldError('firstName')">
+                {{ getFieldError('firstName') }}
+              </small>
+            </div>
+            
+            <div class="form-group">
+              <label for="lastName">Soyad *</label>
+              <input 
+                id="lastName"
+                type="text" 
+                pInputText 
+                formControlName="lastName"
+                placeholder="Soyadını girin"
+                class="w-full"
+              />
+              <small class="error-message" *ngIf="getFieldError('lastName')">
+                {{ getFieldError('lastName') }}
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Information -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="pi pi-cog"></i>
+            Hesap Bilgileri
+          </h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="username">Kullanıcı Adı *</label>
+              <input 
+                id="username"
+                type="text" 
+                pInputText 
+                formControlName="username"
+                placeholder="Kullanıcı adını girin"
+                class="w-full"
+              />
+              <small class="error-message" *ngIf="getFieldError('username')">
+                {{ getFieldError('username') }}
+              </small>
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input 
+                id="email"
+                type="email" 
+                pInputText 
+                formControlName="email"
+                placeholder="Email adresini girin"
+                class="w-full"
+              />
+              <small class="error-message" *ngIf="getFieldError('email')">
+                {{ getFieldError('email') }}
+              </small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Şifre *</label>
+            <input 
+              id="password"
+              type="password" 
+              pInputText 
+              formControlName="password"
+              placeholder="Şifre girin (min. 6 karakter)"
+              class="w-full"
+              [style.display]="editingClient ? 'none' : 'block'"
+            />
+            <small class="password-note" *ngIf="editingClient" style="color: #6b7280; font-size: 0.8rem;">
+              Şifre değiştirmek için ayrı bir işlem gereklidir
+            </small>
+            <small class="error-message" *ngIf="getFieldError('password') && !editingClient">
+              {{ getFieldError('password') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="pi pi-phone"></i>
+            İletişim Bilgileri
+          </h4>
+          
+          <div class="form-group">
+            <label for="phoneNumber">Telefon</label>
+            <input 
+              id="phoneNumber"
+              type="tel" 
+              pInputText 
+              formControlName="phoneNumber"
+              placeholder="Telefon numarasını girin"
+              class="w-full"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="address">Adres</label>
+            <textarea 
+              id="address"
+              pInputTextarea 
+              formControlName="address"
+              placeholder="Adresini girin"
+              [rows]="3"
+              class="w-full"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="pi pi-info-circle"></i>
+            Ek Bilgiler
+          </h4>
+          
+          <div class="form-group">
+            <label for="notes">Notlar</label>
+            <textarea 
+              id="notes"
+              pInputTextarea 
+              formControlName="notes"
+              placeholder="Özel notlar ekleyin"
+              [rows]="3"
+              class="w-full"
+            ></textarea>
+          </div>
+          
+          <div class="form-group">
+            <div class="checkbox-wrapper">
+              <p-checkbox 
+                formControlName="enabled" 
+                [binary]="true" 
+                inputId="enabled"
+              ></p-checkbox>
+              <label for="enabled">Hesap aktif</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer">
+        <p-button 
+          label="İptal" 
+          icon="pi pi-times" 
+          (click)="cancelDialog()"
+          styleClass="p-button-text"
+        ></p-button>
+        <p-button 
+          [label]="editingClient ? 'Güncelle' : 'Ekle'"
+          icon="pi pi-check" 
+          (click)="saveClient()"
+          [disabled]="clientForm.invalid"
+          styleClass="primary-btn"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
+
+<!-- Toast Messages -->
+<p-toast position="top-right"></p-toast>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog> 

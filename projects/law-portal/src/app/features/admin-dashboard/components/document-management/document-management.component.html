@@ -1,0 +1,315 @@
+<div class="document-management-container">
+  <!-- Header -->
+  <div class="header-section">
+    <div class="title-section">
+      <h2 class="page-title">
+        <i class="pi pi-file"></i>
+        Doküman Yönetimi
+      </h2>
+      <p class="page-subtitle">Dava dokümanlarınızı buradan yönetebilirsiniz</p>
+    </div>
+    <div class="action-section">
+      <p-button 
+        label="Yeni Doküman" 
+        icon="pi pi-plus" 
+        (click)="openNewDocumentDialog()"
+        styleClass="primary-btn"
+      ></p-button>
+    </div>
+  </div>
+
+  <!-- Documents Table -->
+  <div class="table-section">
+    <p-table 
+      [value]="documents" 
+      [loading]="loading"
+      [paginator]="true" 
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
+      [globalFilterFields]="['title', 'fileName', 'description', 'type']"
+      styleClass="modern-table"
+      responsiveLayout="scroll"
+      #documentTable
+    >
+      <ng-template pTemplate="caption">
+        <div class="table-header">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input 
+              pInputText 
+              type="text" 
+              placeholder="Doküman ara..." 
+              (input)="documentTable.filterGlobal($any($event.target).value, 'contains')"
+              class="search-input"
+            />
+          </span>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="title">
+            Başlık <p-sortIcon field="title"></p-sortIcon>
+          </th>
+          <th pSortableColumn="fileName">
+            Dosya Adı <p-sortIcon field="fileName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="type">
+            Tür <p-sortIcon field="type"></p-sortIcon>
+          </th>
+          <th>Dava</th>
+          <th pSortableColumn="fileSize">
+            Boyut <p-sortIcon field="fileSize"></p-sortIcon>
+          </th>
+          <th pSortableColumn="createdDate">
+            Tarih <p-sortIcon field="createdDate"></p-sortIcon>
+          </th>
+          <th>İşlemler</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-document>
+        <tr>
+          <td>
+            <div class="document-info">
+              <div class="document-icon">
+                <i [class]="getFileIcon(document.contentType)"></i>
+              </div>
+              <div class="document-details">
+                <div class="document-title">{{ document.title }}</div>
+                <div class="document-description" *ngIf="document.description">
+                  {{ document.description | slice:0:50 }}{{document.description?.length > 50 ? '...' : ''}}
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="file-name">{{ document.fileName }}</span>
+          </td>
+          <td>
+            <span class="type-badge">{{ getTypeLabel(document.type) }}</span>
+          </td>
+          <td>
+            <div class="case-info" *ngIf="document.legalCaseId">
+              <div class="case-number">{{ getCaseNumber(document.legalCaseId) }}</div>
+              <div class="case-name">{{ getCaseName(document.legalCaseId) }}</div>
+            </div>
+            <div class="no-case" *ngIf="!document.legalCaseId">
+              <i class="pi pi-minus-circle"></i>
+              Atanmamış
+            </div>
+          </td>
+          <td>
+            <span class="file-size">{{ getFileSizeText(document.fileSize) }}</span>
+          </td>
+          <td>{{ document.createdDate | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <div class="action-buttons">
+              <p-button 
+                icon="pi pi-download" 
+                styleClass="p-button-rounded p-button-text p-button-info"
+                (click)="downloadDocument(document)"
+                pTooltip="İndir"
+                tooltipPosition="top"
+              ></p-button>
+              <p-button 
+                icon="pi pi-pencil" 
+                styleClass="p-button-rounded p-button-text p-button-warning"
+                (click)="editDocument(document)"
+                pTooltip="Düzenle"
+                tooltipPosition="top"
+              ></p-button>
+              <p-button 
+                icon="pi pi-trash" 
+                styleClass="p-button-rounded p-button-text p-button-danger"
+                (click)="deleteDocument(document)"
+                pTooltip="Sil"
+                tooltipPosition="top"
+              ></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-file"></i>
+              <h3>Henüz doküman eklenmemiş</h3>
+              <p>İlk dokümanınızı eklemek için "Yeni Doküman" butonuna tıklayın</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Document Dialog -->
+  <p-dialog 
+    [header]="editingDocument ? 'Doküman Düzenle' : 'Yeni Doküman Ekle'"
+    [(visible)]="showDialog"
+    [modal]="true"
+    [responsive]="true"
+    [style]="{width: '650px'}"
+    [maximizable]="false"
+    [closable]="true"
+    styleClass="modern-dialog"
+  >
+    <form [formGroup]="documentForm" (ngSubmit)="saveDocument()">
+      <div class="form-grid">
+        <!-- File Upload Section -->
+        <div class="form-section" *ngIf="!editingDocument">
+          <h4 class="section-title">
+            <i class="pi pi-upload"></i>
+            Dosya Yükle
+          </h4>
+          
+          <div class="upload-section">
+            <p-fileUpload 
+              mode="basic" 
+              name="document[]"
+              [maxFileSize]="10000000"
+              chooseLabel="Dosya Seç"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+              (onSelect)="onFileSelect($event)"
+              (onRemove)="onFileRemove()"
+              [auto]="false"
+              styleClass="upload-btn"
+            ></p-fileUpload>
+            
+            <div class="file-info" *ngIf="selectedFile">
+              <div class="selected-file">
+                <i [class]="getFileIcon(selectedFile.type)"></i>
+                <span>{{ selectedFile.name }}</span>
+                <small>{{ getFileSizeText(selectedFile.size) }}</small>
+              </div>
+            </div>
+            
+            <small class="upload-help">
+              PDF, Word, Excel, resim dosyaları desteklenmektedir. Maksimum 10MB.
+            </small>
+          </div>
+        </div>
+
+        <!-- Document Information -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="pi pi-info-circle"></i>
+            Doküman Bilgileri
+          </h4>
+          
+          <div class="form-group">
+            <label for="title">Başlık *</label>
+            <input 
+              id="title"
+              type="text" 
+              pInputText 
+              formControlName="title"
+              placeholder="Doküman başlığını girin"
+              class="w-full"
+            />
+            <small class="error-message" *ngIf="getFieldError('title')">
+              {{ getFieldError('title') }}
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Açıklama</label>
+            <textarea 
+              id="description"
+              pInputTextarea 
+              formControlName="description"
+              placeholder="Doküman açıklaması"
+              [rows]="3"
+              class="w-full"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Document Details -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="pi pi-cog"></i>
+            Kategori ve Dava
+          </h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="type">Doküman Türü *</label>
+              <p-dropdown 
+                id="type"
+                formControlName="type"
+                [options]="documentTypeOptions"
+                placeholder="Türü seçin"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+              ></p-dropdown>
+              <small class="error-message" *ngIf="getFieldError('type')">
+                {{ getFieldError('type') }}
+              </small>
+            </div>
+            
+            <div class="form-group">
+              <label for="legalCaseId">Dava *</label>
+              <p-dropdown 
+                id="legalCaseId"
+                formControlName="legalCaseId"
+                [options]="cases"
+                placeholder="Dava seçin"
+                optionLabel="title"
+                optionValue="id"
+                class="w-full"
+              >
+                <ng-template pTemplate="selectedItem" let-selectedCase>
+                  <div class="case-option" *ngIf="selectedCase">
+                    <i class="pi pi-briefcase"></i>
+                    {{ selectedCase.caseNumber }} - {{ selectedCase.title }}
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="item" let-case>
+                  <div class="case-option">
+                    <i class="pi pi-briefcase"></i>
+                    <div class="case-details">
+                      <div class="case-number">{{ case.caseNumber }}</div>
+                      <div class="case-title">{{ case.title }}</div>
+                    </div>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+              <small class="error-message" *ngIf="getFieldError('legalCaseId')">
+                {{ getFieldError('legalCaseId') }}
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer">
+        <p-button 
+          label="İptal" 
+          icon="pi pi-times" 
+          (click)="cancelDialog()"
+          styleClass="p-button-text"
+        ></p-button>
+        <p-button 
+          [label]="editingDocument ? 'Güncelle' : 'Yükle'"
+          icon="pi pi-check" 
+          (click)="saveDocument()"
+          [disabled]="documentForm.invalid || (!editingDocument && !selectedFile)"
+          styleClass="primary-btn"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
+
+<!-- Toast Messages -->
+<p-toast position="top-right"></p-toast>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog> 

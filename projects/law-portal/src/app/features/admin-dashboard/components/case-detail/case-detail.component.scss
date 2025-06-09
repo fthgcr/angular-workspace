@@ -1,0 +1,230 @@
+.case-detail-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Header Section
+.header-section {
+  margin-bottom: 20px;
+  
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    
+    .breadcrumb-separator {
+      color: #6c757d;
+    }
+    
+    .breadcrumb-text {
+      color: #6c757d;
+    }
+    
+    .breadcrumb-current {
+      color: #495057;
+      font-weight: 600;
+    }
+  }
+}
+
+// Case Info Section
+.case-info-section {
+  margin-bottom: 30px;
+  
+  .info-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    
+    .card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      
+      .status-tag {
+        font-size: 14px;
+        font-weight: 600;
+      }
+    }
+    
+    .card-content {
+      padding: 25px;
+      
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        
+        .info-item {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          
+          &.full-width {
+            grid-column: 1 / -1;
+          }
+          
+          label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          span {
+            color: #212529;
+            font-size: 16px;
+            
+            &.case-title {
+              font-weight: 600;
+              font-size: 18px;
+              color: #495057;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Documents Section
+.documents-section {
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    
+    h3 {
+      margin: 0;
+      color: #495057;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .document-count {
+      color: #6c757d;
+      font-size: 14px;
+      padding: 6px 12px;
+      background: #f8f9fa;
+      border-radius: 20px;
+    }
+  }
+  
+  .table-section {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    
+    ::ng-deep {
+      .p-datatable-wrapper {
+        overflow-x: auto;
+      }
+      
+      .document-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        
+        strong {
+          color: #495057;
+          font-size: 14px;
+        }
+        
+        small {
+          color: #6c757d;
+          font-size: 12px;
+        }
+      }
+      
+      .file-name {
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        color: #495057;
+        background: #f8f9fa;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+      
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+      }
+      
+      .empty-state {
+        padding: 40px;
+        text-align: center;
+        
+        p {
+          margin-top: 16px;
+          color: #6c757d;
+          font-size: 16px;
+        }
+      }
+      
+      .p-datatable .p-datatable-thead > tr > th {
+        background: #f8f9fa;
+        border-color: #dee2e6;
+        color: #495057;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 16px 12px;
+      }
+      
+      .p-datatable .p-datatable-tbody > tr > td {
+        border-color: #dee2e6;
+        padding: 16px 12px;
+        font-size: 14px;
+        vertical-align: middle;
+      }
+      
+      .p-datatable .p-datatable-tbody > tr:hover {
+        background: #f8f9fa;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .case-detail-container {
+    padding: 15px;
+  }
+  
+  .case-info-section .info-card {
+    .card-header {
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    
+    .card-content .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .documents-section .section-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+} 
