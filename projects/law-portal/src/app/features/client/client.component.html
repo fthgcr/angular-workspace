@@ -30,7 +30,7 @@
                 <td>{{case.title}}</td>
                 <td>
                   <span [class]="getStatusClass(case.status)">
-                    {{case.status}}
+                    {{getStatusLabel(case.status)}}
                   </span>
                 </td>
                 <td>{{formatDate(case.createdDate)}}</td>

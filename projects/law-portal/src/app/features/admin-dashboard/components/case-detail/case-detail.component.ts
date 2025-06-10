@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { Case, CaseService, CaseType } from '../../../../core/services/case.service';
+import { Case, CaseService, CaseType, CaseStatus } from '../../../../core/services/case.service';
 import { Document, DocumentType, DocumentService, DocumentUploadRequest } from '../../../../core/services/document.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -272,6 +272,26 @@ export class CaseDetailComponent implements OnInit {
       case CaseType.INTELLECTUAL_PROPERTY: return 'Fikri Mülkiyet';
       case CaseType.OTHER: return 'Diğer';
       default: return type as string;
+    }
+  }
+
+  getStatusLabel(status: CaseStatus): string {
+    switch (status) {
+      case CaseStatus.OPEN: return 'Açık';
+      case CaseStatus.IN_PROGRESS: return 'Devam Ediyor';
+      case CaseStatus.PENDING: return 'Beklemede';
+      case CaseStatus.CLOSED: return 'Kapalı';
+      default: return status as string;
+    }
+  }
+
+  getStatusSeverity(status: CaseStatus): 'success' | 'secondary' | 'info' | 'warning' | 'danger' | 'contrast' | undefined {
+    switch (status) {
+      case CaseStatus.OPEN: return 'info';
+      case CaseStatus.IN_PROGRESS: return 'warning';
+      case CaseStatus.PENDING: return 'secondary';
+      case CaseStatus.CLOSED: return 'success';
+      default: return 'secondary';
     }
   }
 

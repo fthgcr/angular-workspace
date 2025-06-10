@@ -56,20 +56,39 @@ export class ClientComponent implements OnInit {
     });
   }
 
-  getStatusClass(status: string): string {
+  getStatusLabel(status: string): string {
+    // Convert English status to Turkish labels
     switch (status) {
-      case 'Devam Ediyor': return 'status-tag status-info';
-      case 'Tamamlandı': return 'status-tag status-success';
-      case 'Beklemede': return 'status-tag status-warning';
+      case 'OPEN': return 'Açık';
+      case 'IN_PROGRESS': return 'Devam Ediyor';
+      case 'PENDING': return 'Beklemede';
+      case 'CLOSED': return 'Kapalı';
+      // Legacy status values (keep for backwards compatibility)
+      case 'Devam Ediyor': return 'Devam Ediyor';
+      case 'Tamamlandı': return 'Kapalı';
+      case 'Beklemede': return 'Beklemede';
+      default: return status;
+    }
+  }
+
+  getStatusClass(status: string): string {
+    const label = this.getStatusLabel(status);
+    switch (label) {
+      case 'Açık': return 'status-tag status-info';
+      case 'Devam Ediyor': return 'status-tag status-warning';
+      case 'Beklemede': return 'status-tag status-secondary';
+      case 'Kapalı': return 'status-tag status-success';
       default: return 'status-tag status-secondary';
     }
   }
 
   getStatusSeverity(status: string): string {
-    switch (status) {
-      case 'Devam Ediyor': return 'info';
-      case 'Tamamlandı': return 'success';
-      case 'Beklemede': return 'warning';
+    const label = this.getStatusLabel(status);
+    switch (label) {
+      case 'Açık': return 'info';
+      case 'Devam Ediyor': return 'warning';
+      case 'Beklemede': return 'secondary';
+      case 'Kapalı': return 'success';
       default: return 'secondary';
     }
   }

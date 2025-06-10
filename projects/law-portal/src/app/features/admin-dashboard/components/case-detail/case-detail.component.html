@@ -23,8 +23,8 @@
       <div class="card-header">
         <h2>{{ case.title }}</h2>
         <p-tag 
-          [value]="case.status" 
-          severity="info"
+          [value]="getStatusLabel(case.status)" 
+          [severity]="getStatusSeverity(case.status)"
           class="status-tag">
         </p-tag>
       </div>
@@ -98,7 +98,7 @@
                 placeholder="Dosyalarda ara..." 
                 (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
             </span>
-            <div>
+          <!-- <div>
               <p-button 
                 icon="pi pi-refresh" 
                 severity="secondary"
@@ -106,7 +106,7 @@
                 (onClick)="loadDocuments(case?.id!)"
                 pTooltip="Yenile">
               </p-button>
-            </div>
+            </div> -->
           </div>
         </ng-template>
 
