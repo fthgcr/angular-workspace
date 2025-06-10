@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { Case, CaseService } from '../../../../core/services/case.service';
+import { Case, CaseService, CaseType } from '../../../../core/services/case.service';
 import { Document, DocumentType, DocumentService, DocumentUploadRequest } from '../../../../core/services/document.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -52,14 +52,11 @@ export class CaseDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const caseId = this.route.snapshot.params['id'];
-    console.log('CaseDetailComponent: ngOnInit called with caseId:', caseId);
     this.loadCase(caseId);
     this.loadDocuments(caseId);
   }
 
   loadCase(caseId: number): void {
-    debugger;
-    console.log('CaseDetailComponent: loadCase called with caseId:', caseId);
     this.loading = true;
     this.caseService.getCaseById(caseId)
       .pipe(
@@ -77,7 +74,6 @@ export class CaseDetailComponent implements OnInit {
         finalize(() => this.loading = false)
       )
              .subscribe(caseData => {
-         console.log('CaseDetailComponent: Case loaded:', caseData);
          this.case = caseData;
        });
   }
@@ -263,6 +259,20 @@ export class CaseDetailComponent implements OnInit {
   getDocumentTypeLabel(type: DocumentType): string {
     const option = this.documentTypeOptions.find(opt => opt.value === type);
     return option ? option.label : type;
+  }
+
+  getCaseTypeLabel(type: CaseType): string {
+    switch (type) {
+      case CaseType.CAR_DEPRECIATION: return 'Değer Kaybı';
+      case CaseType.CIVIL: return 'Hukuk';
+      case CaseType.CRIMINAL: return 'Ceza';
+      case CaseType.FAMILY: return 'Aile';
+      case CaseType.CORPORATE: return 'Kurumsal';
+      case CaseType.REAL_ESTATE: return 'Emlak';
+      case CaseType.INTELLECTUAL_PROPERTY: return 'Fikri Mülkiyet';
+      case CaseType.OTHER: return 'Diğer';
+      default: return type as string;
+    }
   }
 
   getFileIcon(contentType: string): string {

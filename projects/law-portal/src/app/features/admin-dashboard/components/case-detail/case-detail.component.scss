@@ -366,6 +366,22 @@
 
 // Global PrimeNG overrides
 :host ::ng-deep {
+  // Ensure download icon is always white - multiple selectors for maximum specificity
+  .p-datatable .p-datatable-tbody .action-buttons .p-button.p-button-success .pi-download,
+  .p-datatable .p-datatable-tbody .action-buttons .p-button.p-button-success i.pi-download,
+  .action-buttons .p-button.p-button-success .pi-download,
+  .action-buttons .p-button.p-button-success i.pi-download {
+    color: white !important;
+  }
+  
+  // Hover state
+  .p-datatable .p-datatable-tbody .action-buttons .p-button.p-button-success:hover .pi-download,
+  .p-datatable .p-datatable-tbody .action-buttons .p-button.p-button-success:hover i.pi-download,
+  .action-buttons .p-button.p-button-success:hover .pi-download,
+  .action-buttons .p-button.p-button-success:hover i.pi-download {
+    color: white !important;
+  }
+
   // Document info styling
   .document-info {
     display: flex;
