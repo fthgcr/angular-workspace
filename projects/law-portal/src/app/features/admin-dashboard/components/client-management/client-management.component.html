@@ -42,7 +42,7 @@
               pInputText 
               type="text" 
               placeholder="Müvekkil ara..." 
-              (input)="clientTable.filterGlobal($any($event.target).value, 'contains')"
+              (input)="searchClients($any($event.target).value)"
               class="search-input"
             />
           </span>

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Case, CaseStatus, CaseType } from '../case-management/case-management.component';
-import { Client } from '../client-management/client-management.component';
+import { Client } from '../../../../core/services/client.service';
 import { Document, DocumentType } from '../document-management/document-management.component';
 
 @Component({
@@ -84,6 +84,7 @@ export class CaseDetailComponent implements OnInit {
         firstName: 'Ahmet',
         lastName: 'Yılmaz',
         enabled: true,
+        active: true,
         phoneNumber: '+90 555 123 4567',
         address: 'Beşiktaş, İstanbul',
         notes: 'İş hukuku uzmanı avukat',
@@ -96,6 +97,7 @@ export class CaseDetailComponent implements OnInit {
         firstName: 'Zeynep',
         lastName: 'Kaya',
         enabled: true,
+        active: true,
         phoneNumber: '+90 555 987 6543',
         address: 'Çankaya, Ankara',
         notes: 'Aile hukuku davalarında müvekkil',
@@ -108,6 +110,7 @@ export class CaseDetailComponent implements OnInit {
         firstName: 'Mehmet',
         lastName: 'Çelik',
         enabled: true,
+        active: true,
         phoneNumber: '+90 555 555 1234',
         address: 'Konak, İzmir',
         notes: 'Ticaret hukuku müvekkili',

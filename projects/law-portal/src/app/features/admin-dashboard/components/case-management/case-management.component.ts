@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { Client } from '../client-management/client-management.component';
+import { Client } from '../../../../core/services/client.service';
 
 export interface Case {
   id?: number;
@@ -126,7 +126,8 @@ export class CaseManagementComponent implements OnInit {
         email: 'john.doe@email.com',
         firstName: 'John',
         lastName: 'Doe',
-        enabled: true
+        enabled: true,
+        active: true
       },
       {
         id: 2,
@@ -134,7 +135,8 @@ export class CaseManagementComponent implements OnInit {
         email: 'jane.smith@email.com',
         firstName: 'Jane',
         lastName: 'Smith',
-        enabled: true
+        enabled: true,
+        active: true
       }
     ];
   }

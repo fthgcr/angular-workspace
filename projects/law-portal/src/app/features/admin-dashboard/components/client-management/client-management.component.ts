@@ -2,19 +2,7 @@ import { Component, OnInit, AfterViewInit, ElementRef, Renderer2, RendererStyleF
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Router } from '@angular/router';
-
-export interface Client {
-  id?: number;
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  enabled: boolean;
-  phoneNumber?: string;
-  address?: string;
-  notes?: string;
-  createdDate?: Date;
-}
+import { ClientService, Client } from '../../../../core/services/client.service';
 
 @Component({
   selector: 'app-client-management',
@@ -34,7 +22,8 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
     private confirmationService: ConfirmationService,
     private router: Router,
     private elementRef: ElementRef,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private clientService: ClientService
   ) {
     this.clientForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -88,48 +77,64 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
 
   loadClients(): void {
     this.loading = true;
-    // TODO: API çağrısı yapılacak
-    setTimeout(() => {
-      this.clients = [
-        {
-          id: 1,
-          username: 'ahmet.yilmaz',
-          email: 'ahmet.yilmaz@email.com',
-          firstName: 'Ahmet',
-          lastName: 'Yılmaz',
-          enabled: true,
-          phoneNumber: '+90 555 123 4567',
-          address: 'Beşiktaş, İstanbul',
-          notes: 'İş hukuku uzmanı avukat',
-          createdDate: new Date('2024-01-15')
-        },
-        {
-          id: 2,
-          username: 'zeynep.kaya',
-          email: 'zeynep.kaya@email.com',
-          firstName: 'Zeynep',
-          lastName: 'Kaya',
-          enabled: true,
-          phoneNumber: '+90 555 987 6543',
-          address: 'Çankaya, Ankara',
-          notes: 'Aile hukuku davalarında müvekkil',
-          createdDate: new Date('2024-02-10')
-        },
-        {
-          id: 3,
-          username: 'mehmet.celik',
-          email: 'mehmet.celik@email.com',
-          firstName: 'Mehmet',
-          lastName: 'Çelik',
-          enabled: true,
-          phoneNumber: '+90 555 555 1234',
-          address: 'Konak, İzmir',
-          notes: 'Ticaret hukuku müvekkili',
-          createdDate: new Date('2024-03-05')
-        }
-      ];
-      this.loading = false;
-    }, 1000);
+    this.clientService.getAllClients().subscribe({
+      next: (clients) => {
+        this.clients = clients;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading clients:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Müvekkiller yüklenirken bir hata oluştu'
+        });
+        this.loading = false;
+        
+        // Fallback to mock data for development
+        this.clients = [
+          {
+            id: 1,
+            username: 'ahmet.yilmaz',
+            email: 'ahmet.yilmaz@email.com',
+            firstName: 'Ahmet',
+            lastName: 'Yılmaz',
+            enabled: true,
+            active: true,
+            phoneNumber: '+90 555 123 4567',
+            address: 'Beşiktaş, İstanbul',
+            notes: 'İş hukuku uzmanı avukat',
+            createdDate: new Date('2024-01-15')
+          },
+          {
+            id: 2,
+            username: 'zeynep.kaya',
+            email: 'zeynep.kaya@email.com',
+            firstName: 'Zeynep',
+            lastName: 'Kaya',
+            enabled: true,
+            active: true,
+            phoneNumber: '+90 555 987 6543',
+            address: 'Çankaya, Ankara',
+            notes: 'Aile hukuku davalarında müvekkil',
+            createdDate: new Date('2024-02-10')
+          },
+          {
+            id: 3,
+            username: 'mehmet.celik',
+            email: 'mehmet.celik@email.com',
+            firstName: 'Mehmet',
+            lastName: 'Çelik',
+            enabled: true,
+            active: true,
+            phoneNumber: '+90 555 555 1234',
+            address: 'Konak, İzmir',
+            notes: 'Ticaret hukuku müvekkili',
+            createdDate: new Date('2024-03-05')
+          }
+        ];
+      }
+    });
   }
 
   openNewClientDialog(): void {
@@ -160,12 +165,23 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
       acceptLabel: 'Evet',
       rejectLabel: 'Hayır',
       accept: () => {
-        // TODO: API çağrısı yapılacak
-        this.clients = this.clients.filter(c => c.id !== client.id);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Başarılı',
-          detail: 'Müvekkil başarıyla silindi'
+        this.clientService.deleteClient(client.id!).subscribe({
+          next: () => {
+            this.clients = this.clients.filter(c => c.id !== client.id);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Başarılı',
+              detail: 'Müvekkil başarıyla silindi'
+            });
+          },
+          error: (error) => {
+            console.error('Error deleting client:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Hata',
+              detail: error.error?.error || 'Müvekkil silinirken bir hata oluştu'
+            });
+          }
         });
       }
     });
@@ -177,32 +193,53 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
       
       if (this.editingClient) {
         // Güncelleme
-        const index = this.clients.findIndex(c => c.id === this.editingClient!.id);
-        if (index !== -1) {
-          this.clients[index] = { ...this.editingClient, ...formData };
-        }
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Başarılı',
-          detail: 'Müvekkil bilgileri güncellendi'
+        this.clientService.updateClient(this.editingClient.id!, formData).subscribe({
+          next: (updatedClient) => {
+            const index = this.clients.findIndex(c => c.id === this.editingClient!.id);
+            if (index !== -1) {
+              this.clients[index] = updatedClient;
+            }
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Başarılı',
+              detail: 'Müvekkil bilgileri güncellendi'
+            });
+            this.showDialog = false;
+            this.clientForm.reset();
+            this.editingClient = null;
+          },
+          error: (error) => {
+            console.error('Error updating client:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Hata',
+              detail: error.error?.error || 'Müvekkil güncellenirken bir hata oluştu'
+            });
+          }
         });
       } else {
         // Yeni ekleme
-        const newClient: Client = {
-          id: Math.max(...this.clients.map(c => c.id || 0)) + 1,
-          ...formData,
-          createdDate: new Date()
-        };
-        this.clients.push(newClient);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Başarılı',
-          detail: 'Yeni müvekkil eklendi'
+        this.clientService.createClient(formData).subscribe({
+          next: (newClient) => {
+            this.clients.push(newClient);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Başarılı',
+              detail: 'Yeni müvekkil eklendi'
+            });
+            this.showDialog = false;
+            this.clientForm.reset();
+          },
+          error: (error) => {
+            console.error('Error creating client:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Hata',
+              detail: error.error?.error || 'Müvekkil oluşturulurken bir hata oluştu'
+            });
+          }
         });
       }
-      
-      this.showDialog = false;
-      this.clientForm.reset();
     } else {
       this.messageService.add({
         severity: 'warn',
@@ -238,6 +275,34 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
       }
     }
     return '';
+  }
+
+  searchClients(searchTerm: string): void {
+    if (!searchTerm || searchTerm.trim().length === 0) {
+      this.loadClients();
+      return;
+    }
+
+    if (searchTerm.trim().length < 2) {
+      return; // Wait for at least 2 characters
+    }
+
+    this.loading = true;
+    this.clientService.searchClients(searchTerm.trim()).subscribe({
+      next: (clients) => {
+        this.clients = clients;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error searching clients:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Arama yapılırken bir hata oluştu'
+        });
+        this.loading = false;
+      }
+    });
   }
 
   viewClientDetails(client: Client): void {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { Client } from '../client-management/client-management.component';
+import { Client } from '../../../../core/services/client.service';
 import { Case, CaseStatus, CaseType } from '../case-management/case-management.component';
 
 @Component({
@@ -38,6 +38,7 @@ export class ClientDetailComponent implements OnInit {
         firstName: 'Ahmet',
         lastName: 'Yılmaz',
         enabled: true,
+        active: true,
         phoneNumber: '+90 555 123 4567',
         address: 'Beşiktaş, İstanbul',
         notes: 'İş hukuku uzmanı avukat',
@@ -50,6 +51,7 @@ export class ClientDetailComponent implements OnInit {
         firstName: 'Zeynep',
         lastName: 'Kaya',
         enabled: true,
+        active: true,
         phoneNumber: '+90 555 987 6543',
         address: 'Çankaya, Ankara',
         notes: 'Aile hukuku davalarında müvekkil',
@@ -62,6 +64,7 @@ export class ClientDetailComponent implements OnInit {
         firstName: 'Mehmet',
         lastName: 'Çelik',
         enabled: true,
+        active: true,
         phoneNumber: '+90 555 555 1234',
         address: 'Konak, İzmir',
         notes: 'Ticaret hukuku müvekkili',
