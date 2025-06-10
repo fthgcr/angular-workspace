@@ -16,6 +16,12 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
   editingClient: Client | null = null;
   loading = false;
 
+  // Filter options
+  statusOptions = [
+    { label: 'Aktif', value: true },
+    { label: 'Pasif', value: false }
+  ];
+
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,

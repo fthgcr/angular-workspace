@@ -25,6 +25,7 @@ export enum CaseStatus {
 }
 
 export enum CaseType {
+  CAR_DEPRECIATION = 'CAR_DEPRECIATION',
   CIVIL = 'CIVIL',
   CRIMINAL = 'CRIMINAL',
   FAMILY = 'FAMILY',
@@ -74,7 +75,7 @@ export class CaseManagementComponent implements OnInit {
       title: ['', [Validators.required]],
       description: [''],
       status: [CaseStatus.OPEN, [Validators.required]],
-      type: [CaseType.CIVIL, [Validators.required]],
+      type: [CaseType.CAR_DEPRECIATION, [Validators.required]],
       filingDate: [new Date(), [Validators.required]],
       assignedUserId: [null]
     });
@@ -96,7 +97,7 @@ export class CaseManagementComponent implements OnInit {
           title: 'İş Mahkemesi Davası',
           description: 'İşçi-işveren uyuşmazlığı',
           status: CaseStatus.IN_PROGRESS,
-          type: CaseType.CIVIL,
+          type: CaseType.CAR_DEPRECIATION,
           filingDate: new Date('2024-01-15'),
           assignedUserId: 1,
           createdDate: new Date('2024-01-15')
@@ -145,7 +146,7 @@ export class CaseManagementComponent implements OnInit {
     this.editingCase = null;
     this.caseForm.reset({
       status: CaseStatus.OPEN,
-      type: CaseType.CIVIL,
+      type: CaseType.CAR_DEPRECIATION,
       filingDate: new Date()
     });
     this.showDialog = true;

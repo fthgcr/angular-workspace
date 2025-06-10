@@ -38,7 +38,7 @@ export class CaseDetailComponent implements OnInit {
         title: 'İş Mahkemesi Davası',
         description: 'İşçi-işveren uyuşmazlığı',
         status: CaseStatus.IN_PROGRESS,
-        type: CaseType.CIVIL,
+        type: CaseType.CAR_DEPRECIATION,
         filingDate: new Date('2024-01-15'),
         assignedUserId: 1,
         createdDate: new Date('2024-01-15')
@@ -220,6 +220,7 @@ export class CaseDetailComponent implements OnInit {
 
   getTypeLabel(type: CaseType): string {
     switch (type) {
+      case CaseType.CAR_DEPRECIATION: return 'Değer Kaybı';
       case CaseType.CIVIL: return 'Hukuk';
       case CaseType.CRIMINAL: return 'Ceza';
       case CaseType.FAMILY: return 'Aile';

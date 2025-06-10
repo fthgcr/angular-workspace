@@ -98,19 +98,30 @@
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
     
-    h3 {
-      margin: 0;
-      color: #495057;
-      font-size: 20px;
-      font-weight: 600;
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      
+      h3 {
+        margin: 0;
+        color: #495057;
+        font-size: 20px;
+        font-weight: 600;
+      }
+      
+      .case-count {
+        color: #6c757d;
+        font-size: 14px;
+        padding: 6px 12px;
+        background: #f8f9fa;
+        border-radius: 20px;
+      }
     }
     
-    .case-count {
-      color: #6c757d;
-      font-size: 14px;
-      padding: 6px 12px;
-      background: #f8f9fa;
-      border-radius: 20px;
+    .section-actions {
+      display: flex;
+      gap: 10px;
     }
   }
   
@@ -176,7 +187,271 @@
       .p-datatable .p-datatable-tbody > tr:hover {
         background: #f8f9fa;
       }
+
+      // Table header styling
+      .table-header {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+        background: #f9f9f9;
+      }
+
+      .search-input {
+        width: 300px;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      // Filter styling
+      .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 0.5rem;
+      }
+
+      .header-icons {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .filter-input {
+        width: 100% !important;
+        max-width: 200px !important;
+        padding: 0.5rem !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+        font-size: 0.9rem !important;
+      }
+
+      .filter-dropdown {
+        width: 150px !important;
+        
+        .p-dropdown {
+          width: 100% !important;
+          border: 1px solid #ddd !important;
+          border-radius: 4px !important;
+        }
+      }
+
+      .filter-calendar {
+        width: 200px !important;
+        
+        .p-calendar {
+          width: 100% !important;
+          
+          .p-inputtext {
+            border: 1px solid #ddd !important;
+            border-radius: 4px !important;
+            padding: 0.5rem !important;
+          }
+        }
+      }
+
+      // Filter icon styling
+      .p-column-filter-menu-button {
+        color: #667eea !important;
+        padding: 0.25rem !important;
+        
+        &:hover {
+          background: rgba(102, 126, 234, 0.1) !important;
+          border-radius: 4px !important;
+        }
+      }
     }
+  }
+}
+
+// Dialog and Form Styling
+:host ::ng-deep .modern-dialog {
+  .p-dialog-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .p-dialog-content {
+    padding: 2rem !important;
+    max-height: 75vh !important;
+    overflow-y: auto !important;
+  }
+
+  // Dropdown container styling - Allow dropdowns to extend beyond dialog boundaries
+  &.dropdown-container {
+    .p-dialog-content {
+      overflow: visible !important;
+      position: relative !important;
+    }
+
+    // Specific dropdown styling within dialog
+    .dropdown-fixed {
+      .p-dropdown-panel {
+        z-index: 1100 !important;
+        position: absolute !important;
+        max-height: 250px !important;
+        overflow-y: auto !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+        background: white !important;
+      }
+    }
+  }
+}
+
+// Enhanced dropdown panel styling
+:host ::ng-deep .p-dropdown-panel {
+  z-index: 1100 !important;
+  max-height: 250px !important;
+  overflow-y: auto !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  background: white !important;
+
+  .p-dropdown-items {
+    max-height: 200px !important;
+    overflow-y: auto !important;
+  }
+
+  .p-dropdown-item {
+    padding: 0.75rem 1rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    
+    &:hover {
+      background: #f8f9fa !important;
+    }
+
+    &.p-highlight {
+      background: #667eea !important;
+      color: white !important;
+    }
+  }
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-section .section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #eee;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+// Ensure w-full class works properly
+.w-full {
+  width: 100% !important;
+}
+
+.form-group input, .form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+// PrimeNG dropdown styling
+.form-group ::ng-deep .p-dropdown {
+  width: 100% !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  
+  .p-dropdown-label {
+    padding: 0.75rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  &.p-focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1) !important;
+  }
+}
+
+// PrimeNG calendar styling
+.form-group ::ng-deep .p-calendar {
+  width: 100% !important;
+  
+  .p-inputtext {
+    width: 100% !important;
+    padding: 0.75rem !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    font-size: 0.9rem !important;
+    
+    &:focus {
+      border-color: #667eea !important;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1) !important;
+    }
+  }
+}
+
+.error-message {
+  color: #e53e3e;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.dialog-footer {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+// Case number container
+.case-number-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  
+  input {
+    flex: 1;
+  }
+  
+  .p-button {
+    align-self: center;
   }
 }
 
@@ -194,5 +469,9 @@
     flex-direction: column;
     gap: 10px;
     align-items: flex-start;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
   }
 } 

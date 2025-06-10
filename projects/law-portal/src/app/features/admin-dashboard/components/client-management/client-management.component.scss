@@ -129,6 +129,90 @@
   gap: 0.5rem;
 }
 
+/* ===== FILTER STYLING ===== */
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Filter input styling */
+:host ::ng-deep {
+  .filter-input {
+    width: 100% !important;
+    max-width: 200px !important;
+    padding: 0.5rem !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .filter-dropdown {
+    width: 150px !important;
+    
+    .p-dropdown {
+      width: 100% !important;
+      border: 1px solid #ddd !important;
+      border-radius: 4px !important;
+    }
+  }
+
+  .filter-calendar {
+    width: 200px !important;
+    
+    .p-calendar {
+      width: 100% !important;
+      
+      .p-inputtext {
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+        padding: 0.5rem !important;
+      }
+    }
+  }
+
+  // Filter icon styling
+  .p-column-filter-menu-button {
+    color: #667eea !important;
+    padding: 0.25rem !important;
+    
+    &:hover {
+      background: rgba(102, 126, 234, 0.1) !important;
+      border-radius: 4px !important;
+    }
+  }
+
+  // Filter overlay panel
+  .p-column-filter-overlay {
+    .p-column-filter-overlay-menu {
+      padding: 1rem !important;
+      min-width: 250px !important;
+    }
+  }
+
+  // Clear all filters button
+  .p-column-filter-clear-button {
+    background: #f44336 !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    
+    &:hover {
+      background: #d32f2f !important;
+    }
+  }
+}
+
 /* Empty State */
 .empty-state {
   text-align: center;
