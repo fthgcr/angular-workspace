@@ -19,6 +19,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { CardModule } from 'primeng/card';
 
 // Components
 import { AdminDashboardComponent } from './admin-dashboard.component';
@@ -61,7 +62,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     ConfirmDialogModule,
     TooltipModule,
     FileUploadModule,
-    ProgressBarModule
+    ProgressBarModule,
+    CardModule
   ],
   providers: [
     MessageService,

@@ -10,12 +10,18 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.getToken();
     
+    console.log('AuthInterceptor: Request URL:', request.url);
+    console.log('AuthInterceptor: Token exists:', !!token);
+    
     if (token) {
       request = request.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`
         }
       });
+      console.log('AuthInterceptor: Added Authorization header');
+    } else {
+      console.log('AuthInterceptor: No token found, request without auth');
     }
 
     return next.handle(request);

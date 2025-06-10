@@ -1,60 +1,58 @@
 <div class="case-detail-container">
-  <!-- Header Section -->
-  <div class="header-section">
-    <div class="breadcrumb">
-      <button 
-        pButton 
-        class="p-button-text p-button-secondary"
-        icon="pi pi-arrow-left"
-        (click)="goBack()"
-      >
-        Geri Dön
-      </button>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-text">{{ client?.firstName }} {{ client?.lastName }}</span>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-current">{{ case?.title }}</span>
+  <!-- Header -->
+  <div class="case-header">
+    <div class="flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="m-0 text-primary">{{ case?.title || 'Dava Detayları' }}</h2>
+        <p class="text-500 m-0 mt-1">{{ case?.caseNumber }}</p>
+      </div>
+      <div>
+        <p-button 
+          label="Geri" 
+          icon="pi pi-arrow-left" 
+          severity="secondary" 
+          (onClick)="goBack()">
+        </p-button>
+      </div>
     </div>
   </div>
 
-  <!-- Case Info Section -->
-  <div class="case-info-section" *ngIf="case">
-    <div class="info-card">
+  <!-- Case Information Section -->
+  <div class="case-info-section">
+    <div class="info-card" *ngIf="case">
       <div class="card-header">
-        <h2>Dava Bilgileri</h2>
+        <h2>{{ case.title }}</h2>
         <p-tag 
-          [severity]="getStatusSeverity(case.status)" 
-          [value]="getStatusLabel(case.status)"
-          class="status-tag"
-        ></p-tag>
+          [value]="case.status" 
+          severity="info"
+          class="status-tag">
+        </p-tag>
       </div>
       <div class="card-content">
         <div class="info-grid">
           <div class="info-item">
-            <label>Dava No:</label>
+            <label>Dava Numarası</label>
             <span>{{ case.caseNumber }}</span>
           </div>
           <div class="info-item">
-            <label>Müvekkil:</label>
-            <span>{{ client?.firstName }} {{ client?.lastName }}</span>
+            <label>Dava Türü</label>
+            <span>
+              <p-tag 
+                [value]="case.type" 
+                severity="secondary">
+              </p-tag>
+            </span>
           </div>
           <div class="info-item">
-            <label>Dava Türü:</label>
-            <p-tag 
-              severity="info" 
-              [value]="getTypeLabel(case.type)"
-            ></p-tag>
-          </div>
-          <div class="info-item">
-            <label>Açılış Tarihi:</label>
+            <label>Açılış Tarihi</label>
             <span>{{ case.filingDate | date:'dd/MM/yyyy' }}</span>
           </div>
-          <div class="info-item full-width">
-            <label>Başlık:</label>
-            <span class="case-title">{{ case.title }}</span>
+          <div class="info-item">
+            <label>Oluşturulma Tarihi</label>
+            <span>{{ case.createdDate | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
-          <div class="info-item full-width">
-            <label>Açıklama:</label>
+          <div class="info-item full-width" *ngIf="case.description">
+            <label>Açıklama</label>
             <span>{{ case.description }}</span>
           </div>
         </div>
@@ -65,60 +63,91 @@
   <!-- Documents Section -->
   <div class="documents-section">
     <div class="section-header">
-      <h3>Dokümanlar</h3>
-      <span class="document-count">{{ caseDocuments.length }} Doküman</span>
+      <div>
+        <h3>Dava Dokümanları</h3>
+        <span class="document-count">{{ documents.length }} dosya</span>
+      </div>
+      <p-button 
+        label="Dosya Yükle" 
+        icon="pi pi-upload" 
+        severity="success"
+        (onClick)="openUploadDialog()">
+      </p-button>
     </div>
 
     <div class="table-section">
+      <!-- Documents Table -->
       <p-table 
-        [value]="caseDocuments" 
+        #dt
+        [value]="documents" 
         [loading]="loading"
         [paginator]="true" 
         [rows]="10"
         [showCurrentPageReport]="true"
-        currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
-        styleClass="modern-table"
-        responsiveLayout="scroll"
-        [scrollable]="true"
-        scrollHeight="400px"
-      >
+        currentPageReportTemplate="Gösterilen: {first} - {last} / Toplam: {totalRecords}"
+        [globalFilterFields]="['title', 'fileName', 'description']"
+        responsiveLayout="scroll">
+        
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between align-items-center">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input 
+                pInputText 
+                type="text" 
+                placeholder="Dosyalarda ara..." 
+                (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
+            </span>
+            <div>
+              <p-button 
+                icon="pi pi-refresh" 
+                severity="secondary"
+                [text]="true"
+                (onClick)="loadDocuments(case?.id!)"
+                pTooltip="Yenile">
+              </p-button>
+            </div>
+          </div>
+        </ng-template>
+
         <ng-template pTemplate="header">
           <tr>
-            <th style="width: 60px">Tür</th>
+            <th style="width: 50px;">
+              <i class="pi pi-file"></i>
+            </th>
             <th pSortableColumn="title">
-              Başlık 
+              Başlık
               <p-sortIcon field="title"></p-sortIcon>
             </th>
             <th pSortableColumn="fileName">
-              Dosya Adı 
+              Dosya Adı
               <p-sortIcon field="fileName"></p-sortIcon>
             </th>
             <th pSortableColumn="type">
-              Kategori 
+              Tür
               <p-sortIcon field="type"></p-sortIcon>
             </th>
             <th pSortableColumn="fileSize">
-              Boyut 
+              Boyut
               <p-sortIcon field="fileSize"></p-sortIcon>
             </th>
-            <th pSortableColumn="uploadDate">
-              Yükleme Tarihi 
-              <p-sortIcon field="uploadDate"></p-sortIcon>
+            <th pSortableColumn="createdDate">
+              Yüklenme Tarihi
+              <p-sortIcon field="createdDate"></p-sortIcon>
             </th>
-            <th>İşlemler</th>
+            <th style="width: 120px;">İşlemler</th>
           </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-document>
           <tr>
             <td>
-              <i [class]="getFileIcon(document.fileName)" 
-                 style="font-size: 24px; color: #dc3545;"></i>
+              <i [class]="getFileIcon(document.contentType)" class="text-xl"></i>
             </td>
             <td>
               <div class="document-info">
                 <strong>{{ document.title }}</strong>
-                <small>{{ document.description }}</small>
+                <small *ngIf="document.description">{{ document.description }}</small>
               </div>
             </td>
             <td>
@@ -126,21 +155,28 @@
             </td>
             <td>
               <p-tag 
-                severity="secondary" 
-                [value]="getDocumentTypeLabel(document.type)"
-              ></p-tag>
+                [value]="getDocumentTypeLabel(document.type)" 
+                severity="info">
+              </p-tag>
             </td>
             <td>{{ formatFileSize(document.fileSize) }}</td>
-            <td>{{ document.uploadDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ document.createdDate | date:'dd/MM/yyyy HH:mm' }}</td>
             <td>
               <div class="action-buttons">
-                <button 
-                  pButton 
+                <p-button 
                   icon="pi pi-download" 
-                  class="p-button-text p-button-rounded p-button-success"
-                  pTooltip="Dosyayı İndir"
-                  (click)="downloadDocument(document)"
-                ></button>
+                  severity="success"
+                  [text]="true"
+                  (onClick)="downloadDocument(document)"
+                  pTooltip="İndir">
+                </p-button>
+                <p-button 
+                  icon="pi pi-trash" 
+                  severity="danger"
+                  [text]="true"
+                  (onClick)="deleteDocument(document)"
+                  pTooltip="Sil">
+                </p-button>
               </div>
             </td>
           </tr>
@@ -150,8 +186,13 @@
           <tr>
             <td colspan="7" class="text-center">
               <div class="empty-state">
-                <i class="pi pi-file" style="font-size: 3rem; color: #ccc;"></i>
-                <p>Bu davaya ait doküman bulunamadı</p>
+                <i class="pi pi-file-o text-4xl text-400 mb-3"></i>
+                <p class="text-500 mb-0">Bu davaya ait doküman bulunmuyor</p>
+                <p class="text-400 mt-2">
+                  <a class="cursor-pointer text-primary" (click)="openUploadDialog()">
+                    İlk dosyayı yüklemek için tıklayın
+                  </a>
+                </p>
               </div>
             </td>
           </tr>
@@ -159,4 +200,107 @@
       </p-table>
     </div>
   </div>
-</div> 
+</div>
+
+<!-- Upload Dialog -->
+<p-dialog 
+  header="Dosya Yükle" 
+  [(visible)]="showUploadDialog" 
+  [modal]="true" 
+  [style]="{ width: '600px' }"
+  [draggable]="false"
+  [resizable]="false">
+
+  <form [formGroup]="uploadForm" (ngSubmit)="uploadDocuments()">
+    <!-- File Upload -->
+    <div class="field">
+      <label for="fileUpload">Dosya Seç *</label>
+      <p-fileUpload 
+        #fileUpload
+        mode="advanced" 
+        multiple="false"
+        accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+        [maxFileSize]="10000000"
+        (onSelect)="onFileSelect($event)"
+        [auto]="false"
+        [showUploadButton]="false"
+        [showCancelButton]="false"
+        chooseLabel="Dosya Seç"
+        uploadLabel="Yükle"
+        cancelLabel="İptal">
+      </p-fileUpload>
+      <small class="text-500">
+        İzin verilen formatlar: PDF, Word, Excel, Resim dosyaları (Maks. 10MB)
+      </small>
+    </div>
+
+    <!-- Title -->
+    <div class="field">
+      <label for="title">Başlık *</label>
+      <input 
+        id="title"
+        type="text" 
+        pInputText 
+        formControlName="title"
+        placeholder="Doküman başlığı"
+        class="w-full"
+        [class.ng-invalid]="uploadForm.get('title')?.invalid && uploadForm.get('title')?.touched" />
+      <small class="p-error" *ngIf="getFieldError('title')">
+        {{ getFieldError('title') }}
+      </small>
+    </div>
+
+    <!-- Type -->
+    <div class="field">
+      <label for="type">Doküman Türü *</label>
+      <p-dropdown 
+        id="type"
+        [options]="documentTypeOptions" 
+        formControlName="type"
+        placeholder="Tür seçin"
+        optionLabel="label" 
+        optionValue="value"
+        class="w-full"
+        [class.ng-invalid]="uploadForm.get('type')?.invalid && uploadForm.get('type')?.touched">
+      </p-dropdown>
+      <small class="p-error" *ngIf="getFieldError('type')">
+        {{ getFieldError('type') }}
+      </small>
+    </div>
+
+    <!-- Description -->
+    <div class="field">
+      <label for="description">Açıklama</label>
+      <textarea 
+        id="description"
+        pInputTextarea 
+        formControlName="description"
+        rows="3"
+        placeholder="Doküman açıklaması (isteğe bağlı)"
+        class="w-full">
+      </textarea>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button 
+        label="İptal" 
+        severity="secondary" 
+        (onClick)="cancelUpload()"
+        [disabled]="uploading">
+      </p-button>
+      <p-button 
+        label="Yükle" 
+        severity="success"
+        [icon]="uploading ? 'pi pi-spin pi-spinner' : 'pi pi-upload'"
+        (onClick)="uploadDocuments()"
+        [disabled]="uploading || uploadForm.invalid || selectedFiles.length === 0">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Toast and Confirmation Dialog -->
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog> 

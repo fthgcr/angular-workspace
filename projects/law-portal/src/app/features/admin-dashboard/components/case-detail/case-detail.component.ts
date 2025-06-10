@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { Case, CaseStatus, CaseType } from '../case-management/case-management.component';
-import { Client } from '../../../../core/services/client.service';
-import { Document, DocumentType } from '../document-management/document-management.component';
+import { Case, CaseService } from '../../../../core/services/case.service';
+import { Document, DocumentType, DocumentService, DocumentUploadRequest } from '../../../../core/services/document.service';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-case-detail',
@@ -12,237 +14,263 @@ import { Document, DocumentType } from '../document-management/document-manageme
 })
 export class CaseDetailComponent implements OnInit {
   case: Case | null = null;
-  client: Client | null = null;
-  caseDocuments: Document[] = [];
+  documents: Document[] = [];
   loading = false;
+  uploading = false;
+
+  // Upload dialog
+  showUploadDialog = false;
+  uploadForm: FormGroup;
+  selectedFiles: File[] = [];
+
+  // Document type options
+  documentTypeOptions = [
+    { label: 'Dava Dilekçesi', value: DocumentType.COMPLAINT },
+    { label: 'Cevap', value: DocumentType.ANSWER },
+    { label: 'Dilekçe', value: DocumentType.MOTION },
+    { label: 'Delil', value: DocumentType.EXHIBIT },
+    { label: 'Sözleşme', value: DocumentType.CONTRACT },
+    { label: 'Yazışma', value: DocumentType.CORRESPONDENCE },
+    { label: 'Diğer', value: DocumentType.OTHER }
+  ];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private fb: FormBuilder,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
-  ) {}
-
-  ngOnInit(): void {
-    const caseId = this.route.snapshot.params['id'];
-    this.loadCase(caseId);
-    this.loadCaseDocuments(caseId);
-  }
-
-  loadCase(caseId: number): void {
-    // TODO: API çağrısı yapılacak
-    const allCases = [
-      {
-        id: 1,
-        caseNumber: 'CASE-2024-001',
-        title: 'İş Mahkemesi Davası',
-        description: 'İşçi-işveren uyuşmazlığı',
-        status: CaseStatus.IN_PROGRESS,
-        type: CaseType.CAR_DEPRECIATION,
-        filingDate: new Date('2024-01-15'),
-        assignedUserId: 1,
-        createdDate: new Date('2024-01-15')
-      },
-      {
-        id: 2,
-        caseNumber: 'CASE-2024-002',
-        title: 'Boşanma Davası',
-        description: 'Anlaşmalı boşanma süreci',
-        status: CaseStatus.OPEN,
-        type: CaseType.FAMILY,
-        filingDate: new Date('2024-02-10'),
-        assignedUserId: 2,
-        createdDate: new Date('2024-02-10')
-      },
-      {
-        id: 3,
-        caseNumber: 'CASE-2024-003',
-        title: 'Ticaret Uyuşmazlığı',
-        description: 'Sözleşme ihlali davası',
-        status: CaseStatus.PENDING,
-        type: CaseType.CORPORATE,
-        filingDate: new Date('2024-03-05'),
-        assignedUserId: 3,
-        createdDate: new Date('2024-03-05')
-      }
-    ];
-
-    this.case = allCases.find(c => c.id == caseId) || null;
-    
-    if (this.case && this.case.assignedUserId) {
-      this.loadClient(this.case.assignedUserId);
-    }
-  }
-
-  loadClient(clientId: number): void {
-    // TODO: API çağrısı yapılacak
-    const clients = [
-      {
-        id: 1,
-        username: 'ahmet.yilmaz',
-        email: 'ahmet.yilmaz@email.com',
-        firstName: 'Ahmet',
-        lastName: 'Yılmaz',
-        enabled: true,
-        active: true,
-        phoneNumber: '+90 555 123 4567',
-        address: 'Beşiktaş, İstanbul',
-        notes: 'İş hukuku uzmanı avukat',
-        createdDate: new Date('2024-01-15')
-      },
-      {
-        id: 2,
-        username: 'zeynep.kaya',
-        email: 'zeynep.kaya@email.com',
-        firstName: 'Zeynep',
-        lastName: 'Kaya',
-        enabled: true,
-        active: true,
-        phoneNumber: '+90 555 987 6543',
-        address: 'Çankaya, Ankara',
-        notes: 'Aile hukuku davalarında müvekkil',
-        createdDate: new Date('2024-02-10')
-      },
-      {
-        id: 3,
-        username: 'mehmet.celik',
-        email: 'mehmet.celik@email.com',
-        firstName: 'Mehmet',
-        lastName: 'Çelik',
-        enabled: true,
-        active: true,
-        phoneNumber: '+90 555 555 1234',
-        address: 'Konak, İzmir',
-        notes: 'Ticaret hukuku müvekkili',
-        createdDate: new Date('2024-03-05')
-      }
-    ];
-
-    this.client = clients.find(c => c.id == clientId) || null;
-  }
-
-  loadCaseDocuments(caseId: number): void {
-    this.loading = true;
-    // TODO: API çağrısı yapılacak
-    setTimeout(() => {
-      const allDocuments = [
-        {
-          id: 1,
-          title: 'İş Sözleşmesi',
-          description: 'Müvekkil ile işveren arasındaki sözleşme',
-          fileName: 'is-sozlesmesi.pdf',
-          fileSize: 524288,
-          contentType: 'application/pdf',
-          type: DocumentType.CONTRACT,
-          caseId: 1,
-          uploadDate: new Date('2024-01-16'),
-          createdDate: new Date('2024-01-16')
-        },
-        {
-          id: 2,
-          title: 'Dilekçe',
-          description: 'Mahkemeye sunulan dilekçe',
-          fileName: 'dilekce.pdf',
-          fileSize: 1048576,
-          contentType: 'application/pdf',
-          type: DocumentType.COMPLAINT,
-          caseId: 1,
-          uploadDate: new Date('2024-01-20'),
-          createdDate: new Date('2024-01-20')
-        },
-        {
-          id: 3,
-          title: 'Evlilik Cüzdanı',
-          description: 'Evlilik belgesi fotokopisi',
-          fileName: 'evlilik-cuzdani.pdf',
-          fileSize: 256000,
-          contentType: 'application/pdf',
-          type: DocumentType.EXHIBIT,
-          caseId: 2,
-          uploadDate: new Date('2024-02-11'),
-          createdDate: new Date('2024-02-11')
-        },
-        {
-          id: 4,
-          title: 'Şirket Sözleşmesi',
-          description: 'Ana sözleşme belgesi',
-          fileName: 'sirket-sozlesmesi.pdf',
-          fileSize: 2048000,
-          contentType: 'application/pdf',
-          type: DocumentType.CONTRACT,
-          caseId: 3,
-          uploadDate: new Date('2024-03-06'),
-          createdDate: new Date('2024-03-06')
-        }
-      ];
-
-      this.caseDocuments = allDocuments.filter(d => d.caseId == caseId);
-      this.loading = false;
-    }, 500);
-  }
-
-  goBack(): void {
-    if (this.client) {
-      this.router.navigate(['/admin/client', this.client.id]);
-    } else {
-      this.router.navigate(['/admin'], { queryParams: { tab: 'cases' } });
-    }
-  }
-
-  downloadDocument(document: Document): void {
-    // TODO: Dosya indirme işlemi
-    this.messageService.add({
-      severity: 'info',
-      summary: 'İndirme',
-      detail: `${document.fileName} dosyası indiriliyor...`
+    private confirmationService: ConfirmationService,
+    private caseService: CaseService,
+    private documentService: DocumentService
+  ) {
+    this.uploadForm = this.fb.group({
+      title: ['', [Validators.required]],
+      description: [''],
+      type: [DocumentType.OTHER, [Validators.required]]
     });
   }
 
-  getStatusSeverity(status: CaseStatus): 'success' | 'secondary' | 'info' | 'warning' | 'danger' | 'contrast' | undefined {
-    switch (status) {
-      case CaseStatus.OPEN: return 'info';
-      case CaseStatus.IN_PROGRESS: return 'warning';
-      case CaseStatus.PENDING: return 'secondary';
-      case CaseStatus.CLOSED: return 'success';
-      default: return 'info';
+  ngOnInit(): void {
+    const caseId = this.route.snapshot.params['id'];
+    console.log('CaseDetailComponent: ngOnInit called with caseId:', caseId);
+    this.loadCase(caseId);
+    this.loadDocuments(caseId);
+  }
+
+  loadCase(caseId: number): void {
+    debugger;
+    console.log('CaseDetailComponent: loadCase called with caseId:', caseId);
+    this.loading = true;
+    this.caseService.getCaseById(caseId)
+      .pipe(
+        catchError(error => {
+          console.error('CaseDetailComponent: Error loading case:', error);
+          console.error('CaseDetailComponent: Error status:', error.status);
+          console.error('CaseDetailComponent: Error message:', error.message);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Hata',
+            detail: 'Dava bilgileri yüklenirken hata oluştu'
+          });
+          return of(null);
+        }),
+        finalize(() => this.loading = false)
+      )
+             .subscribe(caseData => {
+         console.log('CaseDetailComponent: Case loaded:', caseData);
+         this.case = caseData;
+       });
+  }
+
+  loadDocuments(caseId: number): void {
+    if (!caseId) return;
+    
+    this.loading = true;
+    this.documentService.getDocumentsByCaseId(caseId)
+      .pipe(
+        catchError(error => {
+          console.error('Error loading documents:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Hata',
+            detail: 'Dokümanlar yüklenirken hata oluştu'
+          });
+          return of([]);
+        }),
+        finalize(() => this.loading = false)
+      )
+      .subscribe(documents => {
+        this.documents = documents;
+      });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/admin'], { queryParams: { tab: 'clients' } });
+  }
+
+  openUploadDialog(): void {
+    this.uploadForm.reset({
+      type: DocumentType.OTHER
+    });
+    this.selectedFiles = [];
+    this.showUploadDialog = true;
+  }
+
+  onFileSelect(event: any): void {
+    this.selectedFiles = Array.from(event.files);
+    
+    // Auto-fill title with first file name if only one file
+    if (this.selectedFiles.length === 1 && !this.uploadForm.get('title')?.value) {
+      const fileName = this.selectedFiles[0].name;
+      const nameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+      this.uploadForm.patchValue({ title: nameWithoutExtension });
     }
   }
 
-  getStatusLabel(status: CaseStatus): string {
-    switch (status) {
-      case CaseStatus.OPEN: return 'Açık';
-      case CaseStatus.IN_PROGRESS: return 'Devam Ediyor';
-      case CaseStatus.PENDING: return 'Beklemede';
-      case CaseStatus.CLOSED: return 'Kapalı';
-      default: return status;
+  uploadDocuments(): void {
+    if (this.uploadForm.valid && this.selectedFiles.length > 0 && this.case?.id) {
+      this.uploading = true;
+
+      const uploadRequests = this.selectedFiles.map(file => {
+        const request: DocumentUploadRequest = {
+          caseId: this.case!.id!,
+          title: this.uploadForm.value.title,
+          description: this.uploadForm.value.description,
+          type: this.uploadForm.value.type
+        };
+
+        return this.documentService.uploadDocument(file, request);
+      });
+
+      // Upload files sequentially to avoid overwhelming the server
+      this.uploadFilesSequentially(uploadRequests, 0);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Uyarı',
+        detail: 'Lütfen gerekli alanları doldurun ve en az bir dosya seçin'
+      });
     }
   }
 
-  getTypeLabel(type: CaseType): string {
-    switch (type) {
-      case CaseType.CAR_DEPRECIATION: return 'Değer Kaybı';
-      case CaseType.CIVIL: return 'Hukuk';
-      case CaseType.CRIMINAL: return 'Ceza';
-      case CaseType.FAMILY: return 'Aile';
-      case CaseType.CORPORATE: return 'Kurumsal';
-      case CaseType.REAL_ESTATE: return 'Emlak';
-      case CaseType.INTELLECTUAL_PROPERTY: return 'Fikri Mülkiyet';
-      case CaseType.OTHER: return 'Diğer';
-      default: return type;
+  private uploadFilesSequentially(uploadRequests: any[], index: number): void {
+    if (index >= uploadRequests.length) {
+      // All uploads completed
+      this.uploading = false;
+      this.showUploadDialog = false;
+      this.uploadForm.reset();
+      this.selectedFiles = [];
+      this.loadDocuments(this.case!.id!); // Reload documents
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Başarılı',
+        detail: `${uploadRequests.length} dosya başarıyla yüklendi`
+      });
+      return;
     }
+
+    uploadRequests[index]
+      .pipe(
+        catchError((error: any) => {
+          console.error('Error uploading document:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Hata',
+            detail: `Dosya yüklenirken hata oluştu: ${this.selectedFiles[index]?.name}`
+          });
+          return of(null);
+        })
+      )
+      .subscribe((document: Document | null) => {
+        if (document) {
+          // Upload successful, continue with next file
+          this.uploadFilesSequentially(uploadRequests, index + 1);
+        } else {
+          // Upload failed, but continue with remaining files
+          this.uploadFilesSequentially(uploadRequests, index + 1);
+        }
+      });
+  }
+
+  downloadDocument(document: Document): void {
+    if (!document.id) return;
+
+    this.documentService.downloadDocument(document.id)
+      .pipe(
+        catchError(error => {
+          console.error('Error downloading document:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Hata',
+            detail: 'Dosya indirilirken hata oluştu'
+          });
+          return of(null);
+        })
+      )
+      .subscribe(blob => {
+        if (blob) {
+          // Create download link
+          const url = window.URL.createObjectURL(blob);
+          const link = window.document.createElement('a');
+          link.href = url;
+          link.download = document.fileName;
+          link.click();
+          window.URL.revokeObjectURL(url);
+
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Başarılı',
+            detail: 'Dosya başarıyla indirildi'
+          });
+        }
+      });
+  }
+
+  deleteDocument(document: Document): void {
+    this.confirmationService.confirm({
+      message: `${document.fileName} dosyasını silmek istediğinizden emin misiniz?`,
+      header: 'Dosya Sil',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Evet',
+      rejectLabel: 'Hayır',
+      accept: () => {
+        if (!document.id) return;
+
+        this.documentService.deleteDocument(document.id)
+          .pipe(
+            catchError(error => {
+              console.error('Error deleting document:', error);
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Hata',
+                detail: 'Dosya silinirken hata oluştu'
+              });
+              return of(null);
+            })
+          )
+          .subscribe(() => {
+            this.documents = this.documents.filter(d => d.id !== document.id);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Başarılı',
+              detail: 'Dosya başarıyla silindi'
+            });
+          });
+      }
+    });
   }
 
   getDocumentTypeLabel(type: DocumentType): string {
-    switch (type) {
-      case DocumentType.COMPLAINT: return 'Şikayet';
-      case DocumentType.ANSWER: return 'Cevap';
-      case DocumentType.MOTION: return 'Dilekçe';
-      case DocumentType.EXHIBIT: return 'Delil';
-      case DocumentType.CONTRACT: return 'Sözleşme';
-      case DocumentType.CORRESPONDENCE: return 'Yazışma';
-      case DocumentType.OTHER: return 'Diğer';
-      default: return type;
-    }
+    const option = this.documentTypeOptions.find(opt => opt.value === type);
+    return option ? option.label : type;
+  }
+
+  getFileIcon(contentType: string): string {
+    if (contentType?.includes('pdf')) return 'pi pi-file-pdf';
+    if (contentType?.includes('word') || contentType?.includes('document')) return 'pi pi-file-word';
+    if (contentType?.includes('excel') || contentType?.includes('spreadsheet')) return 'pi pi-file-excel';
+    if (contentType?.includes('image')) return 'pi pi-image';
+    return 'pi pi-file';
   }
 
   formatFileSize(bytes: number): string {
@@ -253,19 +281,23 @@ export class CaseDetailComponent implements OnInit {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  getFileIcon(fileName: string): string {
-    const extension = fileName.split('.').pop()?.toLowerCase();
-    switch (extension) {
-      case 'pdf': return 'pi pi-file-pdf';
-      case 'doc':
-      case 'docx': return 'pi pi-file-word';
-      case 'xls':
-      case 'xlsx': return 'pi pi-file-excel';
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif': return 'pi pi-image';
-      default: return 'pi pi-file';
+  cancelUpload(): void {
+    this.showUploadDialog = false;
+    this.uploadForm.reset();
+    this.selectedFiles = [];
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.uploadForm.get(fieldName);
+    if (field && field.errors && field.touched) {
+      if (field.errors['required']) {
+        switch(fieldName) {
+          case 'title': return 'Başlık gereklidir';
+          case 'type': return 'Doküman türü gereklidir';
+          default: return `${fieldName} gereklidir`;
+        }
+      }
     }
+    return '';
   }
 } 

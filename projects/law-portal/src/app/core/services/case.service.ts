@@ -81,7 +81,11 @@ export class CaseService {
    * Get case by ID
    */
   getCaseById(id: number): Observable<Case> {
-    return this.http.get<Case>(`${this.baseUrl}/${id}`);
+    const url = `${this.baseUrl}/${id}`;
+    console.log('CaseService: Making request to:', url);
+    console.log('CaseService: Base URL is:', this.baseUrl);
+    console.log('CaseService: Full environment:', environment);
+    return this.http.get<Case>(url);
   }
 
   /**
