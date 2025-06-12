@@ -58,6 +58,38 @@
 // Stats Section
 .stats-section {
   margin-bottom: 2rem;
+  position: relative;
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+
+    .loading-spinner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      color: #667eea;
+
+      i {
+        font-size: 2rem;
+      }
+
+      span {
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+    }
+  }
 
   .stats-grid {
     display: grid;
@@ -110,8 +142,20 @@
 
       small {
         font-size: 0.8rem;
-        color: #10b981;
         font-weight: 500;
+        
+        .positive-growth {
+          color: #10b981;
+        }
+        
+        .negative-growth {
+          color: #ef4444;
+        }
+        
+        .empty-state-text {
+          color: #9ca3af;
+          font-style: italic;
+        }
       }
     }
 

@@ -25,15 +25,47 @@
 
   <!-- Stats Cards -->
   <div class="stats-section">
+    <div class="loading-overlay" *ngIf="loading">
+      <div class="loading-spinner">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Veriler yükleniyor...</span>
+      </div>
+    </div>
     <div class="stats-grid">
       <div class="stat-card clients">
         <div class="stat-icon">
           <i class="pi pi-users"></i>
         </div>
         <div class="stat-info">
-          <h3>{{ totalClients }}</h3>
+          <h3>{{ totalClients || 0 }}</h3>
           <p>Toplam Müvekkil</p>
-          <small>+12% bu ay</small>
+          <small *ngIf="totalClients > 0; else noClients">Aktif müvekkiller</small>
+          <ng-template #noClients>
+            <small class="empty-state-text">Henüz müvekkil eklenmemiş</small>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="stat-card revenue">
+        <div class="stat-icon">
+          <i class="pi pi-user"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ monthlyNewClients || 0 }}</h3>
+          <p>Bu Ay Yeni Müvekkil</p>
+          <small *ngIf="monthlyNewClients > 0; else noNewClients">
+            <span *ngIf="clientGrowthPercentage >= 0; else negativeGrowth" class="positive-growth">
+              +{{ clientGrowthPercentage | number:'1.1-1' }}% geçen aya göre
+            </span>
+            <ng-template #negativeGrowth>
+              <span class="negative-growth">
+                {{ clientGrowthPercentage | number:'1.1-1' }}% geçen aya göre
+              </span>
+            </ng-template>
+          </small>
+          <ng-template #noNewClients>
+            <small class="empty-state-text">Bu ay yeni müvekkil eklenmemiş</small>
+          </ng-template>
         </div>
       </div>
 
@@ -42,9 +74,12 @@
           <i class="pi pi-briefcase"></i>
         </div>
         <div class="stat-info">
-          <h3>{{ totalCases }}</h3>
+          <h3>{{ totalCases || 0 }}</h3>
           <p>Aktif Dava</p>
-          <small>+8% bu ay</small>
+          <small *ngIf="totalCases > 0; else noCases">Devam eden davalar</small>
+          <ng-template #noCases>
+            <small class="empty-state-text">Henüz aktif dava bulunmuyor</small>
+          </ng-template>
         </div>
       </div>
 
@@ -53,20 +88,12 @@
           <i class="pi pi-file"></i>
         </div>
         <div class="stat-info">
-          <h3>{{ totalDocuments }}</h3>
+          <h3>{{ totalDocuments || 0 }}</h3>
           <p>Toplam Doküman</p>
-          <small>+25% bu ay</small>
-        </div>
-      </div>
-
-      <div class="stat-card revenue">
-        <div class="stat-icon">
-          <i class="pi pi-chart-line"></i>
-        </div>
-        <div class="stat-info">
-          <h3>₺124.5K</h3>
-          <p>Bu Ay Gelir</p>
-          <small>+15% geçen aya göre</small>
+          <small *ngIf="totalDocuments > 0; else noDocuments">Sistemdeki dokümanlar</small>
+          <ng-template #noDocuments>
+            <small class="empty-state-text">Henüz doküman yüklenmemiş</small>
+          </ng-template>
         </div>
       </div>
     </div>
