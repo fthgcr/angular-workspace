@@ -9,12 +9,12 @@
       <p class="page-subtitle">Müvekkillerinizi buradan yönetebilirsiniz</p>
     </div>
     <div class="action-section">
-      <!--<p-button 
+      <p-button 
         label="Yeni Müvekkil" 
         icon="pi pi-plus" 
         (click)="openNewClientDialog()"
         styleClass="primary-btn"
-      ></p-button> -->
+      ></p-button> 
     </div>
   </div>
 
@@ -312,8 +312,15 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="password">Şifre *</label>
+          <div class="form-group" *ngIf="!editingClient">
+            <label for="password">
+              Şifre *
+              <i class="pi pi-info-circle password-info-icon" 
+                 pTooltip="Varsayılan şifre: 123456. İsterseniz değiştirebilirsiniz."
+                 tooltipPosition="top"
+                 [style]="{'margin-left': '0.5rem', 'color': '#6b7280', 'cursor': 'help'}">
+              </i>
+            </label>
             <input 
               id="password"
               type="password" 
@@ -321,12 +328,11 @@
               formControlName="password"
               placeholder="Şifre girin (min. 6 karakter)"
               class="w-full"
-              [style.display]="editingClient ? 'none' : 'block'"
             />
-            <small class="password-note" *ngIf="editingClient" style="color: #6b7280; font-size: 0.8rem;">
-              Şifre değiştirmek için ayrı bir işlem gereklidir
+            <small class="password-note" style="color: #6b7280; font-size: 0.8rem; font-style: italic;">
+              Varsayılan: 123456 (değiştirilebilir)
             </small>
-            <small class="error-message" *ngIf="getFieldError('password') && !editingClient">
+            <small class="error-message" *ngIf="getFieldError('password')">
               {{ getFieldError('password') }}
             </small>
           </div>

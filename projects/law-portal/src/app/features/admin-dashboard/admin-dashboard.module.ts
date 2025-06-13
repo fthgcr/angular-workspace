@@ -20,6 +20,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { CardModule } from 'primeng/card';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 // Components
 import { AdminDashboardComponent } from './admin-dashboard.component';
@@ -63,7 +64,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     TooltipModule,
     FileUploadModule,
     ProgressBarModule,
-    CardModule
+    CardModule,
+    InputNumberModule
   ],
   providers: [
     MessageService,

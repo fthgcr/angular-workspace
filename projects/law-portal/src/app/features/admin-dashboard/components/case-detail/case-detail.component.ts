@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Case, CaseService, CaseType, CaseStatus } from '../../../../core/services/case.service';
-import { Document, DocumentType, DocumentService, DocumentUploadRequest } from '../../../../core/services/document.service';
+import { Document, DocumentType, DocumentService, DocumentCreateRequest } from '../../../../core/services/document.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
@@ -128,8 +128,8 @@ export class CaseDetailComponent implements OnInit {
       this.uploading = true;
 
       const uploadRequests = this.selectedFiles.map(file => {
-        const request: DocumentUploadRequest = {
-          caseId: this.case!.id!,
+        const request: DocumentCreateRequest = {
+          legalCaseId: this.case!.id!,
           title: this.uploadForm.value.title,
           description: this.uploadForm.value.description,
           type: this.uploadForm.value.type

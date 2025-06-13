@@ -1,36 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { DocumentService, Document, DocumentType } from '../../../../core/services/document.service';
+import { CaseService } from '../../../../core/services/case.service';
 import { Case } from '../case-management/case-management.component';
-
-export interface Document {
-  id?: number;
-  title: string;
-  fileName: string;
-  contentType: string;
-  fileSize: number;
-  description?: string;
-  legalCaseId?: number;
-  legalCase?: Case;
-  type: DocumentType;
-  createdDate?: Date;
-  updatedDate?: Date;
-}
-
-export enum DocumentType {
-  COMPLAINT = 'COMPLAINT',
-  ANSWER = 'ANSWER',
-  MOTION = 'MOTION',
-  EXHIBIT = 'EXHIBIT',
-  CONTRACT = 'CONTRACT',
-  CORRESPONDENCE = 'CORRESPONDENCE',
-  OTHER = 'OTHER'
-}
 
 @Component({
   selector: 'app-document-management',
   templateUrl: './document-management.component.html',
-  styleUrls: ['./document-management.component.scss']
+  styleUrls: ['./document-management.component.scss'],
+  providers: [MessageService, ConfirmationService]
 })
 export class DocumentManagementComponent implements OnInit {
   documents: Document[] = [];
@@ -55,7 +34,9 @@ export class DocumentManagementComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private documentService: DocumentService,
+    private caseService: CaseService
   ) {
     this.documentForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -72,69 +53,40 @@ export class DocumentManagementComponent implements OnInit {
 
   loadDocuments(): void {
     this.loading = true;
-    // TODO: API çağrısı yapılacak
-    setTimeout(() => {
-      this.documents = [
-        {
-          id: 1,
-          title: 'İş Mahkemesi Dava Dilekçesi',
-          fileName: 'dava_dilekçesi.pdf',
-          contentType: 'application/pdf',
-          fileSize: 245760,
-          description: 'İşçi-işveren uyuşmazlığı için açılan dava dilekçesi',
-          type: DocumentType.COMPLAINT,
-          legalCaseId: 1,
-          createdDate: new Date('2024-01-15')
-        },
-        {
-          id: 2,
-          title: 'İş Sözleşmesi',
-          fileName: 'is_sozlesmesi.pdf',
-          contentType: 'application/pdf',
-          fileSize: 186420,
-          description: 'Taraflar arasındaki iş sözleşmesi',
-          type: DocumentType.CONTRACT,
-          legalCaseId: 1,
-          createdDate: new Date('2024-01-20')
-        },
-        {
-          id: 3,
-          title: 'Boşanma Dilekçesi',
-          fileName: 'bosanma_dilekçesi.pdf',
-          contentType: 'application/pdf',
-          fileSize: 324680,
-          description: 'Anlaşmalı boşanma süreci dilekçesi',
-          type: DocumentType.COMPLAINT,
-          legalCaseId: 2,
-          createdDate: new Date('2024-02-10')
-        }
-      ];
-      this.loading = false;
-    }, 1000);
+    this.documentService.getAllDocuments().subscribe({
+      next: (documents) => {
+        this.documents = documents;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading documents:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Dokümanlar yüklenirken bir hata oluştu'
+        });
+        this.loading = false;
+      }
+    });
   }
 
   loadCases(): void {
-    // TODO: API çağrısı yapılacak
-    this.cases = [
-      {
-        id: 1,
-        caseNumber: 'CASE-2024-001',
-        title: 'İş Mahkemesi Davası',
-        description: 'İşçi-işveren uyuşmazlığı',
-        status: 'IN_PROGRESS' as any,
-        type: 'CIVIL' as any,
-        filingDate: new Date('2024-01-15')
+    this.caseService.getAllCases().subscribe({
+      next: (cases) => {
+        this.cases = cases.map(case_ => ({
+          ...case_,
+          fullName: `${case_.caseNumber} - ${case_.title}`
+        }));
       },
-      {
-        id: 2,
-        caseNumber: 'CASE-2024-002',
-        title: 'Boşanma Davası',
-        description: 'Anlaşmalı boşanma süreci',
-        status: 'OPEN' as any,
-        type: 'FAMILY' as any,
-        filingDate: new Date('2024-02-10')
+      error: (error) => {
+        console.error('Error loading cases:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Davalar yüklenirken bir hata oluştu'
+        });
       }
-    ];
+    });
   }
 
   openNewDocumentDialog(): void {
@@ -161,12 +113,25 @@ export class DocumentManagementComponent implements OnInit {
       acceptLabel: 'Evet',
       rejectLabel: 'Hayır',
       accept: () => {
-        this.documents = this.documents.filter(d => d.id !== document.id);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Başarılı',
-          detail: 'Doküman başarıyla silindi'
-        });
+        if (document.id) {
+          this.documentService.deleteDocument(document.id).subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Başarılı',
+                detail: 'Doküman başarıyla silindi'
+              });
+              this.loadDocuments();
+            },
+            error: (error) => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Hata',
+                detail: 'Doküman silinirken bir hata oluştu'
+              });
+            }
+          });
+        }
       }
     });
   }
@@ -200,40 +165,45 @@ export class DocumentManagementComponent implements OnInit {
 
       if (this.editingDocument) {
         // Güncelleme
-        const index = this.documents.findIndex(d => d.id === this.editingDocument!.id);
-        if (index !== -1) {
-          this.documents[index] = { 
-            ...this.editingDocument, 
-            ...formData,
-            updatedDate: new Date()
-          };
-        }
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Başarılı',
-          detail: 'Doküman bilgileri güncellendi'
+        this.documentService.updateDocument(this.editingDocument.id!, formData).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Başarılı',
+              detail: 'Doküman bilgileri güncellendi'
+            });
+            this.hideDialog();
+            this.loadDocuments();
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Hata',
+              detail: 'Doküman güncellenirken bir hata oluştu'
+            });
+          }
         });
       } else {
         // Yeni ekleme
-        const newDocument: Document = {
-          id: Math.max(...this.documents.map(d => d.id || 0)) + 1,
-          ...formData,
-          fileName: this.selectedFile!.name,
-          contentType: this.selectedFile!.type,
-          fileSize: this.selectedFile!.size,
-          createdDate: new Date()
-        };
-        this.documents.push(newDocument);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Başarılı',
-          detail: 'Yeni doküman eklendi'
+        this.documentService.uploadDocument(this.selectedFile!, formData).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Başarılı',
+              detail: 'Yeni doküman eklendi'
+            });
+            this.hideDialog();
+            this.loadDocuments();
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Hata',
+              detail: 'Doküman yüklenirken bir hata oluştu'
+            });
+          }
         });
       }
-      
-      this.showDialog = false;
-      this.documentForm.reset();
-      this.selectedFile = null;
     } else {
       this.messageService.add({
         severity: 'warn',
@@ -243,20 +213,48 @@ export class DocumentManagementComponent implements OnInit {
     }
   }
 
-  cancelDialog(): void {
+  hideDialog(): void {
     this.showDialog = false;
     this.documentForm.reset();
     this.editingDocument = null;
     this.selectedFile = null;
   }
 
+  cancelDialog(): void {
+    this.hideDialog();
+  }
+
   downloadDocument(document: Document): void {
-    // TODO: Gerçek download işlemi yapılacak
-    this.messageService.add({
-      severity: 'info',
-      summary: 'İndiriliyor',
-      detail: `${document.fileName} indiriliyor...`
-    });
+    if (document.id) {
+      this.documentService.downloadDocument(document.id).subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = window.document.createElement('a');
+          link.href = url;
+          link.download = document.fileName;
+          link.click();
+          window.URL.revokeObjectURL(url);
+          
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Başarılı',
+            detail: `${document.fileName} indirildi`
+          });
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Hata',
+            detail: 'Dosya indirilirken bir hata oluştu'
+          });
+        }
+      });
+    }
+  }
+
+  searchDocuments(searchTerm: string): void {
+    // Global search implementation - this will be handled by PrimeNG table's global filter
+    // We can add custom logic here if needed
   }
 
   getCaseName(caseId: number): string {

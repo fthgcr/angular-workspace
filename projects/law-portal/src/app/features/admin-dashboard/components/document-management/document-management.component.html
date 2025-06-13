@@ -9,12 +9,12 @@
       <p class="page-subtitle">Dava dokümanlarınızı buradan yönetebilirsiniz</p>
     </div>
     <div class="action-section">
-      <p-button 
+      <!--<p-button 
         label="Yeni Doküman" 
         icon="pi pi-plus" 
         (click)="openNewDocumentDialog()"
         styleClass="primary-btn"
-      ></p-button>
+      ></p-button> -->
     </div>
   </div>
 
@@ -27,14 +27,14 @@
       [rows]="10"
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
-      [globalFilterFields]="['title', 'fileName', 'description', 'type']"
+      [globalFilterFields]="['title', 'fileName', 'description', 'type', 'legalCaseTitle', 'clientName']"
       styleClass="modern-table"
       responsiveLayout="scroll"
       #documentTable
     >
       <ng-template pTemplate="caption">
         <div class="table-header">
-          <span class="p-input-icon-left">
+          <!-- <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
             <input 
               pInputText 
@@ -43,27 +43,178 @@
               (input)="documentTable.filterGlobal($any($event.target).value, 'contains')"
               class="search-input"
             />
-          </span>
+          </span> -->
         </div>
       </ng-template>
 
       <ng-template pTemplate="header">
         <tr>
           <th pSortableColumn="title">
-            Başlık <p-sortIcon field="title"></p-sortIcon>
+            <div class="column-header">
+              <span>Başlık</span>
+              <div class="header-controls">
+                <p-sortIcon field="title"></p-sortIcon>
+                <p-columnFilter 
+                  type="text" 
+                  field="title" 
+                  display="menu"
+                  matchMode="contains"
+                  [showMatchModes]="false"
+                  [showOperator]="false"
+                  [showAddButton]="false"
+                >
+                  <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                    <input 
+                      type="text" 
+                      pInputText 
+                      [value]="value" 
+                      (input)="filter($any($event.target).value)"
+                      placeholder="Başlık ara..."
+                      class="filter-input"
+                    />
+                  </ng-template>
+                </p-columnFilter>
+              </div>
+            </div>
           </th>
           <th pSortableColumn="fileName">
-            Dosya Adı <p-sortIcon field="fileName"></p-sortIcon>
+            <div class="column-header">
+              <span>Dosya Adı</span>
+              <div class="header-controls">
+                <p-sortIcon field="fileName"></p-sortIcon>
+                <p-columnFilter 
+                  type="text" 
+                  field="fileName" 
+                  display="menu"
+                  matchMode="contains"
+                  [showMatchModes]="false"
+                  [showOperator]="false"
+                  [showAddButton]="false"
+                >
+                  <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                    <input 
+                      type="text" 
+                      pInputText 
+                      [value]="value" 
+                      (input)="filter($any($event.target).value)"
+                      placeholder="Dosya adı ara..."
+                      class="filter-input"
+                    />
+                  </ng-template>
+                </p-columnFilter>
+              </div>
+            </div>
           </th>
           <th pSortableColumn="type">
-            Tür <p-sortIcon field="type"></p-sortIcon>
+            <div class="column-header">
+              <span>Tür</span>
+              <div class="header-controls">
+                <p-sortIcon field="type"></p-sortIcon>
+                <p-columnFilter 
+                  field="type" 
+                  matchMode="equals" 
+                  display="menu"
+                  [showMatchModes]="false"
+                  [showOperator]="false"
+                  [showAddButton]="false"
+                >
+                  <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                    <p-dropdown 
+                      [ngModel]="value" 
+                      [options]="documentTypeOptions"
+                      (onChange)="filter($event.value)"
+                      placeholder="Tür seçin"
+                      [showClear]="true"
+                      optionLabel="label"
+                      optionValue="value"
+                      class="filter-dropdown"
+                    ></p-dropdown>
+                  </ng-template>
+                </p-columnFilter>
+              </div>
+            </div>
           </th>
-          <th>Dava</th>
+          <th>
+            <div class="column-header">
+              <span>Dava</span>
+              <div class="header-controls">
+                <p-columnFilter 
+                  field="legalCaseTitle" 
+                  matchMode="contains" 
+                  display="menu"
+                  [showMatchModes]="false"
+                  [showOperator]="false"
+                  [showAddButton]="false"
+                >
+                  <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                    <input 
+                      type="text" 
+                      pInputText 
+                      [value]="value" 
+                      (input)="filter($any($event.target).value)"
+                      placeholder="Dava ara..."
+                      class="filter-input"
+                    />
+                  </ng-template>
+                </p-columnFilter>
+              </div>
+            </div>
+          </th>
           <th pSortableColumn="fileSize">
-            Boyut <p-sortIcon field="fileSize"></p-sortIcon>
+            <div class="column-header">
+              <span>Boyut</span>
+              <div class="header-controls">
+                <p-sortIcon field="fileSize"></p-sortIcon>
+                <p-columnFilter 
+                  type="numeric" 
+                  field="fileSize" 
+                  display="menu"
+                  matchMode="gte"
+                  [showMatchModes]="false"
+                  [showOperator]="false"
+                  [showAddButton]="false"
+                >
+                  <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                    <p-inputNumber 
+                      [ngModel]="value" 
+                      (onInput)="filter($event.value)"
+                      placeholder="Min boyut (KB)"
+                      mode="decimal"
+                      [useGrouping]="false"
+                      class="filter-input"
+                    ></p-inputNumber>
+                  </ng-template>
+                </p-columnFilter>
+              </div>
+            </div>
           </th>
           <th pSortableColumn="createdDate">
-            Tarih <p-sortIcon field="createdDate"></p-sortIcon>
+            <div class="column-header">
+              <span>Tarih</span>
+              <div class="header-controls">
+                <p-sortIcon field="createdDate"></p-sortIcon>
+                <p-columnFilter 
+                  type="date" 
+                  field="createdDate" 
+                  display="menu"
+                  matchMode="dateIs"
+                  [showMatchModes]="false"
+                  [showOperator]="false"
+                  [showAddButton]="false"
+                >
+                  <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                    <p-calendar 
+                      [ngModel]="value" 
+                      (onSelect)="filter($event)"
+                      dateFormat="dd/mm/yy"
+                      placeholder="Tarih seçin"
+                      [showIcon]="true"
+                      class="filter-calendar"
+                    ></p-calendar>
+                  </ng-template>
+                </p-columnFilter>
+              </div>
+            </div>
           </th>
           <th>İşlemler</th>
         </tr>
@@ -92,8 +243,8 @@
           </td>
           <td>
             <div class="case-info" *ngIf="document.legalCaseId">
-              <div class="case-number">{{ getCaseNumber(document.legalCaseId) }}</div>
-              <div class="case-name">{{ getCaseName(document.legalCaseId) }}</div>
+              <div class="case-number">{{ document.legalCaseNumber }}</div>
+              <div class="case-name">{{ document.legalCaseTitle }}</div>
             </div>
             <div class="no-case" *ngIf="!document.legalCaseId">
               <i class="pi pi-minus-circle"></i>
@@ -259,7 +410,7 @@
                 formControlName="legalCaseId"
                 [options]="cases"
                 placeholder="Dava seçin"
-                optionLabel="title"
+                optionLabel="fullName"
                 optionValue="id"
                 class="w-full"
               >

@@ -36,11 +36,20 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['123456', [Validators.required, Validators.minLength(6)]],
       phoneNumber: [''],
       address: [''],
       notes: [''],
       enabled: [true]
+    });
+
+    // Watch for firstName and lastName changes to auto-generate username
+    this.clientForm.get('firstName')?.valueChanges.subscribe(() => {
+      this.generateUsername();
+    });
+    
+    this.clientForm.get('lastName')?.valueChanges.subscribe(() => {
+      this.generateUsername();
     });
   }
 
@@ -143,10 +152,38 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
     });
   }
 
+  generateUsername(): void {
+    const firstName = this.clientForm.get('firstName')?.value;
+    const lastName = this.clientForm.get('lastName')?.value;
+    
+    if (firstName && lastName && firstName.trim() && lastName.trim()) {
+      // Convert to lowercase and remove Turkish characters
+      const normalizedFirstName = this.normalizeString(firstName.trim());
+      const normalizedLastName = this.normalizeString(lastName.trim());
+      
+      const username = `${normalizedFirstName}.${normalizedLastName}`;
+      this.clientForm.get('username')?.setValue(username);
+    }
+  }
+
+  private normalizeString(str: string): string {
+    // Convert Turkish characters to English equivalents and make lowercase
+    return str
+      .toLowerCase()
+      .replace(/ğ/g, 'g')
+      .replace(/ü/g, 'u')
+      .replace(/ş/g, 's')
+      .replace(/ı/g, 'i')
+      .replace(/ö/g, 'o')
+      .replace(/ç/g, 'c')
+      .replace(/[^a-z0-9]/g, ''); // Remove any non-alphanumeric characters
+  }
+
   openNewClientDialog(): void {
     this.editingClient = null;
     this.clientForm.reset({
-      enabled: true
+      enabled: true,
+      password: '123456'
     });
     // Yeni kullanıcı eklerken password alanını etkinleştir
     this.clientForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
