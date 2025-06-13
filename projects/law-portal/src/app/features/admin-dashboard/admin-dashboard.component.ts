@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'shared-lib';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
-import { DashboardService, DashboardStats } from '../../core/services/dashboard.service';
+import { DashboardService, DashboardStats, ClientStatusSummary, CaseTypeDistribution, CaseStatusDistribution, RecentActivity } from '../../core/services/dashboard.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -23,6 +23,14 @@ export class AdminDashboardComponent implements OnInit {
   monthlyNewClients = 0;
   clientGrowthPercentage = 0;
 
+  // New statistics for analytic dashboard
+  clientStatusSummary: ClientStatusSummary | null = null;
+  caseTypesDistribution: CaseTypeDistribution[] = [];
+  caseStatusDistribution: CaseStatusDistribution[] = [];
+
+  // Recent activities
+  recentActivities: RecentActivity[] = [];
+
   constructor(
     private authService: AuthService, 
     private router: Router,
@@ -37,20 +45,41 @@ export class AdminDashboardComponent implements OnInit {
 
   loadDashboardStats(): void {
     this.loading = true;
-    this.dashboardService.getDashboardStats().subscribe({
-      next: (stats: DashboardStats) => {
+    
+    // Load all dashboard data in parallel
+    Promise.all([
+      this.dashboardService.getDashboardStats().toPromise(),
+      this.dashboardService.getClientStatusSummary().toPromise(),
+      this.dashboardService.getCaseTypesDistribution().toPromise(),
+      this.dashboardService.getCaseStatusDistribution().toPromise(),
+      this.dashboardService.getRecentActivities().toPromise()
+    ]).then(([stats, clientStatus, caseTypes, caseStatus, activities]) => {
+      // Main stats
+      if (stats) {
         this.totalClients = stats.totalClients;
         this.monthlyNewClients = stats.monthlyNewClients;
         this.clientGrowthPercentage = stats.clientGrowthPercentage;
         this.totalCases = stats.activeCases; // Showing active cases instead of total
         this.totalDocuments = stats.totalDocuments;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading dashboard stats:', error);
-        this.loading = false;
-        // Keep default values if API fails
       }
+
+      // Client status summary
+      this.clientStatusSummary = clientStatus || null;
+
+      // Case types distribution
+      this.caseTypesDistribution = caseTypes || [];
+
+      // Case status distribution
+      this.caseStatusDistribution = caseStatus || [];
+
+      // Recent activities
+      this.recentActivities = activities || [];
+
+      this.loading = false;
+    }).catch((error) => {
+      console.error('Error loading dashboard stats:', error);
+      this.loading = false;
+      // Keep default values if API fails
     });
   }
 
@@ -91,5 +120,29 @@ export class AdminDashboardComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'OPEN': return 'open';
+      case 'IN_PROGRESS': return 'progress';
+      case 'PENDING': return 'pending';
+      case 'CLOSED': return 'closed';
+      default: return 'open';
+    }
+  }
+
+  getCaseTypeClass(type: string): string {
+    switch (type) {
+      case 'CIVIL': return 'civil';
+      case 'CRIMINAL': return 'criminal';
+      case 'FAMILY': return 'family';
+      case 'CORPORATE': return 'corporate';
+      case 'REAL_ESTATE': return 'real-estate';
+      case 'INTELLECTUAL_PROPERTY': return 'intellectual';
+      case 'CAR_DEPRECIATION': return 'car-depreciation';
+      case 'OTHER': return 'other';
+      default: return 'other';
+    }
   }
 } 

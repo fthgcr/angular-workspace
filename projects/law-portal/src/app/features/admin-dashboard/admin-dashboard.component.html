@@ -141,121 +141,115 @@
                 <i class="pi pi-clock"></i>
                 Son Aktiviteler
               </h3>
-              <div class="activity-list">
-                <div class="activity-item">
+              <div class="activity-list" *ngIf="recentActivities.length > 0; else noActivities">
+                <div class="activity-item" *ngFor="let activity of recentActivities">
                   <div class="activity-icon">
-                    <i class="pi pi-user-plus"></i>
+                    <i class="pi" [ngClass]="activity.icon"></i>
                   </div>
                   <div class="activity-content">
-                    <p><strong>Yeni müvekkil eklendi:</strong> Ahmet Yılmaz</p>
-                    <small>2 saat önce</small>
-                  </div>
-                </div>
-                <div class="activity-item">
-                  <div class="activity-icon">
-                    <i class="pi pi-briefcase"></i>
-                  </div>
-                  <div class="activity-content">
-                    <p><strong>Dava güncellendi:</strong> CASE-2024-001</p>
-                    <small>4 saat önce</small>
-                  </div>
-                </div>
-                <div class="activity-item">
-                  <div class="activity-icon">
-                    <i class="pi pi-file-o"></i>
-                  </div>
-                  <div class="activity-content">
-                    <p><strong>Doküman yüklendi:</strong> Dava Dilekçesi</p>
-                    <small>1 gün önce</small>
+                    <p>{{ activity.description }}</p>
+                    <small>{{ activity.timeAgo }}</small>
                   </div>
                 </div>
               </div>
+              <ng-template #noActivities>
+                <div class="empty-data">
+                  <i class="pi pi-clock"></i>
+                  <p>Henüz aktivite bulunmuyor</p>
+                </div>
+              </ng-template>
             </div>
 
-            <!-- Quick Actions -->
+            <!-- Client Status Summary -->
             <div class="overview-card">
               <h3>
-                <i class="pi pi-bolt"></i>
-                Hızlı İşlemler
+                <i class="pi pi-users"></i>
+                Müvekkil Durumu Özeti
               </h3>
-              <div class="quick-actions">
-                <p-button 
-                  label="Yeni Müvekkil" 
-                  icon="pi pi-user-plus"
-                  styleClass="p-button-outlined w-100 mb-2"
-                  (click)="switchTab('clients')"
-                ></p-button>
-                <p-button 
-                  label="Yeni Dava" 
-                  icon="pi pi-plus"
-                  styleClass="p-button-outlined w-100 mb-2"
-                  (click)="switchTab('cases')"
-                ></p-button>
-                <p-button 
-                  label="Doküman Yükle" 
-                  icon="pi pi-upload"
-                  styleClass="p-button-outlined w-100 mb-2"
-                  (click)="switchTab('documents')"
-                ></p-button>
-                <p-button 
-                  label="Rapor Oluştur" 
-                  icon="pi pi-chart-bar"
-                  styleClass="p-button-outlined w-100"
-                ></p-button>
+              <div class="client-summary" *ngIf="clientStatusSummary; else noClientData">
+                <div class="summary-grid">
+                  <div class="summary-item active">
+                    <div class="summary-icon">
+                      <i class="pi pi-check-circle"></i>
+                    </div>
+                    <div class="summary-content">
+                      <span class="summary-count">{{ clientStatusSummary.activeClients }}</span>
+                      <span class="summary-label">Aktif</span>
+                    </div>
+                  </div>
+                  <div class="summary-item inactive">
+                    <div class="summary-icon">
+                      <i class="pi pi-pause-circle"></i>
+                    </div>
+                    <div class="summary-content">
+                      <span class="summary-count">{{ clientStatusSummary.inactiveClients }}</span>
+                      <span class="summary-label">Pasif</span>
+                    </div>
+                  </div>
+                  <div class="summary-item total">
+                    <div class="summary-icon">
+                      <i class="pi pi-users"></i>
+                    </div>
+                    <div class="summary-content">
+                      <span class="summary-count">{{ clientStatusSummary.totalClients }}</span>
+                      <span class="summary-label">Toplam</span>
+                    </div>
+                  </div>
+                </div>
               </div>
+              <ng-template #noClientData>
+                <div class="empty-data">
+                  <i class="pi pi-users"></i>
+                  <p>Henüz müvekkil verisi bulunmuyor</p>
+                </div>
+              </ng-template>
             </div>
 
-            <!-- Case Status Chart -->
+            <!-- Case Status Distribution -->
             <div class="overview-card chart-card">
               <h3>
                 <i class="pi pi-chart-pie"></i>
                 Dava Durumu Dağılımı
               </h3>
-              <div class="chart-container">
+              <div class="chart-container" *ngIf="caseStatusDistribution.length > 0; else noCaseStatusData">
                 <div class="chart-placeholder">
-                  <div class="chart-item">
-                    <span class="chart-dot open"></span>
-                    <span>Açık: 12</span>
-                  </div>
-                  <div class="chart-item">
-                    <span class="chart-dot progress"></span>
-                    <span>Devam Eden: 8</span>
-                  </div>
-                  <div class="chart-item">
-                    <span class="chart-dot pending"></span>
-                    <span>Beklemede: 3</span>
-                  </div>
-                  <div class="chart-item">
-                    <span class="chart-dot closed"></span>
-                    <span>Kapalı: 15</span>
+                  <div class="chart-item" *ngFor="let item of caseStatusDistribution">
+                    <span class="chart-dot" [ngClass]="getStatusClass(item.status)"></span>
+                    <span>{{ item.statusName }}: {{ item.count }}</span>
                   </div>
                 </div>
               </div>
+              <ng-template #noCaseStatusData>
+                <div class="empty-data">
+                  <i class="pi pi-chart-pie"></i>
+                  <p>Henüz dava verisi bulunmuyor</p>
+                </div>
+              </ng-template>
             </div>
 
-            <!-- Monthly Performance -->
+            <!-- Case Types Distribution -->
             <div class="overview-card">
               <h3>
-                <i class="pi pi-calendar"></i>
-                Aylık Performans
+                <i class="pi pi-chart-bar"></i>
+                Dava Türleri Dağılımı
               </h3>
-              <div class="performance-stats">
-                <div class="perf-item">
-                  <div class="perf-label">Yeni Müvekkiller</div>
-                  <div class="perf-value">+12</div>
-                  <div class="perf-change positive">↑ 15%</div>
-                </div>
-                <div class="perf-item">
-                  <div class="perf-label">Tamamlanan Davalar</div>
-                  <div class="perf-value">8</div>
-                  <div class="perf-change positive">↑ 25%</div>
-                </div>
-                <div class="perf-item">
-                  <div class="perf-label">Yüklenen Dokümanlar</div>
-                  <div class="perf-value">45</div>
-                  <div class="perf-change positive">↑ 30%</div>
+              <div class="case-types" *ngIf="caseTypesDistribution.length > 0; else noCaseTypeData">
+                <div class="type-list">
+                  <div class="type-item" *ngFor="let item of caseTypesDistribution">
+                    <div class="type-info">
+                      <span class="type-dot" [ngClass]="getCaseTypeClass(item.type)"></span>
+                      <span class="type-name">{{ item.typeName }}</span>
+                    </div>
+                    <span class="type-count">{{ item.count }}</span>
+                  </div>
                 </div>
               </div>
+              <ng-template #noCaseTypeData>
+                <div class="empty-data">
+                  <i class="pi pi-chart-bar"></i>
+                  <p>Henüz dava türü verisi bulunmuyor</p>
+                </div>
+              </ng-template>
             </div>
           </div>
         </div>
