@@ -17,6 +17,20 @@ export interface Case {
   filingDate: Date;
   createdDate?: Date;
   updatedDate?: Date;
+  client?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber?: string;
+    address?: string;
+  };
+  assignedUser?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
 export enum CaseStatus {

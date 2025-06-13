@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { Client } from '../../../../core/services/client.service';
+import { CaseService, CaseStatus, CaseType } from '../../../../core/services/case.service';
+import { ClientService } from '../../../../core/services/client.service';
 
 export interface Case {
   id?: number;
@@ -11,38 +13,45 @@ export interface Case {
   status: CaseStatus;
   type: CaseType;
   filingDate: Date;
-  assignedUser?: Client;
-  assignedUserId?: number;
   createdDate?: Date;
-  updatedDate?: Date;
+  client?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber?: string;
+    address?: string;
+  };
+  assignedUser?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
-export enum CaseStatus {
-  OPEN = 'OPEN',
-  IN_PROGRESS = 'IN_PROGRESS',
-  PENDING = 'PENDING',
-  CLOSED = 'CLOSED'
-}
-
-export enum CaseType {
-  CAR_DEPRECIATION = 'CAR_DEPRECIATION',
-  CIVIL = 'CIVIL',
-  CRIMINAL = 'CRIMINAL',
-  FAMILY = 'FAMILY',
-  CORPORATE = 'CORPORATE',
-  REAL_ESTATE = 'REAL_ESTATE',
-  INTELLECTUAL_PROPERTY = 'INTELLECTUAL_PROPERTY',
-  OTHER = 'OTHER'
+export interface User {
+  id?: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  phoneNumber?: string;
+  address?: string;
+  enabled: boolean;
+  createdDate?: Date;
+  fullName?: string;
 }
 
 @Component({
   selector: 'app-case-management',
   templateUrl: './case-management.component.html',
-  styleUrls: ['./case-management.component.scss']
+  styleUrls: ['./case-management.component.scss'],
+  providers: [MessageService, ConfirmationService]
 })
 export class CaseManagementComponent implements OnInit {
   cases: Case[] = [];
-  clients: Client[] = [];
+  clients: User[] = [];
   caseForm: FormGroup;
   showDialog = false;
   editingCase: Case | null = null;
@@ -56,6 +65,7 @@ export class CaseManagementComponent implements OnInit {
   ];
 
   caseTypeOptions = [
+    { label: 'Değer Kaybı', value: CaseType.CAR_DEPRECIATION },
     { label: 'Hukuk', value: CaseType.CIVIL },
     { label: 'Ceza', value: CaseType.CRIMINAL },
     { label: 'Aile', value: CaseType.FAMILY },
@@ -67,8 +77,11 @@ export class CaseManagementComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private router: Router,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private caseService: CaseService,
+    private clientService: ClientService
   ) {
     this.caseForm = this.fb.group({
       caseNumber: ['', [Validators.required]],
@@ -77,69 +90,52 @@ export class CaseManagementComponent implements OnInit {
       status: [CaseStatus.OPEN, [Validators.required]],
       type: [CaseType.CAR_DEPRECIATION, [Validators.required]],
       filingDate: [new Date(), [Validators.required]],
-      assignedUserId: [null]
+      assignedUserId: [null],
+      clientId: [null, [Validators.required]]
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.loadCases();
     this.loadClients();
   }
 
-  loadCases(): void {
+  loadCases() {
     this.loading = true;
-    // TODO: API çağrısı yapılacak
-    setTimeout(() => {
-      this.cases = [
-        {
-          id: 1,
-          caseNumber: 'CASE-2024-001',
-          title: 'İş Mahkemesi Davası',
-          description: 'İşçi-işveren uyuşmazlığı',
-          status: CaseStatus.IN_PROGRESS,
-          type: CaseType.CAR_DEPRECIATION,
-          filingDate: new Date('2024-01-15'),
-          assignedUserId: 1,
-          createdDate: new Date('2024-01-15')
-        },
-        {
-          id: 2,
-          caseNumber: 'CASE-2024-002',
-          title: 'Boşanma Davası',
-          description: 'Anlaşmalı boşanma süreci',
-          status: CaseStatus.OPEN,
-          type: CaseType.FAMILY,
-          filingDate: new Date('2024-02-10'),
-          assignedUserId: 2,
-          createdDate: new Date('2024-02-10')
-        }
-      ];
-      this.loading = false;
-    }, 1000);
+    this.caseService.getAllCases().subscribe({
+      next: (cases) => {
+        this.cases = cases;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading cases:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Davalar yüklenirken bir hata oluştu'
+        });
+        this.loading = false;
+      }
+    });
   }
 
-  loadClients(): void {
-    // TODO: API çağrısı yapılacak
-    this.clients = [
-      {
-        id: 1,
-        username: 'john.doe',
-        email: 'john.doe@email.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        enabled: true,
-        active: true
+  loadClients() {
+    this.clientService.getAllClients().subscribe({
+      next: (clients) => {
+        this.clients = clients.map(client => ({
+          ...client,
+          fullName: `${client.firstName} ${client.lastName}`
+        }));
       },
-      {
-        id: 2,
-        username: 'jane.smith',
-        email: 'jane.smith@email.com',
-        firstName: 'Jane',
-        lastName: 'Smith',
-        enabled: true,
-        active: true
+      error: (error) => {
+        console.error('Error loading clients:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Müvekkiller yüklenirken bir hata oluştu'
+        });
       }
-    ];
+    });
   }
 
   openNewCaseDialog(): void {
@@ -150,33 +146,6 @@ export class CaseManagementComponent implements OnInit {
       filingDate: new Date()
     });
     this.showDialog = true;
-  }
-
-  editCase(caseItem: Case): void {
-    this.editingCase = caseItem;
-    this.caseForm.patchValue({
-      ...caseItem,
-      filingDate: new Date(caseItem.filingDate)
-    });
-    this.showDialog = true;
-  }
-
-  deleteCase(caseItem: Case): void {
-    this.confirmationService.confirm({
-      message: `${caseItem.caseNumber} numaralı davayı silmek istediğinizden emin misiniz?`,
-      header: 'Dava Sil',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Evet',
-      rejectLabel: 'Hayır',
-      accept: () => {
-        this.cases = this.cases.filter(c => c.id !== caseItem.id);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Başarılı',
-          detail: 'Dava başarıyla silindi'
-        });
-      }
-    });
   }
 
   saveCase(): void {
@@ -268,5 +237,20 @@ export class CaseManagementComponent implements OnInit {
     const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
     const caseNumber = `CASE-${year}-${randomNum}`;
     this.caseForm.patchValue({ caseNumber });
+  }
+
+  hideDialog(): void {
+    this.cancelDialog();
+  }
+
+  searchCases(searchTerm: string): void {
+    // Global search implementation - this will be handled by PrimeNG table's global filter
+    // We can add custom logic here if needed
+  }
+
+  viewCaseDetail(caseItem: Case): void {
+    if (caseItem.id) {
+      this.router.navigate(['/admin/case', caseItem.id]);
+    }
   }
 } 

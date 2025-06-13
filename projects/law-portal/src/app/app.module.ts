@@ -4,7 +4,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedLibModule, NAVIGATION_CONFIG } from 'shared-lib';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import { ReactiveFormsModule } from '@angular/forms';
 
 // PrimeNG Modules
 import { AccordionModule } from 'primeng/accordion';
@@ -13,6 +14,12 @@ import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { MenuModule } from 'primeng/menu';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { DropdownModule } from 'primeng/dropdown';
+import { CalendarModule } from 'primeng/calendar';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -32,16 +39,24 @@ import { TopbarComponent } from './shared/components/topbar/topbar.component';
     HttpClientModule,
     AppRoutingModule,
     SharedLibModule,
+    ReactiveFormsModule,
     // PrimeNG Modules
     AccordionModule,
     TableModule,
     TagModule,
     ButtonModule,
     TooltipModule,
-    MenuModule
+    MenuModule,
+    DialogModule,
+    InputTextModule,
+    InputTextareaModule,
+    DropdownModule,
+    CalendarModule,
+    ConfirmDialogModule
   ],
   providers: [
     MessageService,
+    ConfirmationService,
     {
       provide: NAVIGATION_CONFIG,
       useValue: {
