@@ -49,7 +49,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     // Rol bazlı menü öğelerini ayarla
     const baseItems = [
       { 
-        label: 'Dashboard', 
+        label: 'Panel', 
         icon: 'pi pi-home', 
         route: this.getDashboardRoute(),
         roles: ['USER', 'LAWYER', 'ADMIN']
