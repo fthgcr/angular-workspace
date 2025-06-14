@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { UserProfileService, UserProfile } from 'shared-lib';
+import { AuthService, UserProfileService, UserProfile } from 'shared-lib';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -18,6 +18,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
+    private authService: AuthService,
     private userProfileService: UserProfileService,
     private messageService: MessageService
   ) {}
@@ -44,13 +45,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private loadUserProfile(): void {
     this.loading = true;
     this.subscriptions.add(
-      this.userProfileService.getCurrentUserProfile().subscribe({
+      this.authService.currentUserProfile$.subscribe({
         next: (profile) => {
-          this.userProfile = profile;
-          this.populateForm(profile);
+          if (profile) {
+            this.userProfile = profile;
+            this.populateForm(profile);
+          }
           this.loading = false;
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error loading profile:', error);
           this.messageService.add({
             severity: 'error',
@@ -91,17 +94,18 @@ export class ProfileComponent implements OnInit, OnDestroy {
       
       this.subscriptions.add(
         this.userProfileService.updateUserProfile(updatedProfile).subscribe({
-          next: (profile) => {
+          next: (profile: UserProfile) => {
             this.userProfile = profile;
             this.editMode = false;
             this.loading = false;
+            this.authService.refreshUserProfile();
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
               detail: 'Profile updated successfully'
             });
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Error updating profile:', error);
             this.messageService.add({
               severity: 'error',

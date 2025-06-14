@@ -1,14 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService) {}
+  private readonly ACCESS_TOKEN_KEY = 'access_token';
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = this.authService.getToken();
+    const token = this.getToken();
     
     console.log('AuthInterceptor: Request URL:', request.url);
     console.log('AuthInterceptor: Token exists:', !!token);
@@ -25,5 +27,12 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     return next.handle(request);
+  }
+
+  private getToken(): string | null {
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    }
+    return null;
   }
 }

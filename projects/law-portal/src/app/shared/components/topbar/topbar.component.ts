@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 export class TopbarComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   currentRole: string = '';
+  currentUserProfile: any = null;
   menuItems: any[] = [];
   userMenuItems: any[] = [];
   private subscriptions: Subscription = new Subscription();
@@ -39,6 +40,10 @@ export class TopbarComponent implements OnInit, OnDestroy {
         this.setUserMenuItems();
       })
     );
+
+    this.authService.currentUserProfile$.subscribe(profile => {
+      this.currentUserProfile = profile;
+    });
   }
 
   ngOnDestroy(): void {
@@ -148,9 +153,8 @@ export class TopbarComponent implements OnInit, OnDestroy {
   }
 
   getUserDisplayName(): string {
-    console.log('this.currentUser', JSON.stringify(this.currentUser));
-    if (this.currentUser && this.currentUser.firstName && this.currentUser.lastName) {
-      return `${this.currentUser.firstName} ${this.currentUser.lastName}`;
+    if (this.currentUserProfile && this.currentUserProfile.firstName && this.currentUserProfile.lastName) {
+      return `${this.currentUserProfile.firstName} ${this.currentUserProfile.lastName}`;
     }
     return 'User';
   }

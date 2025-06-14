@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { LoginRequest, RegistrationRequest, RegistrationResponse, User } from '../models/auth.model';
+import { UserProfile } from './user-profile.service';
 import { environment } from '../environments/environment';
 
 interface JwtAuthenticationResponse {
@@ -17,10 +18,14 @@ export class AuthService {
   private readonly ACCESS_TOKEN_KEY = 'access_token';
   private readonly USER_ROLE_KEY = 'user_role';
   private readonly USER_KEY = 'current_user';
+  private readonly USER_PROFILE_KEY = 'current_user_profile';
+  
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser$: Observable<User | null>;
   private currentRoleSubject: BehaviorSubject<string | null>;
   public currentRole$: Observable<string | null>;
+  private currentUserProfileSubject: BehaviorSubject<UserProfile | null>;
+  public currentUserProfile$: Observable<UserProfile | null>;
 
   constructor(
     private http: HttpClient,
@@ -30,6 +35,13 @@ export class AuthService {
     this.currentUser$ = this.currentUserSubject.asObservable();
     this.currentRoleSubject = new BehaviorSubject<string | null>(this.getCurrentRole());
     this.currentRole$ = this.currentRoleSubject.asObservable();
+    this.currentUserProfileSubject = new BehaviorSubject<UserProfile | null>(this.getCurrentUserProfile());
+    this.currentUserProfile$ = this.currentUserProfileSubject.asObservable();
+    
+    // Schedule profile loading after component initialization to avoid circular dependency
+    if (this.isAuthenticated()) {
+      setTimeout(() => this.loadUserProfileOnInit(), 0);
+    }
   }
 
   private getStorage(): Storage | null {
@@ -61,6 +73,9 @@ export class AuthService {
               storage.setItem(this.USER_KEY, JSON.stringify(user));
             }
             this.currentUserSubject.next(user);
+            
+            // Load full user profile after successful login
+            this.loadUserProfile();
           }
         })
       );
@@ -85,9 +100,11 @@ export class AuthService {
       storage.removeItem(this.ACCESS_TOKEN_KEY);
       storage.removeItem(this.USER_ROLE_KEY);
       storage.removeItem(this.USER_KEY);
+      storage.removeItem(this.USER_PROFILE_KEY);
     }
     this.currentUserSubject.next(null);
     this.currentRoleSubject.next(null);
+    this.currentUserProfileSubject.next(null);
   }
 
   getAccessToken(): string | null {
@@ -112,6 +129,13 @@ export class AuthService {
     return storage ? storage.getItem(this.USER_ROLE_KEY) : null;
   }
 
+  getCurrentUserProfile(): UserProfile | null {
+    const storage = this.getStorage();
+    if (!storage) return null;
+    const profileStr = storage.getItem(this.USER_PROFILE_KEY);
+    return profileStr ? JSON.parse(profileStr) : null;
+  }
+
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
@@ -134,6 +158,39 @@ export class AuthService {
       return payload.sub || '';
     } catch (error) {
       return '';
+    }
+  }
+
+  private loadUserProfileOnInit(): void {
+    if (this.isAuthenticated()) {
+      // Just refresh from API to get latest data
+      this.loadUserProfile();
+    }
+  }
+
+  private loadUserProfile(): void {
+    const url = `${environment.infraCoreUrl}/user/profile`;
+    this.http.get<UserProfile>(url).subscribe({
+      next: (profile) => {
+        const storage = this.getStorage();
+        if (storage) {
+          storage.setItem(this.USER_PROFILE_KEY, JSON.stringify(profile));
+        }
+        this.currentUserProfileSubject.next(profile);
+      },
+      error: (error) => {
+        console.error('Error loading user profile:', error);
+        this.currentUserProfileSubject.next(null);
+      }
+    });
+  }
+
+  /**
+   * Refresh user profile data from API
+   */
+  refreshUserProfile(): void {
+    if (this.isAuthenticated()) {
+      this.loadUserProfile();
     }
   }
 }
