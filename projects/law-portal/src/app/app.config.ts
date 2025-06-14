@@ -19,7 +19,6 @@ export const appConfig: ApplicationConfig = {
       provide: NAVIGATION_CONFIG,
       useValue: {
         adminDashboard: '/admin-dashboard',
-        lawyerDashboard: '/lawyer-dashboard',
         clientDashboard: '/client-dashboard',
         userDashboard: '/client',
         defaultRoute: '/client'

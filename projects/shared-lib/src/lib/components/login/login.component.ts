@@ -55,7 +55,6 @@ export class LoginComponent implements OnInit {
     // Use injected navigation config if available, otherwise use defaults
     const routes = this.navigationConfig || {
       adminDashboard: '/admin-dashboard',
-      lawyerDashboard: '/lawyer-dashboard', 
       clientDashboard: '/client-dashboard',
       userDashboard: '/dashboard'
     };
@@ -65,14 +64,14 @@ export class LoginComponent implements OnInit {
         this.router.navigate([routes.adminDashboard]);
         break;
       case 'LAWYER':
-        this.router.navigate([routes.lawyerDashboard]);
+        this.router.navigate([routes.adminDashboard]);
         break;
       case 'CLIENT':
         this.router.navigate([routes.clientDashboard]);
         break;
       case 'USER':
       default:
-        this.router.navigate([routes.userDashboard || routes.defaultRoute || '/dashboard']);
+        this.router.navigate([routes.userDashboard || '/dashboard']);
         break;
     }
   }

@@ -29,6 +29,7 @@ import { CaseManagementComponent } from './components/case-management/case-manag
 import { DocumentManagementComponent } from './components/document-management/document-management.component';
 import { ClientDetailComponent } from './components/client-detail/client-detail.component';
 import { CaseDetailComponent } from './components/case-detail/case-detail.component';
+import { AdminLawyersComponent } from './lawyers/admin-lawyers.component';
 
 // Services
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -40,7 +41,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     CaseManagementComponent,
     DocumentManagementComponent,
     ClientDetailComponent,
-    CaseDetailComponent
+    CaseDetailComponent,
+    AdminLawyersComponent
   ],
   imports: [
     CommonModule,

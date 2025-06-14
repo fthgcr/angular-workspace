@@ -61,7 +61,6 @@ import { TopbarComponent } from './shared/components/topbar/topbar.component';
       provide: NAVIGATION_CONFIG,
       useValue: {
         adminDashboard: '/admin-dashboard',
-        lawyerDashboard: '/lawyer-dashboard',
         clientDashboard: '/client-dashboard',
         userDashboard: '/client',
         defaultRoute: '/client'

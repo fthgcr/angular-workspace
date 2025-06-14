@@ -1,0 +1,281 @@
+<div class="admin-lawyers-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="pi pi-briefcase"></i>
+        Avukat Yönetimi
+      </h1>
+      <p class="page-description">
+        Sistemdeki avukatları görüntüleyin, düzenleyin ve yeni avukat ekleyin.
+      </p>
+    </div>
+    <div class="header-actions">
+      <p-button 
+        label="Yeni Avukat Ekle" 
+        icon="pi pi-plus" 
+        (onClick)="openNewUserDialog()"
+        styleClass="p-button-success">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Lawyers Table -->
+  <div class="table-container">
+    <p-table 
+      [value]="users" 
+      [loading]="loading"
+      [paginator]="true" 
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
+      [globalFilterFields]="['username', 'firstName', 'lastName', 'email']"
+      styleClass="p-datatable-gridlines"
+      #dt>
+      
+      <!-- Table Header -->
+      <ng-template pTemplate="caption">
+        <div class="table-header">
+          <span class="table-title">
+            <i class="pi pi-users"></i>
+            Avukatlar ({{users.length}})
+          </span>
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input 
+              pInputText 
+              type="text" 
+              placeholder="Avukat ara..." 
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')">
+          </span>
+        </div>
+      </ng-template>
+
+      <!-- Table Header Row -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="username">
+            Kullanıcı Adı <p-sortIcon field="username"></p-sortIcon>
+          </th>
+          <th pSortableColumn="firstName">
+            Ad Soyad <p-sortIcon field="firstName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="email">
+            E-posta <p-sortIcon field="email"></p-sortIcon>
+          </th>
+          <th>Telefon</th>
+          <th>Rol</th>
+          <th>Durum</th>
+          <th>İşlemler</th>
+        </tr>
+      </ng-template>
+
+      <!-- Table Body -->
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>
+            <div class="user-info">
+              <i class="pi pi-user user-icon"></i>
+              <span class="username">{{user.username}}</span>
+            </div>
+          </td>
+          <td>
+            <span class="full-name">{{user.firstName}} {{user.lastName}}</span>
+          </td>
+          <td>
+            <span class="email">{{user.email}}</span>
+          </td>
+          <td>
+            <span class="phone">{{user.phoneNumber || '-'}}</span>
+          </td>
+          <td>
+            <p-tag 
+              *ngFor="let role of user.roles" 
+              [value]="role" 
+              [severity]="getRoleSeverity(role)"
+              styleClass="role-tag">
+            </p-tag>
+          </td>
+          <td>
+            <p-tag 
+              [value]="user.enabled ? 'Aktif' : 'Pasif'" 
+              [severity]="user.enabled ? 'success' : 'danger'">
+            </p-tag>
+          </td>
+          <td class="action-column">
+            <div class="action-buttons">
+              <p-button 
+                icon="pi pi-pencil" 
+                styleClass="p-button-rounded p-button-text p-button-info"
+                pTooltip="Düzenle"
+                tooltipPosition="top"
+                (onClick)="editUser(user)">
+              </p-button>
+              <p-button 
+                icon="pi pi-trash" 
+                styleClass="p-button-rounded p-button-text p-button-danger"
+                pTooltip="Sil"
+                tooltipPosition="top"
+                (onClick)="deleteUser(user)">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty State -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="empty-state">
+            <div class="empty-content">
+              <i class="pi pi-users empty-icon"></i>
+              <h3>Henüz avukat bulunmuyor</h3>
+              <p>Sisteme ilk avukatı eklemek için "Yeni Avukat Ekle" butonunu kullanın.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Add/Edit Dialog -->
+  <p-dialog 
+    [(visible)]="showDialog" 
+    [header]="isEditMode ? 'Avukat Düzenle' : 'Yeni Avukat Ekle'"
+    [modal]="true" 
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="user-dialog"
+    [style]="{width: '500px'}">
+    
+    <form [formGroup]="userForm" (ngSubmit)="saveUser()">
+      <div class="form-grid">
+        <!-- Username -->
+        <div class="form-field">
+          <label for="username">Kullanıcı Adı *</label>
+          <input 
+            id="username"
+            type="text" 
+            pInputText 
+            formControlName="username"
+            [class.ng-invalid]="isFieldInvalid('username')"
+            placeholder="Kullanıcı adını giriniz">
+          <small class="error-message" *ngIf="isFieldInvalid('username')">
+            {{getFieldError('username')}}
+          </small>
+        </div>
+
+        <!-- Password -->
+        <div class="form-field" *ngIf="!isEditMode">
+          <label for="password">Şifre *</label>
+          <input 
+            id="password"
+            type="password" 
+            pInputText 
+            formControlName="password"
+            [class.ng-invalid]="isFieldInvalid('password')"
+            placeholder="Şifre giriniz">
+          <small class="error-message" *ngIf="isFieldInvalid('password')">
+            {{getFieldError('password')}}
+          </small>
+        </div>
+
+        <!-- Email -->
+        <div class="form-field">
+          <label for="email">E-posta *</label>
+          <input 
+            id="email"
+            type="email" 
+            pInputText 
+            formControlName="email"
+            [class.ng-invalid]="isFieldInvalid('email')"
+            placeholder="E-posta adresini giriniz">
+          <small class="error-message" *ngIf="isFieldInvalid('email')">
+            {{getFieldError('email')}}
+          </small>
+        </div>
+
+        <!-- First Name -->
+        <div class="form-field">
+          <label for="firstName">Ad *</label>
+          <input 
+            id="firstName"
+            type="text" 
+            pInputText 
+            formControlName="firstName"
+            [class.ng-invalid]="isFieldInvalid('firstName')"
+            placeholder="Adını giriniz">
+          <small class="error-message" *ngIf="isFieldInvalid('firstName')">
+            {{getFieldError('firstName')}}
+          </small>
+        </div>
+
+        <!-- Last Name -->
+        <div class="form-field">
+          <label for="lastName">Soyad *</label>
+          <input 
+            id="lastName"
+            type="text" 
+            pInputText 
+            formControlName="lastName"
+            [class.ng-invalid]="isFieldInvalid('lastName')"
+            placeholder="Soyadını giriniz">
+          <small class="error-message" *ngIf="isFieldInvalid('lastName')">
+            {{getFieldError('lastName')}}
+          </small>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-field">
+          <label for="phoneNumber">Telefon</label>
+          <input 
+            id="phoneNumber"
+            type="text" 
+            pInputText 
+            formControlName="phoneNumber"
+            placeholder="Telefon numarasını giriniz">
+        </div>
+
+        <!-- Address -->
+        <div class="form-field full-width">
+          <label for="address">Adres</label>
+          <textarea 
+            id="address"
+            pInputTextarea 
+            formControlName="address"
+            placeholder="Adres bilgisini giriniz"
+            [rows]="3">
+          </textarea>
+        </div>
+
+        <!-- Role (Hidden but always LAWYER) -->
+        <input type="hidden" formControlName="role">
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer">
+        <p-button 
+          label="İptal" 
+          icon="pi pi-times" 
+          styleClass="p-button-text"
+          (onClick)="hideDialog()">
+        </p-button>
+        <p-button 
+          [label]="isEditMode ? 'Güncelle' : 'Kaydet'" 
+          icon="pi pi-check" 
+          styleClass="p-button-success"
+          (onClick)="saveUser()"
+          [disabled]="userForm.invalid">
+        </p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
+
+<!-- Toast Messages -->
+<p-toast></p-toast>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog>

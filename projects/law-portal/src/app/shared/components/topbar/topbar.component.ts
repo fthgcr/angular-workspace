@@ -63,34 +63,19 @@ export class TopbarComponent implements OnInit, OnDestroy {
     ];
 
     // Role özel menü öğeleri
-    if (this.currentRole === 'ADMIN') {
+    if (this.currentRole === 'ADMIN' || this.currentRole === 'LAWYER') {
       baseItems.push(
         { 
-          label: 'Users', 
+          label: 'Avukatlar', 
           icon: 'pi pi-users', 
-          route: '/admin/users',
-          roles: ['ADMIN']
+          route: '/admin/lawyers',
+          roles: ['ADMIN', 'LAWYER']
         },
         { 
           label: 'Reports', 
           icon: 'pi pi-chart-bar', 
           route: '/admin/reports',
-          roles: ['ADMIN']
-        }
-      );
-    } else if (this.currentRole === 'LAWYER') {
-      baseItems.push(
-        { 
-          label: 'Clients', 
-          icon: 'pi pi-users', 
-          route: '/lawyer/clients',
-          roles: ['LAWYER']
-        },
-        { 
-          label: 'Calendar', 
-          icon: 'pi pi-calendar', 
-          route: '/lawyer/calendar',
-          roles: ['LAWYER']
+          roles: ['ADMIN', 'LAWYER']
         }
       );
     }
@@ -125,7 +110,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
       case 'ADMIN':
         return '/admin';
       case 'LAWYER':
-        return '/lawyer';
+        return '/admin';
       case 'USER':
       default:
         return '/client';

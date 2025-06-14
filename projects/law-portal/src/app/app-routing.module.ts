@@ -23,20 +23,12 @@ export const routes: Routes = [
     data: { roles: ['USER'] } 
   },
   
-  // Admin Dashboard - Sadece ADMIN rolü erişebilir
+  // Admin Dashboard - ADMIN ve LAWYER rolleri erişebilir
   { 
     path: 'admin', 
     loadChildren: () => import('./features/admin-dashboard/admin-dashboard.module').then(m => m.AdminDashboardModule),
     canActivate: [AuthGuard, RoleGuard], 
-    data: { roles: ['ADMIN'] } 
-  },
-  
-  // Lawyer Dashboard - Sadece LAWYER rolü erişebilir
-  { 
-    path: 'lawyer', 
-    loadChildren: () => import('./features/lawyer-dashboard/lawyer-dashboard.module').then(m => m.LawyerDashboardModule),
-    canActivate: [AuthGuard, RoleGuard], 
-    data: { roles: ['LAWYER'] } 
+    data: { roles: ['ADMIN', 'LAWYER'] } 
   },
   
   // User Dashboard - USER rolü için (Client component'ine redirect edecek)
