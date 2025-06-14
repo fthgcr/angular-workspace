@@ -32,29 +32,24 @@
     <div class="user-section">
       <!-- User Profile Dropdown -->
       <div class="user-profile">
-        <p-menu #userMenu [model]="userMenuItems" [popup]="true"></p-menu>
-        <div class="user-info" (click)="userMenu.toggle($event)">
-          <div class="user-avatar">
-            <i class="pi pi-user"></i>
-          </div>
+        <button 
+          type="button" 
+          class="user-info" 
+          (click)="onMenuToggle($event, userMenu)"
+          #userMenuButton
+        >
           <div class="user-details">
             <span class="user-name">{{ getUserDisplayName() }}</span>
             <span class="user-role">{{ getRoleDisplayName() }}</span>
           </div>
           <i class="pi pi-chevron-down dropdown-icon"></i>
-        </div>
-      </div>
-
-      <!-- Direct Logout Button -->
-      <div class="logout-section">
-        <p-button 
-          icon="pi pi-sign-out" 
-          label="Logout"
-          styleClass="logout-btn"
-          (click)="logout()"
-          pTooltip="Sign out"
-          tooltipPosition="bottom"
-        ></p-button>
+        </button>
+        <p-menu 
+          #userMenu 
+          [model]="userMenuItems" 
+          [popup]="true"
+          [appendTo]="'body'"
+        ></p-menu>
       </div>
     </div>
   </div>

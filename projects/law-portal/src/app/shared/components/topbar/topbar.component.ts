@@ -53,13 +53,14 @@ export class TopbarComponent implements OnInit, OnDestroy {
         icon: 'pi pi-home', 
         route: this.getDashboardRoute(),
         roles: ['USER', 'LAWYER', 'ADMIN']
-      },
+      }
+      /*,
       { 
         label: 'Cases', 
         icon: 'pi pi-briefcase', 
         route: '/cases',
         roles: ['USER', 'LAWYER', 'ADMIN']
-      }
+      } */
     ];
 
     // Role özel menü öğeleri
@@ -69,14 +70,15 @@ export class TopbarComponent implements OnInit, OnDestroy {
           label: 'Avukatlar', 
           icon: 'pi pi-users', 
           route: '/admin/lawyers',
-          roles: ['ADMIN', 'LAWYER']
-        },
+          roles: ['ADMIN']
+        }
+        /*,
         { 
           label: 'Reports', 
           icon: 'pi pi-chart-bar', 
           route: '/admin/reports',
           roles: ['ADMIN', 'LAWYER']
-        }
+        } */
       );
     }
 
@@ -87,6 +89,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
   }
 
   private setUserMenuItems(): void {
+    console.log('Setting user menu items'); // Debug log
     this.userMenuItems = [
       {
         label: 'Profile',
@@ -96,13 +99,17 @@ export class TopbarComponent implements OnInit, OnDestroy {
         }
       },
       {
-        label: 'Settings',
-        icon: 'pi pi-cog',
+        separator: true
+      },
+      {
+        label: 'Logout',
+        icon: 'pi pi-sign-out',
         command: () => {
-          this.navigateTo('/settings');
+          this.logout();
         }
       }
     ];
+    console.log('User menu items set:', this.userMenuItems); // Debug log
   }
 
   getDashboardRoute(): string {
@@ -141,24 +148,23 @@ export class TopbarComponent implements OnInit, OnDestroy {
   }
 
   getUserDisplayName(): string {
-    if (this.currentUser) {
-      return this.currentUser.firstName && this.currentUser.lastName 
-        ? `${this.currentUser.firstName} ${this.currentUser.lastName}`
-        : this.currentUser.username || 'User';
+    console.log('this.currentUser', JSON.stringify(this.currentUser));
+    if (this.currentUser && this.currentUser.firstName && this.currentUser.lastName) {
+      return `${this.currentUser.firstName} ${this.currentUser.lastName}`;
     }
     return 'User';
   }
 
+  onMenuToggle(event: Event, menu: any): void {
+    console.log('Menu toggle clicked', event); // Debug log
+    console.log('Menu items:', this.userMenuItems); // Debug log
+    menu.toggle(event);
+  }
+
   getRoleDisplayName(): string {
-    switch (this.currentRole) {
-      case 'ADMIN':
-        return 'Administrator';
-      case 'LAWYER':
-        return 'Lawyer';
-      case 'USER':
-        return 'Client';
-      default:
-        return 'User';
+    if (this.currentUser && this.currentUser.username) {
+      return this.currentUser.username;
     }
+    return 'User';
   }
 } 

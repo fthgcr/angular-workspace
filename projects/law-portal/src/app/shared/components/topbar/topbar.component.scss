@@ -168,26 +168,20 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
 
+  // Button reset styles when used as button element
+  &[type="button"] {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    outline: none;
+  }
+
   &:hover {
     background: rgba(255, 255, 255, 0.25);
     transform: translateY(-1px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-}
-
-.user-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 35px;
-  height: 35px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-
-  i {
-    font-size: 1.1rem;
-    color: white;
   }
 }
 
@@ -369,12 +363,7 @@
     }
   }
 
-  .user-avatar {
-    width: 30px;
-    height: 30px;
-
-    i {
-      font-size: 1rem;
-    }
+  .user-info {
+    padding: 0.5rem;
   }
 } 
