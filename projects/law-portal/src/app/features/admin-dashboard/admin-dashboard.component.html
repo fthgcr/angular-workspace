@@ -142,13 +142,27 @@
                 Son Aktiviteler
               </h3>
               <div class="activity-list" *ngIf="recentActivities.length > 0; else noActivities">
-                <div class="activity-item" *ngFor="let activity of recentActivities">
+                <div class="activity-item" *ngFor="let activity of recentActivities" [ngClass]="getActivityTypeClass(activity)">
                   <div class="activity-icon">
-                    <i class="pi" [ngClass]="activity.icon"></i>
+                    <i class="pi" [ngClass]="getActivityIcon(activity)"></i>
                   </div>
                   <div class="activity-content">
-                    <p>{{ activity.description }}</p>
-                    <small>{{ activity.timeAgo }}</small>
+                    <div class="activity-main">
+                      <p class="activity-description">{{ getDetailedActivityDescription(activity) }}</p>
+                      <div class="activity-meta">
+                        <span class="activity-user">
+                          <i class="pi pi-user"></i>
+                          {{ getUserDisplayName(activity) }}
+                        </span>
+                        <span class="activity-target" *ngIf="activity.targetEntity">
+                          <i class="pi pi-tag"></i>
+                          {{ getTargetEntityDisplay(activity) }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="activity-time">
+                      <small>{{ activity.timeAgo }}</small>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'shared-lib';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
-import { DashboardService, DashboardStats, ClientStatusSummary, CaseTypeDistribution, CaseStatusDistribution, RecentActivity } from '../../core/services/dashboard.service';
+import { DashboardService, DashboardStats, ClientStatusSummary, CaseTypeDistribution, CaseStatusDistribution, RecentActivity, ActivityType } from '../../core/services/dashboard.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -144,5 +144,139 @@ export class AdminDashboardComponent implements OnInit {
       case 'OTHER': return 'other';
       default: return 'other';
     }
+  }
+
+  /**
+   * Get detailed activity description with user and entity information
+   */
+  getDetailedActivityDescription(activity: RecentActivity): string {
+    const performedBy = `${activity.performedBy.firstName} ${activity.performedBy.lastName}`;
+    const targetName = activity.targetEntity.name;
+    const relatedName = activity.relatedEntity?.name;
+
+    switch (activity.type) {
+      case ActivityType.CLIENT_CREATED:
+        return `${performedBy} tarafından "${targetName}" adlı müvekkil eklendi`;
+      
+      case ActivityType.CLIENT_UPDATED:
+        return `${performedBy} tarafından "${targetName}" adlı müvekkil güncellendi`;
+      
+      case ActivityType.CASE_CREATED:
+        if (relatedName) {
+          return `${performedBy} tarafından "${targetName}" davası "${relatedName}" müvekkiline eklendi`;
+        }
+        return `${performedBy} tarafından "${targetName}" davası eklendi`;
+      
+      case ActivityType.CASE_UPDATED:
+        return `${performedBy} tarafından "${targetName}" davası güncellendi`;
+      
+      case ActivityType.CASE_ASSIGNED:
+        if (relatedName) {
+          return `"${targetName}" davası ${performedBy} tarafından "${relatedName}" müvekkiline atandı`;
+        }
+        return `"${targetName}" davası ${performedBy} tarafından atandı`;
+      
+      case ActivityType.DOCUMENT_CREATED:
+        if (relatedName) {
+          return `${performedBy} tarafından "${relatedName}" müvekkiline "${targetName}" dosyası eklendi`;
+        }
+        return `${performedBy} tarafından "${targetName}" dosyası eklendi`;
+      
+      case ActivityType.DOCUMENT_UPDATED:
+        return `${performedBy} tarafından "${targetName}" dosyası güncellendi`;
+      
+      case ActivityType.USER_CREATED:
+        return `${performedBy} tarafından "${targetName}" kullanıcısı oluşturuldu`;
+      
+      case ActivityType.USER_UPDATED:
+        return `${performedBy} tarafından "${targetName}" kullanıcısı güncellendi`;
+      
+      default:
+        return activity.description;
+    }
+  }
+
+  /**
+   * Get activity icon based on activity type
+   */
+  getActivityIcon(activity: RecentActivity): string {
+    switch (activity.type) {
+      case ActivityType.CLIENT_CREATED:
+      case ActivityType.CLIENT_UPDATED:
+        return 'pi-user-plus';
+      
+      case ActivityType.CASE_CREATED:
+      case ActivityType.CASE_UPDATED:
+      case ActivityType.CASE_ASSIGNED:
+        return 'pi-briefcase';
+      
+      case ActivityType.DOCUMENT_CREATED:
+      case ActivityType.DOCUMENT_UPDATED:
+        return 'pi-file-plus';
+      
+      case ActivityType.USER_CREATED:
+      case ActivityType.USER_UPDATED:
+        return 'pi-users';
+      
+      case ActivityType.CLIENT_DELETED:
+      case ActivityType.CASE_DELETED:
+      case ActivityType.DOCUMENT_DELETED:
+        return 'pi-trash';
+      
+      default:
+        return activity.icon || 'pi-clock';
+    }
+  }
+
+  /**
+   * Get CSS class for activity type
+   */
+  getActivityTypeClass(activity: RecentActivity): string {
+    switch (activity.type) {
+      case ActivityType.CLIENT_CREATED:
+      case ActivityType.CASE_CREATED:
+      case ActivityType.DOCUMENT_CREATED:
+      case ActivityType.USER_CREATED:
+        return 'activity-created';
+      
+      case ActivityType.CLIENT_UPDATED:
+      case ActivityType.CASE_UPDATED:
+      case ActivityType.DOCUMENT_UPDATED:
+      case ActivityType.USER_UPDATED:
+      case ActivityType.CASE_ASSIGNED:
+        return 'activity-updated';
+      
+      case ActivityType.CLIENT_DELETED:
+      case ActivityType.CASE_DELETED:
+      case ActivityType.DOCUMENT_DELETED:
+        return 'activity-deleted';
+      
+      default:
+        return 'activity-default';
+    }
+  }
+
+  /**
+   * Get user display name for activity
+   */
+  getUserDisplayName(activity: RecentActivity): string {
+    return `${activity.performedBy.firstName} ${activity.performedBy.lastName}`;
+  }
+
+  /**
+   * Get target entity display with related info
+   */
+  getTargetEntityDisplay(activity: RecentActivity): string {
+    const target = activity.targetEntity.name;
+    const related = activity.relatedEntity?.name;
+    
+    if (related && activity.targetEntity.type === 'CASE') {
+      return `${target} (${related})`;
+    }
+    if (related && activity.targetEntity.type === 'DOCUMENT') {
+      return `${target} (${related})`;
+    }
+    
+    return target;
   }
 } 

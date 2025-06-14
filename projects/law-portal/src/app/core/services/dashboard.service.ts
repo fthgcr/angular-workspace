@@ -35,11 +35,54 @@ export interface CaseStatusDistribution {
 }
 
 export interface RecentActivity {
-  type: string;
+  id?: number;
+  type: ActivityType;
   description: string;
   createdDate: string;
   icon: string;
   timeAgo: string;
+  
+  // User who performed the action
+  performedBy: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    username: string;
+  };
+  
+  // Target entity details
+  targetEntity: {
+    id: number;
+    name: string;
+    type: 'CLIENT' | 'CASE' | 'DOCUMENT' | 'USER';
+  };
+  
+  // Related entity (e.g., client for a case, case for a document)
+  relatedEntity?: {
+    id: number;
+    name: string;
+    type: 'CLIENT' | 'CASE' | 'DOCUMENT' | 'USER';
+  };
+  
+  // Additional details specific to activity type
+  details?: {
+    [key: string]: any;
+  };
+}
+
+export enum ActivityType {
+  CLIENT_CREATED = 'CLIENT_CREATED',
+  CLIENT_UPDATED = 'CLIENT_UPDATED',
+  CLIENT_DELETED = 'CLIENT_DELETED',
+  CASE_CREATED = 'CASE_CREATED',
+  CASE_UPDATED = 'CASE_UPDATED',
+  CASE_DELETED = 'CASE_DELETED',
+  CASE_ASSIGNED = 'CASE_ASSIGNED',
+  DOCUMENT_CREATED = 'DOCUMENT_CREATED',
+  DOCUMENT_UPDATED = 'DOCUMENT_UPDATED',
+  DOCUMENT_DELETED = 'DOCUMENT_DELETED',
+  USER_CREATED = 'USER_CREATED',
+  USER_UPDATED = 'USER_UPDATED'
 }
 
 @Injectable({
