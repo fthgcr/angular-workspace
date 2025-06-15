@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { PrimeNGConfig } from 'primeng/api';
 
 export interface Language {
   code: string;
@@ -13,6 +14,7 @@ export interface Language {
 export class LanguageService {
   
   private readonly STORAGE_KEY = 'selected-language';
+  private primeConfig?: PrimeNGConfig;
 
   public readonly languages: Language[] = [
     { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
@@ -29,6 +31,12 @@ export class LanguageService {
     }
   }
 
+  // PrimeNG config'i kaydet ve çevirileri uygula
+  setPrimeNGConfig(primeConfig: PrimeNGConfig): void {
+    this.primeConfig = primeConfig;
+    this.updatePrimeNGTranslations();
+  }
+
   getCurrentLanguage(): Language {
     return this.currentLanguageSubject.value;
   }
@@ -36,6 +44,8 @@ export class LanguageService {
   setLanguage(language: Language): void {
     this.currentLanguageSubject.next(language);
     this.saveLanguage(language);
+    // Dil değiştiğinde PrimeNG çevirilerini güncelle
+    this.updatePrimeNGTranslations();
   }
 
   private getDefaultLanguage(): Language {
@@ -43,11 +53,19 @@ export class LanguageService {
   }
 
   private saveLanguage(language: Language): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(language));
+    // localStorage kontrolü (SSR için)
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(language));
+    }
   }
 
   private getSavedLanguage(): Language | null {
     try {
+      // localStorage kontrolü (SSR için)
+      if (typeof localStorage === 'undefined') {
+        return null;
+      }
+      
       const saved = localStorage.getItem(this.STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -578,4 +596,85 @@ export class LanguageService {
       'date': 'Date'
     }
   };
+
+  // PrimeNG çevirilerini güncelle
+  private updatePrimeNGTranslations(): void {
+    if (!this.primeConfig) return;
+
+    const currentLang = this.getCurrentLanguage().code;
+    
+    if (currentLang === 'tr') {
+      this.primeConfig.setTranslation({
+        apply: 'Uygula',
+        cancel: 'İptal',
+        clear: 'Temizle',
+        accept: 'Evet',
+        reject: 'Hayır',
+        choose: 'Seç',
+        upload: 'Yükle',
+        addRule: 'Kural Ekle',
+        removeRule: 'Kuralı Kaldır',
+        noFilter: 'Filtre Yok',
+        lt: 'Küçüktür',
+        lte: 'Küçük Eşittir',
+        gt: 'Büyüktür',
+        gte: 'Büyük Eşittir',
+        equals: 'Eşittir',
+        notEquals: 'Eşit Değildir',
+        contains: 'İçerir',
+        notContains: 'İçermez',
+        startsWith: 'İle Başlar',
+        endsWith: 'İle Biter',
+        matchAll: 'Tümü Eşleşsin',
+        matchAny: 'Herhangi Biri Eşleşsin',
+        dateIs: 'Tarih Eşittir',
+        dateIsNot: 'Tarih Eşit Değildir',
+        dateBefore: 'Tarih Öncesi',
+        dateAfter: 'Tarih Sonrası',
+        monthNames: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+        monthNamesShort: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'],
+        dayNames: ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'],
+        dayNamesShort: ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'],
+        dayNamesMin: ['Pa', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'],
+        today: 'Bugün',
+        weekHeader: 'Hf'
+      });
+    } else {
+      this.primeConfig.setTranslation({
+        apply: 'Apply',
+        cancel: 'Cancel',
+        clear: 'Clear',
+        accept: 'Yes',
+        reject: 'No',
+        choose: 'Choose',
+        upload: 'Upload',
+        addRule: 'Add Rule',
+        removeRule: 'Remove Rule',
+        noFilter: 'No Filter',
+        lt: 'Less than',
+        lte: 'Less than or equal to',
+        gt: 'Greater than',
+        gte: 'Greater than or equal to',
+        equals: 'Equals',
+        notEquals: 'Not equals',
+        contains: 'Contains',
+        notContains: 'Not contains',
+        startsWith: 'Starts with',
+        endsWith: 'Ends with',
+        matchAll: 'Match All',
+        matchAny: 'Match Any',
+        dateIs: 'Date is',
+        dateIsNot: 'Date is not',
+        dateBefore: 'Date is before',
+        dateAfter: 'Date is after',
+        monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        dayNamesMin: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+        today: 'Today',
+        weekHeader: 'Wk'
+      });
+    }
+  }
 }
