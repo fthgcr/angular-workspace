@@ -355,4 +355,10 @@ export class CaseDetailComponent implements OnInit, OnDestroy {
     }
     return '';
   }
+
+  getTruncatedText(text: string, maxLength: number): string {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  }
 }

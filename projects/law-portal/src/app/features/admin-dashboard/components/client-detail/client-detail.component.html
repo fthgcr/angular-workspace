@@ -181,8 +181,21 @@
             <td>{{ caseItem.caseNumber }}</td>
             <td>
               <div class="case-title">
-                <strong>{{ caseItem.title }}</strong>
-                <small *ngIf="caseItem.description">{{ caseItem.description }}</small>
+                <strong 
+                  [pTooltip]="caseItem.title.length > 50 ? caseItem.title : null"
+                  tooltipPosition="top"
+                  class="case-title-text"
+                >
+                  {{ getTruncatedTitle(caseItem.title, 50) }}
+                </strong>
+                <small 
+                  *ngIf="caseItem.description"
+                  [pTooltip]="caseItem.description.length > 80 ? caseItem.description : null"
+                  tooltipPosition="bottom"
+                  class="case-description-text"
+                >
+                  {{ getTruncatedTitle(caseItem.description, 80) }}
+                </small>
               </div>
             </td>
             <td>
