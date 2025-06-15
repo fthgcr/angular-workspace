@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedLibModule, NAVIGATION_CONFIG } from 'shared-lib';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 // PrimeNG Modules
 import { AccordionModule } from 'primeng/accordion';
@@ -44,6 +44,7 @@ import { ProfileComponent } from './features/profile/profile.component';
     AppRoutingModule,
     SharedLibModule,
     ReactiveFormsModule,
+    FormsModule,
     // PrimeNG Modules
     AccordionModule,
     TableModule,

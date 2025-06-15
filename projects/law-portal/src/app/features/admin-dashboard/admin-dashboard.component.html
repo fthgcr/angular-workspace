@@ -4,20 +4,20 @@
     <div class="header-content">
       <h1 class="dashboard-title">
         <i class="pi pi-cog"></i>
-        Avukat Paneli
+        {{ translate('lawyer.panel') }}
       </h1>
       <div class="header-stats">
         <div class="stat-item">
           <span class="stat-value">{{ totalClients }}</span>
-          <span class="stat-label">Müvekkil</span>
+          <span class="stat-label">{{ translate('client.count') }}</span>
         </div>
         <div class="stat-item">
           <span class="stat-value">{{ totalCases }}</span>
-          <span class="stat-label">Dava</span>
+          <span class="stat-label">{{ translate('case.count') }}</span>
         </div>
         <div class="stat-item">
           <span class="stat-value">{{ totalDocuments }}</span>
-          <span class="stat-label">Doküman</span>
+          <span class="stat-label">{{ translate('document.count') }}</span>
         </div>
       </div>
     </div>
@@ -28,7 +28,7 @@
     <div class="loading-overlay" *ngIf="loading">
       <div class="loading-spinner">
         <i class="pi pi-spin pi-spinner"></i>
-        <span>Veriler yükleniyor...</span>
+        <span>{{ translate('loading.data') }}</span>
       </div>
     </div>
     <div class="stats-grid">
@@ -38,10 +38,10 @@
         </div>
         <div class="stat-info">
           <h3>{{ totalClients || 0 }}</h3>
-          <p>Toplam Müvekkil</p>
-          <small *ngIf="totalClients > 0; else noClients">Aktif müvekkiller</small>
+          <p>{{ translate('total.clients') }}</p>
+          <small *ngIf="totalClients > 0; else noClients">{{ translate('active.clients') }}</small>
           <ng-template #noClients>
-            <small class="empty-state-text">Henüz müvekkil eklenmemiş</small>
+            <small class="empty-state-text">{{ translate('no.clients') }}</small>
           </ng-template>
         </div>
       </div>
@@ -52,19 +52,19 @@
         </div>
         <div class="stat-info">
           <h3>{{ monthlyNewClients || 0 }}</h3>
-          <p>Bu Ay Yeni Müvekkil</p>
+          <p>{{ translate('monthly.new.clients') }}</p>
           <small *ngIf="monthlyNewClients > 0; else noNewClients">
             <span *ngIf="clientGrowthPercentage >= 0; else negativeGrowth" class="positive-growth">
-              +{{ clientGrowthPercentage | number:'1.1-1' }}% geçen aya göre
+              +{{ clientGrowthPercentage | number:'1.1-1' }}% {{ translate('growth.vs.last.month') }}
             </span>
             <ng-template #negativeGrowth>
               <span class="negative-growth">
-                {{ clientGrowthPercentage | number:'1.1-1' }}% geçen aya göre
+                {{ clientGrowthPercentage | number:'1.1-1' }}% {{ translate('growth.vs.last.month') }}
               </span>
             </ng-template>
           </small>
           <ng-template #noNewClients>
-            <small class="empty-state-text">Bu ay yeni müvekkil eklenmemiş</small>
+            <small class="empty-state-text">{{ translate('no.new.clients') }}</small>
           </ng-template>
         </div>
       </div>
@@ -75,10 +75,10 @@
         </div>
         <div class="stat-info">
           <h3>{{ totalCases || 0 }}</h3>
-          <p>Aktif Dava</p>
-          <small *ngIf="totalCases > 0; else noCases">Devam eden davalar</small>
+          <p>{{ translate('active.cases') }}</p>
+          <small *ngIf="totalCases > 0; else noCases">{{ translate('ongoing.cases') }}</small>
           <ng-template #noCases>
-            <small class="empty-state-text">Henüz aktif dava bulunmuyor</small>
+            <small class="empty-state-text">{{ translate('no.active.cases') }}</small>
           </ng-template>
         </div>
       </div>
@@ -89,10 +89,10 @@
         </div>
         <div class="stat-info">
           <h3>{{ totalDocuments || 0 }}</h3>
-          <p>Toplam Doküman</p>
-          <small *ngIf="totalDocuments > 0; else noDocuments">Sistemdeki dokümanlar</small>
+          <p>{{ translate('total.documents') }}</p>
+          <small *ngIf="totalDocuments > 0; else noDocuments">{{ translate('system.documents') }}</small>
           <ng-template #noDocuments>
-            <small class="empty-state-text">Henüz doküman yüklenmemiş</small>
+            <small class="empty-state-text">{{ translate('admin.no.documents') }}</small>
           </ng-template>
         </div>
       </div>
@@ -139,7 +139,7 @@
             <div class="overview-card">
               <h3>
                 <i class="pi pi-clock"></i>
-                Son Aktiviteler
+                {{ translate('recent.activities') }}
               </h3>
               <div class="activity-list" *ngIf="recentActivities.length > 0; else noActivities">
                 <div class="activity-item" *ngFor="let activity of recentActivities" [ngClass]="getActivityTypeClass(activity)">
@@ -169,7 +169,7 @@
               <ng-template #noActivities>
                 <div class="empty-data">
                   <i class="pi pi-clock"></i>
-                  <p>Henüz aktivite bulunmuyor</p>
+                  <p>{{ translate('no.activities') }}</p>
                 </div>
               </ng-template>
             </div>
@@ -178,7 +178,7 @@
             <div class="overview-card">
               <h3>
                 <i class="pi pi-users"></i>
-                Müvekkil Durumu Özeti
+                {{ translate('client.status.summary') }}
               </h3>
               <div class="client-summary" *ngIf="clientStatusSummary; else noClientData">
                 <div class="summary-grid">
@@ -188,7 +188,7 @@
                     </div>
                     <div class="summary-content">
                       <span class="summary-count">{{ clientStatusSummary.activeClients }}</span>
-                      <span class="summary-label">Aktif</span>
+                      <span class="summary-label">{{ translate('active') }}</span>
                     </div>
                   </div>
                   <div class="summary-item inactive">
@@ -197,7 +197,7 @@
                     </div>
                     <div class="summary-content">
                       <span class="summary-count">{{ clientStatusSummary.inactiveClients }}</span>
-                      <span class="summary-label">Pasif</span>
+                      <span class="summary-label">{{ translate('inactive') }}</span>
                     </div>
                   </div>
                   <div class="summary-item total">
@@ -206,7 +206,7 @@
                     </div>
                     <div class="summary-content">
                       <span class="summary-count">{{ clientStatusSummary.totalClients }}</span>
-                      <span class="summary-label">Toplam</span>
+                      <span class="summary-label">{{ translate('total') }}</span>
                     </div>
                   </div>
                 </div>
@@ -214,7 +214,7 @@
               <ng-template #noClientData>
                 <div class="empty-data">
                   <i class="pi pi-users"></i>
-                  <p>Henüz müvekkil verisi bulunmuyor</p>
+                  <p>{{ translate('no.client.data') }}</p>
                 </div>
               </ng-template>
             </div>
@@ -223,7 +223,7 @@
             <div class="overview-card chart-card">
               <h3>
                 <i class="pi pi-chart-pie"></i>
-                Dava Durumu Dağılımı
+                {{ translate('case.status.distribution') }}
               </h3>
               <div class="chart-container" *ngIf="caseStatusDistribution.length > 0; else noCaseStatusData">
                 <div class="chart-placeholder">
@@ -236,7 +236,7 @@
               <ng-template #noCaseStatusData>
                 <div class="empty-data">
                   <i class="pi pi-chart-pie"></i>
-                  <p>Henüz dava verisi bulunmuyor</p>
+                  <p>{{ translate('no.case.status.data') }}</p>
                 </div>
               </ng-template>
             </div>
@@ -245,7 +245,7 @@
             <div class="overview-card">
               <h3>
                 <i class="pi pi-chart-bar"></i>
-                Dava Türleri Dağılımı
+                {{ translate('case.types.distribution') }}
               </h3>
               <div class="case-types" *ngIf="caseTypesDistribution.length > 0; else noCaseTypeData">
                 <div class="type-list">
@@ -261,7 +261,7 @@
               <ng-template #noCaseTypeData>
                 <div class="empty-data">
                   <i class="pi pi-chart-bar"></i>
-                  <p>Henüz dava türü verisi bulunmuyor</p>
+                  <p>{{ translate('no.case.type.data') }}</p>
                 </div>
               </ng-template>
             </div>

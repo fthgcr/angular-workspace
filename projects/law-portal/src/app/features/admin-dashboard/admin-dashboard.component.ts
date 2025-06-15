@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from 'shared-lib';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
 import { DashboardService, DashboardStats, ClientStatusSummary, CaseTypeDistribution, CaseStatusDistribution, RecentActivity, ActivityType } from '../../core/services/dashboard.service';
+import { LanguageService } from '../../services/language.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss']
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   currentUser: any;
   activeTab = 'overview';
   menuItems: MenuItem[] = [];
@@ -31,16 +33,30 @@ export class AdminDashboardComponent implements OnInit {
   // Recent activities
   recentActivities: RecentActivity[] = [];
 
+  private subscriptions = new Subscription();
+
   constructor(
     private authService: AuthService, 
     private router: Router,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private languageService: LanguageService
   ) { }
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     this.initializeMenu();
     this.loadDashboardStats();
+    
+    // Subscribe to language changes
+    this.subscriptions.add(
+      this.languageService.currentLanguage$.subscribe(() => {
+        this.initializeMenu(); // Refresh menu items when language changes
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   loadDashboardStats(): void {
@@ -86,22 +102,22 @@ export class AdminDashboardComponent implements OnInit {
   initializeMenu(): void {
     this.menuItems = [
       {
-        label: 'Genel Bakış',
+        label: this.translate('overview'),
         icon: 'pi pi-home',
         id: 'overview'
       },
       {
-        label: 'Müvekkil Yönetimi',
+        label: this.translate('client.management'),
         icon: 'pi pi-users',
         id: 'clients'
       },
       {
-        label: 'Dava Yönetimi',
+        label: this.translate('case.management'),
         icon: 'pi pi-briefcase',
         id: 'cases'
       },
       {
-        label: 'Doküman Yönetimi',
+        label: this.translate('document.management'),
         icon: 'pi pi-file',
         id: 'documents'
       }
@@ -278,5 +294,12 @@ export class AdminDashboardComponent implements OnInit {
     }
     
     return target;
+  }
+
+  /**
+   * Get translation for a key
+   */
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 } 

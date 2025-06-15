@@ -30,6 +30,32 @@
 
     <!-- User Section -->
     <div class="user-section">
+      <!-- Language Selector -->
+      <div class="language-selector">
+        <div class="language-buttons">
+          <button 
+            type="button" 
+            class="language-btn"
+            [class.active]="currentLanguage.code === 'tr'"
+            (click)="changeLanguage('tr')"
+            [title]="'Türkçe'"
+          >
+            <span class="language-flag">🇹🇷</span>
+            <span class="language-text">TR</span>
+          </button>
+          <button 
+            type="button" 
+            class="language-btn"
+            [class.active]="currentLanguage.code === 'en'"
+            (click)="changeLanguage('en')"
+            [title]="'English'"
+          >
+            <span class="language-flag">🇬🇧</span>
+            <span class="language-text">EN</span>
+          </button>
+        </div>
+      </div>
+
       <!-- User Profile Dropdown -->
       <div class="user-profile">
         <button 

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from 'shared-lib';
 import { MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
+import { LanguageService, Language } from '../../../services/language.service';
 
 @Component({
   selector: 'app-topbar',
@@ -15,13 +16,22 @@ export class TopbarComponent implements OnInit, OnDestroy {
   currentUserProfile: any = null;
   menuItems: any[] = [];
   userMenuItems: any[] = [];
+  
+  // Language properties
+  currentLanguage: Language;
+  languages: Language[] = [];
+  
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private messageService: MessageService
-  ) {}
+    private messageService: MessageService,
+    private languageService: LanguageService
+  ) {
+    this.currentLanguage = this.languageService.getCurrentLanguage();
+    this.languages = this.languageService.languages;
+  }
 
   ngOnInit(): void {
     // Subscribe to user and role changes
@@ -44,6 +54,15 @@ export class TopbarComponent implements OnInit, OnDestroy {
     this.authService.currentUserProfile$.subscribe(profile => {
       this.currentUserProfile = profile;
     });
+
+    // Subscribe to language changes
+    this.subscriptions.add(
+      this.languageService.currentLanguage$.subscribe(language => {
+        this.currentLanguage = language;
+        this.setMenuItems();
+        this.setUserMenuItems();
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -54,7 +73,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     // Rol bazlı menü öğelerini ayarla
     const baseItems = [
       { 
-        label: 'Panel', 
+        label: this.translate('panel'), 
         icon: 'pi pi-home', 
         route: this.getDashboardRoute(),
         roles: ['USER', 'LAWYER', 'ADMIN']
@@ -72,7 +91,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     if (this.currentRole === 'ADMIN' || this.currentRole === 'LAWYER') {
       baseItems.push(
         { 
-          label: 'Avukatlar', 
+          label: this.translate('lawyers'), 
           icon: 'pi pi-users', 
           route: '/admin/lawyers',
           roles: ['ADMIN']
@@ -97,7 +116,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     console.log('Setting user menu items'); // Debug log
     this.userMenuItems = [
       {
-        label: 'Profile',
+        label: this.translate('profile'),
         icon: 'pi pi-user',
         command: () => {
           this.navigateTo('/profile');
@@ -107,7 +126,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
         separator: true
       },
       {
-        label: 'Logout',
+        label: this.translate('logout'),
         icon: 'pi pi-sign-out',
         command: () => {
           this.logout();
@@ -142,8 +161,8 @@ export class TopbarComponent implements OnInit, OnDestroy {
     // Success mesajı göster
     this.messageService.add({
       severity: 'success',
-      summary: 'Logout Successful',
-      detail: `Goodbye ${userName}! You have been successfully logged out.`
+      summary: this.translate('logout.successful'),
+      detail: `${this.translate('goodbye')} ${userName}! ${this.translate('logout.message')}`
     });
     
     // Login sayfasına yönlendir
@@ -170,5 +189,24 @@ export class TopbarComponent implements OnInit, OnDestroy {
       return this.currentUser.username;
     }
     return 'User';
+  }
+
+
+
+  /**
+   * Change language by code
+   */
+  changeLanguage(languageCode: string): void {
+    const language = this.languages.find(lang => lang.code === languageCode);
+    if (language && language.code !== this.currentLanguage.code) {
+      this.languageService.setLanguage(language);
+    }
+  }
+
+  /**
+   * Get translation for a key
+   */
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 } 

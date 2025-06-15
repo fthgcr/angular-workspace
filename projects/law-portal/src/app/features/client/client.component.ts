@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ClientService, ClientCase, ClientDocument } from '../../services/client.service';
 import { MessageService } from 'primeng/api';
+import { Subscription } from 'rxjs';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-client',
@@ -8,7 +10,7 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./client.component.scss'],
   standalone: false
 })
-export class ClientComponent implements OnInit {
+export class ClientComponent implements OnInit, OnDestroy {
 
   // Data properties
   cases: ClientCase[] = [];
@@ -16,75 +18,99 @@ export class ClientComponent implements OnInit {
   caseDocuments: ClientDocument[] = [];
   
   // Loading states
-  loading = false;
-  loadingDocuments = false;
+  isLoadingCases = false;
+  isLoadingDocuments = false;
   
   // UI states
   isDescriptionExpanded = false;
 
+  private subscriptions = new Subscription();
+
   constructor(
     private clientService: ClientService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private languageService: LanguageService
   ) { }
 
   ngOnInit(): void {
-    this.loadCases();
+    this.loadMyCases();
+    
+    // Subscribe to language changes
+    this.subscriptions.add(
+      this.languageService.currentLanguage$.subscribe(() => {
+        // Language changed, component will be reloaded automatically
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   /**
-   * Load all cases for the current client
+   * Load user's cases
    */
-  private loadCases(): void {
-    this.loading = true;
+  loadMyCases(): void {
+    this.isLoadingCases = true;
     
     this.clientService.getMyCases().subscribe({
       next: (cases) => {
-        this.cases = cases || [];
-        this.loading = false;
+        // Map backend data to frontend interface
+        this.cases = cases.map(caseItem => ({
+          ...caseItem,
+          startDate: caseItem.startDate || caseItem.filingDate, // Use startDate or fallback to filingDate
+          lawyerName: caseItem.lawyerName || 
+                     (caseItem.assignedUser ? 
+                      `${caseItem.assignedUser.firstName} ${caseItem.assignedUser.lastName}` : 
+                      undefined)
+        }));
+        this.isLoadingCases = false;
       },
       error: (error) => {
         console.error('Error loading cases:', error);
         this.messageService.add({
           severity: 'error',
-          summary: 'Hata',
-          detail: 'Davalar yüklenirken bir hata oluştu'
+          summary: this.translate('error'),
+          detail: this.translate('error.loading.cases')
         });
-        this.loading = false;
+        this.isLoadingCases = false;
       }
     });
   }
 
   /**
-   * Handle case selection from table
+   * Handle case selection
    */
-  onCaseSelect(event: any): void {
-    this.selectedCase = event.data;
+  onCaseSelect(caseItem: ClientCase): void {
+    this.selectedCase = caseItem;
     this.isDescriptionExpanded = false; // Reset description state
-    if (this.selectedCase) {
-      this.loadCaseDocuments(this.selectedCase.id);
-    }
+    this.loadCaseDocuments(caseItem.id);
   }
 
   /**
    * Load documents for selected case
    */
-  private loadCaseDocuments(caseId: number): void {
-    this.loadingDocuments = true;
+  loadCaseDocuments(caseId: number): void {
+    this.isLoadingDocuments = true;
     this.caseDocuments = [];
     
     this.clientService.getDocumentsByCaseId(caseId).subscribe({
       next: (documents) => {
-        this.caseDocuments = documents || [];
-        this.loadingDocuments = false;
+        // Map backend data to frontend interface
+        this.caseDocuments = documents.map(doc => ({
+          ...doc,
+          uploadDate: doc.uploadDate || doc.createdDate // Use uploadDate or fallback to createdDate
+        }));
+        this.isLoadingDocuments = false;
       },
       error: (error) => {
         console.error('Error loading case documents:', error);
         this.messageService.add({
           severity: 'error',
-          summary: 'Hata',
-          detail: 'Dava dosyaları yüklenirken bir hata oluştu'
+          summary: this.translate('error'),
+          detail: this.translate('error.loading.documents')
         });
-        this.loadingDocuments = false;
+        this.isLoadingDocuments = false;
       }
     });
   }
@@ -108,166 +134,138 @@ export class ClientComponent implements OnInit {
   /**
    * Get truncated description
    */
-  getTruncatedDescription(description: string, maxLength: number = 150): string {
+  getTruncatedDescription(description: string, limit: number = 150): string {
     if (!description) return '';
-    if (description.length <= maxLength) return description;
-    return description.substring(0, maxLength) + '...';
-  }
-
-  /**
-   * Check if description needs truncation
-   */
-  shouldTruncateDescription(description: string, maxLength: number = 150): boolean {
-    return !!(description && description.length > maxLength);
+    if (description.length <= limit) return description;
+    return description.substring(0, limit) + '...';
   }
 
   /**
    * Get active cases count
    */
   getActiveCasesCount(): number {
-    return this.cases.filter(c => c.status === 'OPEN' || c.status === 'IN_PROGRESS').length;
+    return this.cases.filter(c => c.status !== 'closed').length;
   }
 
   /**
    * Get total documents count (estimated)
    */
   getTotalDocumentsCount(): number {
-    // Since we don't load all documents at once, we'll show selected case documents count
-    // or a placeholder if no case is selected
-    return this.selectedCase ? this.caseDocuments.length : this.cases.length * 2; // Estimate
+    // This is an estimation since we don't load all documents at once
+    return this.cases.length * 3; // Assume average 3 documents per case
   }
 
   /**
    * Refresh all data
    */
   refreshData(): void {
-    this.loadCases();
+    this.loadMyCases();
     if (this.selectedCase) {
       this.loadCaseDocuments(this.selectedCase.id);
     }
     
     this.messageService.add({
       severity: 'success',
-      summary: 'Başarılı',
-      detail: 'Veriler yenilendi'
+      summary: this.translate('success'),
+      detail: this.translate('data.refreshed')
     });
   }
-
-
 
   /**
    * Download document
    */
-  downloadDocument(doc: ClientDocument): void {
-    this.clientService.downloadDocument(doc.id).subscribe({
+  downloadDocument(document: ClientDocument): void {
+    this.clientService.downloadDocument(document.id).subscribe({
       next: (blob) => {
+        // Create download link
         const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
+        const link = window.document.createElement('a');
         link.href = url;
-        link.download = doc.fileName;
+        link.download = document.fileName;
         link.click();
         window.URL.revokeObjectURL(url);
         
         this.messageService.add({
           severity: 'success',
-          summary: 'Başarılı',
-          detail: 'Dosya indirildi'
+          summary: this.translate('success'),
+          detail: this.translate('file.downloaded')
         });
       },
       error: (error) => {
         console.error('Error downloading document:', error);
         this.messageService.add({
           severity: 'error',
-          summary: 'Hata',
-          detail: 'Dosya indirilirken bir hata oluştu'
+          summary: this.translate('error'),
+          detail: this.translate('error.downloading')
         });
       }
     });
   }
 
   /**
-   * Format date string
+   * Get case type label
    */
-  formatDate(dateString: string): string {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('tr-TR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
+  getCaseTypeLabel(type: string): string {
+    return this.translate(`type.${type.toLowerCase()}`);
+  }
+
+  /**
+   * Get status severity for PrimeNG Tag
+   */
+  getStatusSeverity(status: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' | undefined {
+    switch (status?.toLowerCase()) {
+      case 'open':
+        return 'info';
+      case 'in_progress':
+        return 'warning';
+      case 'pending':
+        return 'secondary';
+      case 'closed':
+        return 'success';
+      default:
+        return 'secondary';
+    }
+  }
+
+  /**
+   * Get document icon based on file type
+   */
+  getDocumentIcon(fileName: string): string {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return 'pi pi-file-pdf';
+      case 'doc':
+      case 'docx':
+        return 'pi pi-file-word';
+      case 'xls':
+      case 'xlsx':
+        return 'pi pi-file-excel';
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+        return 'pi pi-image';
+      default:
+        return 'pi pi-file';
+    }
   }
 
   /**
    * Format file size
    */
   formatFileSize(bytes: number): string {
-    if (!bytes) return '0 B';
+    if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
   /**
-   * Get status label in Turkish
+   * Get translation for a key
    */
-  getStatusLabel(status: string): string {
-    switch (status) {
-      case 'OPEN': return 'Açık';
-      case 'IN_PROGRESS': return 'Devam Ediyor';
-      case 'PENDING': return 'Beklemede';
-      case 'CLOSED': return 'Kapalı';
-      default: return status;
-    }
-  }
-
-  /**
-   * Get status severity for PrimeNG tag
-   */
-  getStatusSeverity(status: string): "success" | "secondary" | "info" | "warning" | "danger" | "contrast" | undefined {
-    switch (status) {
-      case 'OPEN': return 'info';
-      case 'IN_PROGRESS': return 'warning';
-      case 'PENDING': return 'secondary';
-      case 'CLOSED': return 'success';
-      default: return 'secondary';
-    }
-  }
-
-  /**
-   * Get case type label in Turkish
-   */
-  getCaseTypeLabel(type: string): string {
-    switch (type) {
-      case 'CAR_DEPRECIATION': return 'Araç Değer Kaybı';
-      case 'CIVIL': return 'Hukuk';
-      case 'CRIMINAL': return 'Ceza';
-      case 'FAMILY': return 'Aile';
-      case 'CORPORATE': return 'Şirket';
-      case 'REAL_ESTATE': return 'Gayrimenkul';
-      case 'INTELLECTUAL_PROPERTY': return 'Fikri Mülkiyet';
-      case 'OTHER': return 'Diğer';
-      default: return type;
-    }
-  }
-
-  /**
-   * Get document icon based on type
-   */
-  getDocumentIcon(type: string): string {
-    switch (type.toUpperCase()) {
-      case 'PDF': return 'pi pi-file-pdf';
-      case 'DOC':
-      case 'DOCX': return 'pi pi-file-word';
-      case 'XLS':
-      case 'XLSX': return 'pi pi-file-excel';
-      case 'JPG':
-      case 'JPEG':
-      case 'PNG':
-      case 'GIF': return 'pi pi-image';
-      case 'TXT': return 'pi pi-file';
-      default: return 'pi pi-file';
-    }
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 } 

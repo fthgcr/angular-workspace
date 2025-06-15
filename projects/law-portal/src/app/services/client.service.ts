@@ -11,6 +11,8 @@ export interface ClientCase {
   status: string;
   type: string;
   filingDate: string;
+  startDate: string;
+  lawyerName?: string;
   assignedUser?: {
     id: number;
     firstName: string;
@@ -34,6 +36,7 @@ export interface ClientDocument {
   fileSize: number;
   type: string;
   createdDate: string;
+  uploadDate: string;
   legalCase: {
     id: number;
     title: string;

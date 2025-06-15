@@ -1,277 +1,334 @@
-<div class="client-dashboard">
-  <div class="header">
-    <div class="header-background">
-      <div class="header-content">
-        <div class="header-main">
-          <div class="header-text">
-            <div class="welcome-section">
-              <h1>
-                <i class="pi pi-user-plus"></i>
-                Müvekkil Paneli
-              </h1>
-              <p class="subtitle">Hoş geldiniz! Dava süreçlerinizi buradan takip edebilirsiniz.</p>
-              <p class="description">Davalarınızı seçerek detay bilgilerini ve dosyalarını görüntüleyebilirsiniz.</p>
-            </div>
-          </div>
-          
-          <div class="header-stats">
-            <div class="stat-card">
-              <div class="stat-icon">
-                <i class="pi pi-briefcase"></i>
-              </div>
-              <div class="stat-info">
-                <span class="stat-number">{{cases.length}}</span>
-                <span class="stat-label">Toplam Dava</span>
-              </div>
-            </div>
-            
-            <div class="stat-card">
-              <div class="stat-icon">
-                <i class="pi pi-clock"></i>
-              </div>
-              <div class="stat-info">
-                <span class="stat-number">{{getActiveCasesCount()}}</span>
-                <span class="stat-label">Aktif Dava</span>
-              </div>
-            </div>
-            
-            <div class="stat-card">
-              <div class="stat-icon">
-                <i class="pi pi-file"></i>
-              </div>
-              <div class="stat-info">
-                <span class="stat-number">{{getTotalDocumentsCount()}}</span>
-                <span class="stat-label">Toplam Dosya</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="header-actions">
-          <p-button 
-            icon="pi pi-refresh" 
-            label="Yenile"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="refreshData()"
-            pTooltip="Verileri yenile">
-          </p-button>
+<div class="client-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <!-- Floating Circles -->
+    <div class="floating-circle circle-1"></div>
+    <div class="floating-circle circle-2"></div>
+    <div class="floating-circle circle-3"></div>
+    
+    <!-- Header Content -->
+    <div class="header-content">
+      <div class="welcome-section">
+        <div class="welcome-text">
+          <h1 class="page-title">
+            <i class="pi pi-balance-scale title-icon"></i>
+            {{ translate('client.panel') }}
+          </h1>
+          <p class="welcome-message">{{ translate('welcome.message') }}</p>
+          <p class="description">{{ translate('cases.description') }}</p>
         </div>
       </div>
       
-      <!-- Decorative Elements -->
-      <div class="header-decoration">
-        <div class="decoration-circle circle-1"></div>
-        <div class="decoration-circle circle-2"></div>
-        <div class="decoration-circle circle-3"></div>
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="pi pi-briefcase"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ cases.length }}</div>
+            <div class="stat-label">{{ translate('client.total.cases') }}</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon active">
+            <i class="pi pi-clock"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getActiveCasesCount() }}</div>
+            <div class="stat-label">{{ translate('client.active.cases') }}</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon documents">
+            <i class="pi pi-file"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getTotalDocumentsCount() }}</div>
+            <div class="stat-label">{{ translate('client.total.documents') }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button 
+          pButton 
+          type="button" 
+          class="refresh-btn"
+          [label]="translate('refresh')"
+          icon="pi pi-refresh" 
+          (click)="refreshData()"
+          [pTooltip]="translate('refresh.tooltip')"
+          tooltipPosition="bottom"
+        ></button>
       </div>
     </div>
   </div>
 
-  <!-- Dava Listesi -->
-  <div class="cases-section">
-    <div class="section-header">
-      <h2>📊 Davalarım</h2>
-      <span class="case-count" *ngIf="!loading">{{cases.length}} Dava</span>
-    </div>
-
-    <div class="cases-table-container">
-      <div *ngIf="loading" class="loading-container">
-        <p-progressSpinner></p-progressSpinner>
-        <p>Davalar yükleniyor...</p>
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Cases Section -->
+    <div class="cases-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="pi pi-briefcase"></i>
+          {{ translate('my.cases') }}
+        </h2>
       </div>
 
-      <div *ngIf="!loading && cases.length === 0" class="empty-state">
-        <i class="pi pi-inbox" style="font-size: 3rem; color: #6c757d;"></i>
-        <h3>Henüz dava bulunmamaktadır</h3>
-        <p>Size atanmış herhangi bir dava bulunmamaktadır.</p>
-      </div>
-
-      <p-table 
-        *ngIf="!loading && cases.length > 0"
-        [value]="cases" 
-        [paginator]="true" 
-        [rows]="10"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="{first} - {last} / {totalRecords} dava"
-        [rowsPerPageOptions]="[5,10,20]"
-        selectionMode="single"
-        [(selection)]="selectedCase"
-        (onRowSelect)="onCaseSelect($event)"
-        [metaKeySelection]="false"
-        styleClass="p-datatable-striped">
-        
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Dava No</th>
-            <th>Başlık</th>
-            <th>Durum</th>
-            <th>Tür</th>
-            <th>Başlangıç Tarihi</th>
-            <th>Avukat</th>
-          </tr>
-        </ng-template>
-        
-        <ng-template pTemplate="body" let-case let-rowIndex="rowIndex">
-          <tr [pSelectableRow]="case" [pSelectableRowIndex]="rowIndex">
-            <td>
-              <span class="case-number">{{case.caseNumber}}</span>
-            </td>
-            <td>
-              <span class="case-title">{{case.title}}</span>
-            </td>
-            <td>
-              <p-tag 
-                [value]="getStatusLabel(case.status)" 
-                [severity]="getStatusSeverity(case.status)">
-              </p-tag>
-            </td>
-            <td>
-              <span class="case-type">{{getCaseTypeLabel(case.type)}}</span>
-            </td>
-            <td>
-              <span class="case-date">{{formatDate(case.filingDate)}}</span>
-            </td>
-            <td>
-              <div class="lawyer-info" *ngIf="case.assignedUser">
-                <span class="lawyer-name">{{case.assignedUser.firstName}} {{case.assignedUser.lastName}}</span>
-                <small class="lawyer-email">{{case.assignedUser.email}}</small>
-              </div>
-              <span *ngIf="!case.assignedUser" class="text-muted">Atanmamış</span>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-  </div>
-
-  <!-- Seçilen Davanın Detayları -->
-  <div class="case-details-section" *ngIf="selectedCase">
-    <div class="section-header">
-      <h2>📋 Dava Detayları</h2>
-      <p-button 
-        icon="pi pi-times" 
-        severity="secondary" 
-        [text]="true" 
-        (onClick)="clearSelection()"
-        pTooltip="Seçimi Temizle">
-      </p-button>
-    </div>
-
-    <div class="case-details-content">
-      <!-- Dava Bilgileri -->
-      <div class="case-info-card">
-        <div class="card-header">
-          <h3>{{selectedCase.title}}</h3>
-          <p-tag 
-            [value]="getStatusLabel(selectedCase.status)" 
-            [severity]="getStatusSeverity(selectedCase.status)">
-          </p-tag>
-        </div>
-        
-        <div class="card-body">
-          <div class="info-grid">
-            <div class="info-item">
-              <label>Dava Numarası:</label>
-              <span>{{selectedCase.caseNumber}}</span>
-            </div>
-            <div class="info-item">
-              <label>Dava Türü:</label>
-              <span>{{getCaseTypeLabel(selectedCase.type)}}</span>
-            </div>
-            <div class="info-item">
-              <label>Başlangıç Tarihi:</label>
-              <span>{{formatDate(selectedCase.filingDate)}}</span>
-            </div>
-            <div class="info-item" *ngIf="selectedCase.assignedUser">
-              <label>Sorumlu Avukat:</label>
-              <div class="lawyer-detail">
-                <span>{{selectedCase.assignedUser.firstName}} {{selectedCase.assignedUser.lastName}}</span>
-                <small>{{selectedCase.assignedUser.email}}</small>
-              </div>
-            </div>
-          </div>
-          
-          <div class="description-section" *ngIf="selectedCase.description">
-            <div class="description-header">
-              <label>Açıklama:</label>
-              <p-button 
-                *ngIf="shouldTruncateDescription(selectedCase.description)"
-                [icon]="isDescriptionExpanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-                [label]="isDescriptionExpanded ? 'Daha Az' : 'Daha Fazla'"
-                severity="secondary"
-                [text]="true"
-                size="small"
-                (onClick)="toggleDescription()">
-              </p-button>
-            </div>
-            <p class="description-text" [class.expanded]="isDescriptionExpanded">
-              <span *ngIf="!isDescriptionExpanded && shouldTruncateDescription(selectedCase.description)">
-                {{getTruncatedDescription(selectedCase.description)}}
-              </span>
-              <span *ngIf="isDescriptionExpanded || !shouldTruncateDescription(selectedCase.description)">
-                {{selectedCase.description}}
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Dava Dosyaları -->
-      <div class="case-documents-card">
-        <div class="card-header">
-          <h3>📁 Dava Dosyaları</h3>
-          <span class="document-count">{{caseDocuments.length}} Dosya</span>
-        </div>
-        
-        <div class="card-body">
-          <div *ngIf="loadingDocuments" class="loading-container">
-            <p-progressSpinner [style]="{'width': '30px', 'height': '30px'}"></p-progressSpinner>
-            <span>Dosyalar yükleniyor...</span>
-          </div>
-
-          <div *ngIf="!loadingDocuments && caseDocuments.length === 0" class="empty-documents">
-            <i class="pi pi-file" style="font-size: 2rem; color: #6c757d;"></i>
-            <p>Bu davaya ait dosya bulunmamaktadır.</p>
-          </div>
-
-          <div *ngIf="!loadingDocuments && caseDocuments.length > 0" class="documents-list">
-            <div class="document-item" *ngFor="let document of caseDocuments">
-              <div class="document-icon">
-                <i [class]="getDocumentIcon(document.type)"></i>
-              </div>
-              <div class="document-info">
-                <h4>{{document.title}}</h4>
-                <p class="document-filename">{{document.fileName}}</p>
-                <div class="document-meta">
-                  <span class="document-type">{{document.type}}</span>
-                  <span class="document-size">{{formatFileSize(document.fileSize)}}</span>
-                  <span class="document-date">{{formatDate(document.createdDate)}}</span>
+      <!-- Cases Table -->
+      <div class="table-container">
+        <p-table 
+          [value]="cases" 
+          [loading]="isLoadingCases"
+          [loadingIcon]="'pi pi-spin pi-spinner'"
+          [paginator]="true" 
+          [rows]="10"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[5, 10, 20]"
+          [globalFilterFields]="['caseNumber', 'title', 'status', 'type']"
+          selectionMode="single"
+          [(selection)]="selectedCase"
+          (onRowSelect)="onCaseSelect($event.data)"
+          dataKey="id"
+          styleClass="p-datatable-gridlines p-datatable-striped"
+          [tableStyle]="{'min-width': '50rem'}"
+        >
+          <!-- Loading Template -->
+          <ng-template pTemplate="loadingbody">
+            <tr>
+              <td colspan="6" class="loading-cell">
+                <div class="loading-content">
+                  <i class="pi pi-spin pi-spinner loading-icon"></i>
+                  <span>{{ translate('loading.cases') }}</span>
                 </div>
-                <p class="document-description" *ngIf="document.description">{{document.description}}</p>
-              </div>
-              <div class="document-actions">
-                <p-button 
-                  icon="pi pi-download" 
-                  severity="info"
-                  [outlined]="true"
-                  (onClick)="downloadDocument(document)"
-                  pTooltip="Dosyayı İndir">
-                </p-button>
-              </div>
-            </div>
-          </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <!-- Table Header -->
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="caseNumber">
+                {{ translate('case.number') }}
+                <p-sortIcon field="caseNumber"></p-sortIcon>
+              </th>
+              <th pSortableColumn="title">
+                {{ translate('title') }}
+                <p-sortIcon field="title"></p-sortIcon>
+              </th>
+              <th pSortableColumn="status">
+                {{ translate('status') }}
+                <p-sortIcon field="status"></p-sortIcon>
+              </th>
+              <th pSortableColumn="type">
+                {{ translate('type') }}
+                <p-sortIcon field="type"></p-sortIcon>
+              </th>
+              <th pSortableColumn="startDate">
+                {{ translate('start.date') }}
+                <p-sortIcon field="startDate"></p-sortIcon>
+              </th>
+              <th pSortableColumn="lawyerName">
+                {{ translate('lawyer') }}
+                <p-sortIcon field="lawyerName"></p-sortIcon>
+              </th>
+            </tr>
+          </ng-template>
+
+          <!-- Table Body -->
+          <ng-template pTemplate="body" let-case>
+            <tr [pSelectableRow]="case" [ngClass]="{'selected-row': selectedCase?.id === case.id}">
+              <td>
+                <span class="case-number">{{ case.caseNumber }}</span>
+              </td>
+              <td>
+                <span class="case-title">{{ case.title }}</span>
+              </td>
+              <td>
+                <p-tag 
+                  [value]="translate('status.' + case.status.toLowerCase())" 
+                  [severity]="getStatusSeverity(case.status)"
+                ></p-tag>
+              </td>
+              <td>
+                <span class="case-type">{{ getCaseTypeLabel(case.type) }}</span>
+              </td>
+              <td>
+                <span class="case-date">{{ case.startDate | date:'dd/MM/yyyy' }}</span>
+              </td>
+              <td>
+                <span class="lawyer-name">{{ case.lawyerName || translate('unassigned') }}</span>
+              </td>
+            </tr>
+          </ng-template>
+
+          <!-- Empty State -->
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-content">
+                  <i class="pi pi-briefcase empty-icon"></i>
+                  <h3>{{ translate('no.cases') }}</h3>
+                  <p>{{ translate('no.cases.description') }}</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Case Details Section -->
+    <div class="case-details-section" *ngIf="selectedCase; else selectCaseTemplate">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="pi pi-info-circle"></i>
+          {{ translate('case.details') }}
+        </h2>
+        <button 
+          pButton 
+          type="button" 
+          class="clear-selection-btn"
+          [label]="translate('clear.selection')"
+          icon="pi pi-times" 
+          (click)="clearSelection()"
+          severity="secondary"
+          size="small"
+        ></button>
+      </div>
+
+      <!-- Case Information Cards -->
+      <div class="case-info-grid">
+        <div class="info-card">
+          <div class="info-label">{{ translate('case.number.label') }}</div>
+          <div class="info-value">{{ selectedCase.caseNumber }}</div>
+        </div>
+        
+        <div class="info-card">
+          <div class="info-label">{{ translate('case.type.label') }}</div>
+          <div class="info-value">{{ getCaseTypeLabel(selectedCase.type) }}</div>
+        </div>
+        
+        <div class="info-card">
+          <div class="info-label">{{ translate('start.date.label') }}</div>
+          <div class="info-value">{{ selectedCase.startDate | date:'dd/MM/yyyy' }}</div>
+        </div>
+        
+        <div class="info-card">
+          <div class="info-label">{{ translate('responsible.lawyer') }}</div>
+          <div class="info-value">{{ selectedCase.lawyerName || translate('unassigned') }}</div>
+        </div>
+      </div>
+
+      <!-- Case Description -->
+      <div class="description-section" *ngIf="selectedCase.description">
+        <h3 class="description-title">{{ translate('description') }}</h3>
+        <div class="description-content">
+          <p class="description-text">
+            {{ isDescriptionExpanded ? selectedCase.description : getTruncatedDescription(selectedCase.description) }}
+          </p>
+          <button 
+            *ngIf="selectedCase.description.length > 150"
+            type="button" 
+            class="toggle-description-btn"
+            (click)="toggleDescription()"
+          >
+            <span>{{ isDescriptionExpanded ? translate('show.less') : translate('show.more') }}</span>
+            <i class="pi" [ngClass]="isDescriptionExpanded ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Case Documents -->
+      <div class="documents-section">
+        <h3 class="documents-title">
+          <i class="pi pi-file"></i>
+          {{ translate('case.documents') }}
+        </h3>
+        
+        <!-- Loading State -->
+        <div *ngIf="isLoadingDocuments" class="loading-state">
+          <i class="pi pi-spin pi-spinner loading-icon"></i>
+          <span>{{ translate('loading.documents') }}</span>
+        </div>
+
+        <!-- Documents Table -->
+        <div *ngIf="!isLoadingDocuments && caseDocuments.length > 0" class="documents-table">
+          <p-table 
+            [value]="caseDocuments"
+            [paginator]="true" 
+            [rows]="5"
+            [showCurrentPageReport]="true"
+            styleClass="p-datatable-gridlines"
+            [tableStyle]="{'min-width': '50rem'}"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3rem"></th>
+                <th>{{ translate('file.name') }}</th>
+                <th>{{ translate('file.title') }}</th>
+                <th>{{ translate('upload.date') }}</th>
+                <th>{{ translate('file.size') }}</th>
+                <th style="width: 8rem">{{ translate('actions') }}</th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-doc>
+              <tr>
+                <td>
+                  <i [class]="getDocumentIcon(doc.fileName)" class="document-icon"></i>
+                </td>
+                <td>
+                  <span class="document-name">{{ doc.fileName }}</span>
+                </td>
+                <td>
+                  <span class="document-title">{{ doc.title || '-' }}</span>
+                </td>
+                <td>
+                  <span class="upload-date">{{ doc.uploadDate | date:'dd/MM/yyyy HH:mm' }}</span>
+                </td>
+                <td>
+                  <span class="file-size">{{ formatFileSize(doc.fileSize) }}</span>
+                </td>
+                <td>
+                  <button 
+                    pButton 
+                    type="button" 
+                    icon="pi pi-download" 
+                    class="download-btn"
+                    [pTooltip]="translate('download.tooltip')"
+                    tooltipPosition="top"
+                    (click)="downloadDocument(doc)"
+                    size="small"
+                    severity="info"
+                  ></button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+        <!-- No Documents State -->
+        <div *ngIf="!isLoadingDocuments && caseDocuments.length === 0" class="no-documents">
+          <i class="pi pi-file-o empty-icon"></i>
+          <p>{{ translate('no.documents') }}</p>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Seçim Yapılmadığında Gösterilecek Mesaj -->
-  <div class="no-selection-message" *ngIf="!selectedCase && !loading && cases.length > 0">
-    <div class="message-content">
-      <i class="pi pi-info-circle" style="font-size: 3rem; color: #007bff;"></i>
-      <h3>Dava Seçiniz</h3>
-      <p>Detay bilgilerini ve dosyalarını görüntülemek için yukarıdaki tablodan bir dava seçiniz.</p>
-    </div>
+    <!-- Select Case Template -->
+    <ng-template #selectCaseTemplate>
+      <div class="select-case-section">
+        <div class="select-case-content">
+          <i class="pi pi-briefcase select-icon"></i>
+          <h3>{{ translate('select.case') }}</h3>
+          <p>{{ translate('select.case.description') }}</p>
+        </div>
+      </div>
+    </ng-template>
   </div>
 </div> 
