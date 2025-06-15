@@ -1,54 +1,134 @@
 import { Component, OnInit } from '@angular/core';
-
-interface Case {
-  id: number;
-  title: string;
-  status: string;
-  createdDate: Date;
-  description: string;
-}
-
-interface Document {
-  id: number;
-  name: string;
-  type: string;
-  uploadDate: Date;
-  size: string;
-}
+import { ClientService, ClientCase, ClientDocument } from '../../services/client.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-client',
   templateUrl: './client.component.html',
   styleUrls: ['./client.component.scss'],
-  standalone: false // Module-based component
+  standalone: false
 })
 export class ClientComponent implements OnInit {
 
-  // Accordion data
-  cases: Case[] = [];
-  documents: Document[] = [];
-  thirdAccordionData: any[] = []; // Placeholder for future
-  fourthAccordionData: any[] = []; // Placeholder for future
+  // Data properties
+  cases: ClientCase[] = [];
+  selectedCase: ClientCase | null = null;
+  caseDocuments: ClientDocument[] = [];
+  
+  // Loading states
+  loading = false;
+  loadingDocuments = false;
 
-  // Accordion states
-  accordionStates: { [key: number]: boolean } = {
-    1: true,  // İlk akordiyon açık başlasın
-    2: false,
-    3: false,
-    4: false
-  };
-
-  constructor() { }
+  constructor(
+    private clientService: ClientService,
+    private messageService: MessageService
+  ) { }
 
   ngOnInit(): void {
-    this.loadMockData();
+    this.loadCases();
   }
 
-  toggleAccordion(index: number): void {
-    this.accordionStates[index] = !this.accordionStates[index];
+  /**
+   * Load all cases for the current client
+   */
+  private loadCases(): void {
+    this.loading = true;
+    
+    this.clientService.getMyCases().subscribe({
+      next: (cases) => {
+        this.cases = cases || [];
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading cases:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Davalar yüklenirken bir hata oluştu'
+        });
+        this.loading = false;
+      }
+    });
   }
 
-  formatDate(date: Date): string {
+  /**
+   * Handle case selection from table
+   */
+  onCaseSelect(event: any): void {
+    this.selectedCase = event.data;
+    if (this.selectedCase) {
+      this.loadCaseDocuments(this.selectedCase.id);
+    }
+  }
+
+  /**
+   * Load documents for selected case
+   */
+  private loadCaseDocuments(caseId: number): void {
+    this.loadingDocuments = true;
+    this.caseDocuments = [];
+    
+    this.clientService.getDocumentsByCaseId(caseId).subscribe({
+      next: (documents) => {
+        this.caseDocuments = documents || [];
+        this.loadingDocuments = false;
+      },
+      error: (error) => {
+        console.error('Error loading case documents:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Dava dosyaları yüklenirken bir hata oluştu'
+        });
+        this.loadingDocuments = false;
+      }
+    });
+  }
+
+  /**
+   * Clear case selection
+   */
+  clearSelection(): void {
+    this.selectedCase = null;
+    this.caseDocuments = [];
+  }
+
+  /**
+   * Download document
+   */
+  downloadDocument(doc: ClientDocument): void {
+    this.clientService.downloadDocument(doc.id).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = doc.fileName;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Başarılı',
+          detail: 'Dosya indirildi'
+        });
+      },
+      error: (error) => {
+        console.error('Error downloading document:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Dosya indirilirken bir hata oluştu'
+        });
+      }
+    });
+  }
+
+  /**
+   * Format date string
+   */
+  formatDate(dateString: string): string {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
     return date.toLocaleDateString('tr-TR', {
       day: '2-digit',
       month: '2-digit',
@@ -56,92 +136,76 @@ export class ClientComponent implements OnInit {
     });
   }
 
+  /**
+   * Format file size
+   */
+  formatFileSize(bytes: number): string {
+    if (!bytes) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  /**
+   * Get status label in Turkish
+   */
   getStatusLabel(status: string): string {
-    // Convert English status to Turkish labels
     switch (status) {
       case 'OPEN': return 'Açık';
       case 'IN_PROGRESS': return 'Devam Ediyor';
       case 'PENDING': return 'Beklemede';
       case 'CLOSED': return 'Kapalı';
-      // Legacy status values (keep for backwards compatibility)
-      case 'Devam Ediyor': return 'Devam Ediyor';
-      case 'Tamamlandı': return 'Kapalı';
-      case 'Beklemede': return 'Beklemede';
       default: return status;
     }
   }
 
-  getStatusClass(status: string): string {
-    const label = this.getStatusLabel(status);
-    switch (label) {
-      case 'Açık': return 'status-tag status-info';
-      case 'Devam Ediyor': return 'status-tag status-warning';
-      case 'Beklemede': return 'status-tag status-secondary';
-      case 'Kapalı': return 'status-tag status-success';
-      default: return 'status-tag status-secondary';
-    }
-  }
-
-  getStatusSeverity(status: string): string {
-    const label = this.getStatusLabel(status);
-    switch (label) {
-      case 'Açık': return 'info';
-      case 'Devam Ediyor': return 'warning';
-      case 'Beklemede': return 'secondary';
-      case 'Kapalı': return 'success';
+  /**
+   * Get status severity for PrimeNG tag
+   */
+  getStatusSeverity(status: string): "success" | "secondary" | "info" | "warning" | "danger" | "contrast" | undefined {
+    switch (status) {
+      case 'OPEN': return 'info';
+      case 'IN_PROGRESS': return 'warning';
+      case 'PENDING': return 'secondary';
+      case 'CLOSED': return 'success';
       default: return 'secondary';
     }
   }
 
-  private loadMockData(): void {
-    // Mock cases data
-    this.cases = [
-      {
-        id: 1,
-        title: 'Boşanma Davası',
-        status: 'Devam Ediyor',
-        createdDate: new Date('2024-01-15'),
-        description: 'Mal paylaşımı ile ilgili boşanma davası'
-      },
-      {
-        id: 2,
-        title: 'İcra Takibi',
-        status: 'Tamamlandı',
-        createdDate: new Date('2023-12-10'),
-        description: 'Alacak tahsili için açılan icra takibi'
-      },
-      {
-        id: 3,
-        title: 'İş Mahkemesi',
-        status: 'Beklemede',
-        createdDate: new Date('2024-02-20'),
-        description: 'İşten çıkarma tazminatı davası'
-      }
-    ];
+  /**
+   * Get case type label in Turkish
+   */
+  getCaseTypeLabel(type: string): string {
+    switch (type) {
+      case 'CAR_DEPRECIATION': return 'Araç Değer Kaybı';
+      case 'CIVIL': return 'Hukuk';
+      case 'CRIMINAL': return 'Ceza';
+      case 'FAMILY': return 'Aile';
+      case 'CORPORATE': return 'Şirket';
+      case 'REAL_ESTATE': return 'Gayrimenkul';
+      case 'INTELLECTUAL_PROPERTY': return 'Fikri Mülkiyet';
+      case 'OTHER': return 'Diğer';
+      default: return type;
+    }
+  }
 
-    // Mock documents data
-    this.documents = [
-      {
-        id: 1,
-        name: 'Boşanma Dilekçesi.pdf',
-        type: 'PDF',
-        uploadDate: new Date('2024-01-16'),
-        size: '2.5 MB'
-      },
-      {
-        id: 2,
-        name: 'Kimlik Fotokopisi.jpg',
-        type: 'JPG',
-        uploadDate: new Date('2024-01-15'),
-        size: '850 KB'
-      },
-      {
-        id: 3,
-        name: 'Evlilik Cüzdanı.pdf',
-        type: 'PDF',
-        uploadDate: new Date('2024-01-15'),
-        size: '1.2 MB'
-      }
-    ];
+  /**
+   * Get document icon based on type
+   */
+  getDocumentIcon(type: string): string {
+    switch (type.toUpperCase()) {
+      case 'PDF': return 'pi pi-file-pdf';
+      case 'DOC':
+      case 'DOCX': return 'pi pi-file-word';
+      case 'XLS':
+      case 'XLSX': return 'pi pi-file-excel';
+      case 'JPG':
+      case 'JPEG':
+      case 'PNG':
+      case 'GIF': return 'pi pi-image';
+      case 'TXT': return 'pi pi-file';
+      default: return 'pi pi-file';
+    }
   }
 } 

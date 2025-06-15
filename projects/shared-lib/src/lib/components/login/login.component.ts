@@ -1,10 +1,9 @@
-import { Component, OnInit, Inject, Optional } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { LoginRequest } from '../../models/auth.model';
-import { NavigationConfig, NAVIGATION_CONFIG } from '../../tokens/navigation.token';
 
 @Component({
   selector: 'lib-login',
@@ -19,8 +18,7 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private messageService: MessageService,
-    private router: Router,
-    @Optional() @Inject(NAVIGATION_CONFIG) private navigationConfig: NavigationConfig | null
+    private router: Router
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
@@ -50,30 +48,8 @@ export class LoginComponent implements OnInit {
   }
 
   private redirectBasedOnRole(): void {
-    const role = this.authService.getCurrentRole();
-    
-    // Use injected navigation config if available, otherwise use defaults
-    const routes = this.navigationConfig || {
-      adminDashboard: '/admin-dashboard',
-      clientDashboard: '/client-dashboard',
-      userDashboard: '/dashboard'
-    };
-    
-    switch (role) {
-      case 'ADMIN':
-        this.router.navigate([routes.adminDashboard]);
-        break;
-      case 'LAWYER':
-        this.router.navigate([routes.adminDashboard]);
-        break;
-      case 'CLIENT':
-        this.router.navigate([routes.clientDashboard]);
-        break;
-      case 'USER':
-      default:
-        this.router.navigate([routes.userDashboard || '/dashboard']);
-        break;
-    }
+    // Tüm kullanıcıları ana sayfaya yönlendir
+    this.router.navigate(['/']);
   }
 
   onSubmit(): void {

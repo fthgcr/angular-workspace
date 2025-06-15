@@ -31,7 +31,7 @@ export class AdminLawyersComponent implements OnInit {
     this.userForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(4)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.email]], // Email zorunluluğu kaldırıldı, sadece format kontrolü
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       phoneNumber: [''],
@@ -161,27 +161,29 @@ export class AdminLawyersComponent implements OnInit {
     }
   }
 
-  deleteUser(user: User): void {
+  deactivateUser(user: User): void {
     this.confirmationService.confirm({
-      message: `"${user.username}" adlı avukatı silmek istediğinizden emin misiniz?`,
-      header: 'Silme Onayı',
+      message: `"${user.username}" adlı avukatı devre dışı bırakmak istediğinizden emin misiniz? Bu işlem geri alınabilir.`,
+      header: 'Avukatı Devre Dışı Bırak',
       icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Evet, Devre Dışı Bırak',
+      rejectLabel: 'İptal',
       accept: () => {
-        this.adminService.deleteUser(user.id!).subscribe({
+        this.adminService.deactivateUser(user.id!).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
               summary: 'Başarılı',
-              detail: 'Avukat başarıyla silindi'
+              detail: 'Avukat başarıyla devre dışı bırakıldı'
             });
             this.loadUsers();
           },
           error: (error: any) => {
-            console.error('Error deleting user:', error);
+            console.error('Error deactivating user:', error);
             this.messageService.add({
               severity: 'error',
               summary: 'Hata',
-              detail: 'Avukat silinirken hata oluştu'
+              detail: 'Avukat devre dışı bırakılırken hata oluştu'
             });
           }
         });
@@ -210,19 +212,6 @@ export class AdminLawyersComponent implements OnInit {
       return user.roles.join(', ');
     }
     return 'Rol Yok';
-  }
-
-  getRoleSeverity(role: string): "success" | "secondary" | "info" | "warning" | "danger" | "contrast" | undefined {
-    switch (role) {
-      case 'ADMIN':
-        return 'danger';
-      case 'LAWYER':
-        return 'success';
-      case 'USER':
-        return 'info';
-      default:
-        return 'secondary';
-    }
   }
 
   isFieldInvalid(fieldName: string): boolean {

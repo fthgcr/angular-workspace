@@ -5,6 +5,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { NoAuthGuard } from './guards/no-auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { RedirectGuard } from './guards/redirect.guard';
+import { ClientRestrictionGuard } from './guards/client-restriction.guard';
 import { ClientComponent } from './features/client/client.component';
 import { ProfileComponent } from './features/profile/profile.component';
 
@@ -12,30 +13,30 @@ export const routes: Routes = [
   // Ana sayfa - Kullanıcı girişi yapıp yapmadığına göre yönlendir
   { path: '', canActivate: [RedirectGuard], children: [] },
   
-  // Kimlik doğrulama sayfaları - Giriş yapmış kullanıcılar erişemez
-  { path: 'login', component: LoginComponent, canActivate: [NoAuthGuard] },
-  { path: 'register', component: RegisterComponent, canActivate: [NoAuthGuard] },
+  // Kimlik doğrulama sayfaları - CLIENT/USER kısıtlaması uygulanır
+  { path: 'login', component: LoginComponent, canActivate: [NoAuthGuard, ClientRestrictionGuard] },
+  { path: 'register', component: RegisterComponent, canActivate: [NoAuthGuard, ClientRestrictionGuard] },
   
-  // Profile - Tüm authenticated kullanıcılar erişebilir
+  // Profile - Tüm authenticated kullanıcılar erişebilir, CLIENT/USER kısıtlaması uygulanır
   { 
     path: 'profile', 
     component: ProfileComponent, 
-    canActivate: [AuthGuard] 
+    canActivate: [AuthGuard, ClientRestrictionGuard] 
   },
   
-  // Client Component - Sadece USER rolü erişebilir
+  // Client Component - USER ve CLIENT rolleri erişebilir
   { 
     path: 'client', 
     component: ClientComponent, 
-    canActivate: [AuthGuard, RoleGuard], 
-    data: { roles: ['USER'] } 
+    canActivate: [AuthGuard, RoleGuard, ClientRestrictionGuard], 
+    data: { roles: ['USER', 'CLIENT'] } 
   },
   
-  // Admin Dashboard - ADMIN ve LAWYER rolleri erişebilir
+  // Admin Dashboard - ADMIN ve LAWYER rolleri erişebilir, CLIENT/USER kısıtlaması uygulanır
   { 
     path: 'admin', 
     loadChildren: () => import('./features/admin-dashboard/admin-dashboard.module').then(m => m.AdminDashboardModule),
-    canActivate: [AuthGuard, RoleGuard], 
+    canActivate: [AuthGuard, RoleGuard, ClientRestrictionGuard], 
     data: { roles: ['ADMIN', 'LAWYER'] } 
   },
   
@@ -46,11 +47,11 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
   
-  // Cases - Tüm kullanıcılar erişebilir (AuthGuard ile korunuyor)
+  // Cases - Tüm kullanıcılar erişebilir, CLIENT/USER kısıtlaması uygulanır
   { 
     path: 'cases', 
     loadChildren: () => import('./features/cases/cases.module').then(m => m.CasesModule),
-    canActivate: [AuthGuard] 
+    canActivate: [AuthGuard, ClientRestrictionGuard] 
   },
   
   // Bilinmeyen route'lar için fallback

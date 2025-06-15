@@ -64,7 +64,6 @@
             E-posta <p-sortIcon field="email"></p-sortIcon>
           </th>
           <th>Telefon</th>
-          <th>Rol</th>
           <th>Durum</th>
           <th>İşlemler</th>
         </tr>
@@ -90,16 +89,8 @@
           </td>
           <td>
             <p-tag 
-              *ngFor="let role of user.roles" 
-              [value]="role" 
-              [severity]="getRoleSeverity(role)"
-              styleClass="role-tag">
-            </p-tag>
-          </td>
-          <td>
-            <p-tag 
-              [value]="user.enabled ? 'Aktif' : 'Pasif'" 
-              [severity]="user.enabled ? 'success' : 'danger'">
+              [value]="user.active ? 'Aktif' : 'Pasif'" 
+              [severity]="user.active ? 'success' : 'danger'">
             </p-tag>
           </td>
           <td class="action-column">
@@ -114,9 +105,9 @@
               <p-button 
                 icon="pi pi-trash" 
                 styleClass="p-button-rounded p-button-text p-button-danger"
-                pTooltip="Sil"
+                pTooltip="Devre Dışı Bırak"
                 tooltipPosition="top"
-                (onClick)="deleteUser(user)">
+                (onClick)="deactivateUser(user)">
               </p-button>
             </div>
           </td>
@@ -126,7 +117,7 @@
       <!-- Empty State -->
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7" class="empty-state">
+          <td colspan="6" class="empty-state">
             <div class="empty-content">
               <i class="pi pi-users empty-icon"></i>
               <h3>Henüz avukat bulunmuyor</h3>
@@ -271,7 +262,7 @@
 
         <!-- Email -->
         <div class="form-field">
-          <label for="email">E-posta *</label>
+          <label for="email">E-posta</label>
           <input 
             id="email"
             type="email" 

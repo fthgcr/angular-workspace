@@ -37,7 +37,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
   ) {
     this.clientForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.email]], // Email zorunluluğu kaldırıldı, sadece format kontrolü
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       password: ['123456', [Validators.required, Validators.minLength(6)]],

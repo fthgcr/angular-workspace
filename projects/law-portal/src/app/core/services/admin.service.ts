@@ -70,6 +70,10 @@ export class AdminService {
     return this.http.delete(`${this.apiUrl}/users/${userId}`);
   }
 
+  deactivateUser(userId: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/users/${userId}/deactivate`, {});
+  }
+
   getRoles(): Observable<Role[]> {
     return this.http.get<Role[]>(`${this.apiUrl}/roles`);
   }

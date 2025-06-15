@@ -1,146 +1,195 @@
 <div class="client-dashboard">
   <div class="header">
     <h1>Müvekkil Paneli</h1>
-    <p>Dava ve dosya bilgilerinizi buradan takip edebilirsiniz.</p>
+    <p>Davalarınızı seçerek detay bilgilerini ve dosyalarını görüntüleyebilirsiniz.</p>
   </div>
 
-  <div class="accordion-container">
-    
-    <!-- 1. Akordiyon - Davalarım -->
-    <div class="accordion-item">
-      <div class="accordion-header" (click)="toggleAccordion(1)">
-        <h3>📊 Davalarım</h3>
-        <span class="toggle-icon" [class.open]="accordionStates[1]">▼</span>
+  <!-- Dava Listesi -->
+  <div class="cases-section">
+    <div class="section-header">
+      <h2>📊 Davalarım</h2>
+      <span class="case-count" *ngIf="!loading">{{cases.length}} Dava</span>
+    </div>
+
+    <div class="cases-table-container">
+      <div *ngIf="loading" class="loading-container">
+        <p-progressSpinner></p-progressSpinner>
+        <p>Davalar yükleniyor...</p>
       </div>
-      <div class="accordion-content" [class.open]="accordionStates[1]">
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Dava No</th>
-                <th>Dava Başlığı</th>
-                <th>Durum</th>
-                <th>Başlangıç Tarihi</th>
-                <th>Açıklama</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let case of cases">
-                <td>{{case.id}}</td>
-                <td>{{case.title}}</td>
-                <td>
-                  <span [class]="getStatusClass(case.status)">
-                    {{getStatusLabel(case.status)}}
-                  </span>
-                </td>
-                <td>{{formatDate(case.createdDate)}}</td>
-                <td>{{case.description}}</td>
-              </tr>
-            </tbody>
-          </table>
+
+      <div *ngIf="!loading && cases.length === 0" class="empty-state">
+        <i class="pi pi-inbox" style="font-size: 3rem; color: #6c757d;"></i>
+        <h3>Henüz dava bulunmamaktadır</h3>
+        <p>Size atanmış herhangi bir dava bulunmamaktadır.</p>
+      </div>
+
+      <p-table 
+        *ngIf="!loading && cases.length > 0"
+        [value]="cases" 
+        [paginator]="true" 
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first} - {last} / {totalRecords} dava"
+        [rowsPerPageOptions]="[5,10,20]"
+        selectionMode="single"
+        [(selection)]="selectedCase"
+        (onRowSelect)="onCaseSelect($event)"
+        [metaKeySelection]="false"
+        styleClass="p-datatable-striped">
+        
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Dava No</th>
+            <th>Başlık</th>
+            <th>Durum</th>
+            <th>Tür</th>
+            <th>Başlangıç Tarihi</th>
+            <th>Avukat</th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-case let-rowIndex="rowIndex">
+          <tr [pSelectableRow]="case" [pSelectableRowIndex]="rowIndex">
+            <td>
+              <span class="case-number">{{case.caseNumber}}</span>
+            </td>
+            <td>
+              <span class="case-title">{{case.title}}</span>
+            </td>
+            <td>
+              <p-tag 
+                [value]="getStatusLabel(case.status)" 
+                [severity]="getStatusSeverity(case.status)">
+              </p-tag>
+            </td>
+            <td>
+              <span class="case-type">{{getCaseTypeLabel(case.type)}}</span>
+            </td>
+            <td>
+              <span class="case-date">{{formatDate(case.filingDate)}}</span>
+            </td>
+            <td>
+              <div class="lawyer-info" *ngIf="case.assignedUser">
+                <span class="lawyer-name">{{case.assignedUser.firstName}} {{case.assignedUser.lastName}}</span>
+                <small class="lawyer-email">{{case.assignedUser.email}}</small>
+              </div>
+              <span *ngIf="!case.assignedUser" class="text-muted">Atanmamış</span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Seçilen Davanın Detayları -->
+  <div class="case-details-section" *ngIf="selectedCase">
+    <div class="section-header">
+      <h2>📋 Dava Detayları</h2>
+      <p-button 
+        icon="pi pi-times" 
+        severity="secondary" 
+        [text]="true" 
+        (onClick)="clearSelection()"
+        pTooltip="Seçimi Temizle">
+      </p-button>
+    </div>
+
+    <div class="case-details-content">
+      <!-- Dava Bilgileri -->
+      <div class="case-info-card">
+        <div class="card-header">
+          <h3>{{selectedCase.title}}</h3>
+          <p-tag 
+            [value]="getStatusLabel(selectedCase.status)" 
+            [severity]="getStatusSeverity(selectedCase.status)">
+          </p-tag>
+        </div>
+        
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Dava Numarası:</label>
+              <span>{{selectedCase.caseNumber}}</span>
+            </div>
+            <div class="info-item">
+              <label>Dava Türü:</label>
+              <span>{{getCaseTypeLabel(selectedCase.type)}}</span>
+            </div>
+            <div class="info-item">
+              <label>Başlangıç Tarihi:</label>
+              <span>{{formatDate(selectedCase.filingDate)}}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedCase.assignedUser">
+              <label>Sorumlu Avukat:</label>
+              <div class="lawyer-detail">
+                <span>{{selectedCase.assignedUser.firstName}} {{selectedCase.assignedUser.lastName}}</span>
+                <small>{{selectedCase.assignedUser.email}}</small>
+              </div>
+            </div>
+          </div>
+          
+          <div class="description-section" *ngIf="selectedCase.description">
+            <label>Açıklama:</label>
+            <p class="description-text">{{selectedCase.description}}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dava Dosyaları -->
+      <div class="case-documents-card">
+        <div class="card-header">
+          <h3>📁 Dava Dosyaları</h3>
+          <span class="document-count">{{caseDocuments.length}} Dosya</span>
+        </div>
+        
+        <div class="card-body">
+          <div *ngIf="loadingDocuments" class="loading-container">
+            <p-progressSpinner [style]="{'width': '30px', 'height': '30px'}"></p-progressSpinner>
+            <span>Dosyalar yükleniyor...</span>
+          </div>
+
+          <div *ngIf="!loadingDocuments && caseDocuments.length === 0" class="empty-documents">
+            <i class="pi pi-file" style="font-size: 2rem; color: #6c757d;"></i>
+            <p>Bu davaya ait dosya bulunmamaktadır.</p>
+          </div>
+
+          <div *ngIf="!loadingDocuments && caseDocuments.length > 0" class="documents-list">
+            <div class="document-item" *ngFor="let document of caseDocuments">
+              <div class="document-icon">
+                <i [class]="getDocumentIcon(document.type)"></i>
+              </div>
+              <div class="document-info">
+                <h4>{{document.title}}</h4>
+                <p class="document-filename">{{document.fileName}}</p>
+                <div class="document-meta">
+                  <span class="document-type">{{document.type}}</span>
+                  <span class="document-size">{{formatFileSize(document.fileSize)}}</span>
+                  <span class="document-date">{{formatDate(document.createdDate)}}</span>
+                </div>
+                <p class="document-description" *ngIf="document.description">{{document.description}}</p>
+              </div>
+              <div class="document-actions">
+                <p-button 
+                  icon="pi pi-download" 
+                  severity="info"
+                  [outlined]="true"
+                  (onClick)="downloadDocument(document)"
+                  pTooltip="Dosyayı İndir">
+                </p-button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- 2. Akordiyon - Dosyalarım -->
-    <div class="accordion-item">
-      <div class="accordion-header" (click)="toggleAccordion(2)">
-        <h3>📁 Dosyalarım</h3>
-        <span class="toggle-icon" [class.open]="accordionStates[2]">▼</span>
-      </div>
-      <div class="accordion-content" [class.open]="accordionStates[2]">
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Dosya ID</th>
-                <th>Dosya Adı</th>
-                <th>Tür</th>
-                <th>Yükleme Tarihi</th>
-                <th>Boyut</th>
-                <th>İşlemler</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let document of documents">
-                <td>{{document.id}}</td>
-                <td>{{document.name}}</td>
-                <td>
-                  <span class="file-type-tag">{{document.type}}</span>
-                </td>
-                <td>{{formatDate(document.uploadDate)}}</td>
-                <td>{{document.size}}</td>
-                <td>
-                  <button class="download-btn" title="İndir">⬇</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <!-- Seçim Yapılmadığında Gösterilecek Mesaj -->
+  <div class="no-selection-message" *ngIf="!selectedCase && !loading && cases.length > 0">
+    <div class="message-content">
+      <i class="pi pi-info-circle" style="font-size: 3rem; color: #007bff;"></i>
+      <h3>Dava Seçiniz</h3>
+      <p>Detay bilgilerini ve dosyalarını görüntülemek için yukarıdaki tablodan bir dava seçiniz.</p>
     </div>
-
-    <!-- 3. Akordiyon - Gelecek İçin Rezerve -->
-    <div class="accordion-item">
-      <div class="accordion-header" (click)="toggleAccordion(3)">
-        <h3>⚖️ Üçüncü Akordiyon</h3>
-        <span class="toggle-icon" [class.open]="accordionStates[3]">▼</span>
-      </div>
-      <div class="accordion-content" [class.open]="accordionStates[3]">
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Kolon 1</th>
-                <th>Kolon 2</th>
-                <th>Kolon 3</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngIf="thirdAccordionData.length === 0">
-                <td colspan="3" class="empty-message">Bu bölüm henüz hazır değil</td>
-              </tr>
-              <tr *ngFor="let item of thirdAccordionData">
-                <td>{{item.col1}}</td>
-                <td>{{item.col2}}</td>
-                <td>{{item.col3}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4. Akordiyon - Gelecek İçin Rezerve -->
-    <div class="accordion-item">
-      <div class="accordion-header" (click)="toggleAccordion(4)">
-        <h3>📋 Dördüncü Akordiyon</h3>
-        <span class="toggle-icon" [class.open]="accordionStates[4]">▼</span>
-      </div>
-      <div class="accordion-content" [class.open]="accordionStates[4]">
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Kolon A</th>
-                <th>Kolon B</th>
-                <th>Kolon C</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngIf="fourthAccordionData.length === 0">
-                <td colspan="3" class="empty-message">Bu bölüm henüz hazir değil</td>
-              </tr>
-              <tr *ngFor="let item of fourthAccordionData">
-                <td>{{item.colA}}</td>
-                <td>{{item.colB}}</td>
-                <td>{{item.colC}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div> 
