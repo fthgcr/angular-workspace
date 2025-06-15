@@ -1,7 +1,71 @@
 <div class="client-dashboard">
   <div class="header">
-    <h1>Müvekkil Paneli</h1>
-    <p>Davalarınızı seçerek detay bilgilerini ve dosyalarını görüntüleyebilirsiniz.</p>
+    <div class="header-background">
+      <div class="header-content">
+        <div class="header-main">
+          <div class="header-text">
+            <div class="welcome-section">
+              <h1>
+                <i class="pi pi-user-plus"></i>
+                Müvekkil Paneli
+              </h1>
+              <p class="subtitle">Hoş geldiniz! Dava süreçlerinizi buradan takip edebilirsiniz.</p>
+              <p class="description">Davalarınızı seçerek detay bilgilerini ve dosyalarını görüntüleyebilirsiniz.</p>
+            </div>
+          </div>
+          
+          <div class="header-stats">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="pi pi-briefcase"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-number">{{cases.length}}</span>
+                <span class="stat-label">Toplam Dava</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="pi pi-clock"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-number">{{getActiveCasesCount()}}</span>
+                <span class="stat-label">Aktif Dava</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="pi pi-file"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-number">{{getTotalDocumentsCount()}}</span>
+                <span class="stat-label">Toplam Dosya</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <p-button 
+            icon="pi pi-refresh" 
+            label="Yenile"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="refreshData()"
+            pTooltip="Verileri yenile">
+          </p-button>
+        </div>
+      </div>
+      
+      <!-- Decorative Elements -->
+      <div class="header-decoration">
+        <div class="decoration-circle circle-1"></div>
+        <div class="decoration-circle circle-2"></div>
+        <div class="decoration-circle circle-3"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Dava Listesi -->
@@ -129,8 +193,26 @@
           </div>
           
           <div class="description-section" *ngIf="selectedCase.description">
-            <label>Açıklama:</label>
-            <p class="description-text">{{selectedCase.description}}</p>
+            <div class="description-header">
+              <label>Açıklama:</label>
+              <p-button 
+                *ngIf="shouldTruncateDescription(selectedCase.description)"
+                [icon]="isDescriptionExpanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                [label]="isDescriptionExpanded ? 'Daha Az' : 'Daha Fazla'"
+                severity="secondary"
+                [text]="true"
+                size="small"
+                (onClick)="toggleDescription()">
+              </p-button>
+            </div>
+            <p class="description-text" [class.expanded]="isDescriptionExpanded">
+              <span *ngIf="!isDescriptionExpanded && shouldTruncateDescription(selectedCase.description)">
+                {{getTruncatedDescription(selectedCase.description)}}
+              </span>
+              <span *ngIf="isDescriptionExpanded || !shouldTruncateDescription(selectedCase.description)">
+                {{selectedCase.description}}
+              </span>
+            </p>
           </div>
         </div>
       </div>

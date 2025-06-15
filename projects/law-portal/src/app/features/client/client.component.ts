@@ -18,6 +18,9 @@ export class ClientComponent implements OnInit {
   // Loading states
   loading = false;
   loadingDocuments = false;
+  
+  // UI states
+  isDescriptionExpanded = false;
 
   constructor(
     private clientService: ClientService,
@@ -56,6 +59,7 @@ export class ClientComponent implements OnInit {
    */
   onCaseSelect(event: any): void {
     this.selectedCase = event.data;
+    this.isDescriptionExpanded = false; // Reset description state
     if (this.selectedCase) {
       this.loadCaseDocuments(this.selectedCase.id);
     }
@@ -91,7 +95,65 @@ export class ClientComponent implements OnInit {
   clearSelection(): void {
     this.selectedCase = null;
     this.caseDocuments = [];
+    this.isDescriptionExpanded = false;
   }
+
+  /**
+   * Toggle description expansion
+   */
+  toggleDescription(): void {
+    this.isDescriptionExpanded = !this.isDescriptionExpanded;
+  }
+
+  /**
+   * Get truncated description
+   */
+  getTruncatedDescription(description: string, maxLength: number = 150): string {
+    if (!description) return '';
+    if (description.length <= maxLength) return description;
+    return description.substring(0, maxLength) + '...';
+  }
+
+  /**
+   * Check if description needs truncation
+   */
+  shouldTruncateDescription(description: string, maxLength: number = 150): boolean {
+    return !!(description && description.length > maxLength);
+  }
+
+  /**
+   * Get active cases count
+   */
+  getActiveCasesCount(): number {
+    return this.cases.filter(c => c.status === 'OPEN' || c.status === 'IN_PROGRESS').length;
+  }
+
+  /**
+   * Get total documents count (estimated)
+   */
+  getTotalDocumentsCount(): number {
+    // Since we don't load all documents at once, we'll show selected case documents count
+    // or a placeholder if no case is selected
+    return this.selectedCase ? this.caseDocuments.length : this.cases.length * 2; // Estimate
+  }
+
+  /**
+   * Refresh all data
+   */
+  refreshData(): void {
+    this.loadCases();
+    if (this.selectedCase) {
+      this.loadCaseDocuments(this.selectedCase.id);
+    }
+    
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Başarılı',
+      detail: 'Veriler yenilendi'
+    });
+  }
+
+
 
   /**
    * Download document
