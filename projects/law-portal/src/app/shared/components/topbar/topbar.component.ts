@@ -4,6 +4,7 @@ import { AuthService } from 'shared-lib';
 import { MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { LanguageService, Language } from '../../../services/language.service';
+import { AppConfigService } from '../../../services/app-config.service';
 
 @Component({
   selector: 'app-topbar',
@@ -27,7 +28,8 @@ export class TopbarComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private messageService: MessageService,
-    private languageService: LanguageService
+    private languageService: LanguageService,
+    private appConfigService: AppConfigService
   ) {
     this.currentLanguage = this.languageService.getCurrentLanguage();
     this.languages = this.languageService.languages;
@@ -115,16 +117,16 @@ export class TopbarComponent implements OnInit, OnDestroy {
   private setUserMenuItems(): void {
     console.log('Setting user menu items'); // Debug log
     this.userMenuItems = [
-      {
+      /*{
         label: this.translate('profile'),
         icon: 'pi pi-user',
         command: () => {
           this.navigateTo('/profile');
         }
-      },
+      }, 
       {
         separator: true
-      },
+      },*/
       {
         label: this.translate('logout'),
         icon: 'pi pi-sign-out',
@@ -168,7 +170,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     // Login sayfasına yönlendir
     setTimeout(() => {
       this.router.navigate(['/login']);
-    }, 1000);
+    }, 300);
   }
 
   getUserDisplayName(): string {
@@ -208,5 +210,38 @@ export class TopbarComponent implements OnInit, OnDestroy {
    */
   translate(key: string): string {
     return this.languageService.translate(key);
+  }
+
+  // App Config methods
+  getAppTitle(): string {
+    return this.appConfigService.getAppTitle();
+  }
+
+  getAppDescription(): string {
+    return this.appConfigService.getAppDescription();
+  }
+
+  getLogoIcon(): string {
+    return this.appConfigService.getLogoIcon();
+  }
+
+  getLogoImageUrl(): string {
+    return this.appConfigService.getLogoImageUrl();
+  }
+
+  getLogoBase64(): string {
+    return this.appConfigService.getLogoBase64();
+  }
+
+  getEffectiveLogoUrl(): string {
+    return this.appConfigService.getEffectiveLogoUrl();
+  }
+
+  hasLogoImage(): boolean {
+    return this.appConfigService.hasLogoImage();
+  }
+
+  getLogoDimensions(): { width: number; height: number; recommended_size: string } {
+    return this.appConfigService.getLogoDimensions();
   }
 } 

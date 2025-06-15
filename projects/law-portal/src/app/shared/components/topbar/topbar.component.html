@@ -3,11 +3,25 @@
     <!-- Logo Section -->
     <div class="logo-section" (click)="navigateTo(getDashboardRoute())">
       <div class="logo-icon">
-        <i class="pi pi-balance-scale"></i>
+        <!-- Logo Image (if available) -->
+        <img 
+          *ngIf="hasLogoImage()" 
+          [src]="getEffectiveLogoUrl()" 
+          [alt]="getAppTitle()"
+          [style.width.px]="getLogoDimensions().width"
+          [style.height.px]="getLogoDimensions().height"
+          class="logo-image"
+        />
+        <!-- Logo Icon (fallback) -->
+        <i 
+          *ngIf="!hasLogoImage()" 
+          [ngClass]="getLogoIcon()"
+          class="logo-icon-fallback"
+        ></i>
       </div>
       <div class="logo-text">
-        <h1 class="app-title">LawPortal</h1>
-        <p class="app-subtitle">Legal Management System</p>
+        <h1 class="app-title">{{ getAppTitle() }}</h1>
+        <p class="app-subtitle">{{ getAppDescription() }}</p>
       </div>
     </div>
 
