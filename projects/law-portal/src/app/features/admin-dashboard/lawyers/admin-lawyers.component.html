@@ -181,6 +181,94 @@
           </small>
         </div>
 
+        <!-- Password Management for Editing Mode -->
+        <div class="form-field full-width" *ngIf="isEditMode">
+          <label for="passwordManagement">
+            Şifre Yönetimi
+            <i class="pi pi-info-circle password-info-icon" 
+               pTooltip="Şifreyi değiştirmek için 'Şifreyi Düzenle' butonuna tıklayın."
+               tooltipPosition="top"
+               [style]="{'margin-left': '0.5rem', 'color': '#6b7280', 'cursor': 'help'}">
+            </i>
+          </label>
+          
+          <div class="password-management-container" style="display: flex; align-items: center; gap: 0.5rem;">
+            <!-- Password Display/Input -->
+            <div style="flex: 1;">
+                             <input 
+                 id="passwordManagement"
+                 type="password"
+                 pInputText 
+                 [value]="isPasswordEditing ? userForm.get('password')?.value || '' : '*****'"
+                 [readonly]="!isPasswordEditing"
+                 [placeholder]="isPasswordEditing ? 'Yeni şifre girin (min. 6 karakter)' : ''"
+                 class="w-full"
+                 [style]="{'background-color': isPasswordEditing ? '#ffffff' : '#f8f9fa', 'cursor': isPasswordEditing ? 'text' : 'default'}"
+                 (input)="isPasswordEditing && userForm.get('password')?.setValue($any($event.target).value)"
+               />
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="password-actions" style="display: flex; gap: 0.25rem;">
+              <p-button 
+                *ngIf="!isPasswordEditing"
+                icon="pi pi-pencil" 
+                styleClass="p-button-rounded p-button-text p-button-sm p-button-info"
+                pTooltip="Şifreyi Düzenle"
+                tooltipPosition="top"
+                (onClick)="togglePasswordEdit()"
+                [style]="{'width': '2rem', 'height': '2rem'}"
+              ></p-button>
+              
+              <p-button 
+                *ngIf="!isPasswordEditing"
+                icon="pi pi-refresh" 
+                styleClass="p-button-rounded p-button-text p-button-sm p-button-warning"
+                pTooltip="Şifreyi Sıfırla (123456)"
+                tooltipPosition="top"
+                (onClick)="resetPassword()"
+                [style]="{'width': '2rem', 'height': '2rem'}"
+              ></p-button>
+              
+              <p-button 
+                *ngIf="isPasswordEditing"
+                icon="pi pi-check" 
+                styleClass="p-button-rounded p-button-text p-button-sm p-button-success"
+                pTooltip="Şifre Değişikliğini Onayla"
+                tooltipPosition="top"
+                (onClick)="confirmPasswordEdit()"
+                [disabled]="!userForm.get('password')?.value || userForm.get('password')?.value.length < 6"
+                [style]="{'width': '2rem', 'height': '2rem'}"
+              ></p-button>
+              
+              <p-button 
+                *ngIf="isPasswordEditing"
+                icon="pi pi-times" 
+                styleClass="p-button-rounded p-button-text p-button-sm p-button-secondary"
+                pTooltip="Şifre Düzenlemeyi İptal Et"
+                tooltipPosition="top"
+                (onClick)="cancelPasswordEdit()"
+                [style]="{'width': '2rem', 'height': '2rem'}"
+              ></p-button>
+            </div>
+          </div>
+          
+          <!-- Password Edit Info -->
+          <small class="password-note" *ngIf="isPasswordEditing" style="color: #059669; font-size: 0.8rem; font-style: italic; display: block; margin-top: 0.25rem;">
+            <i class="pi pi-info-circle" style="margin-right: 0.25rem;"></i>
+            Yeni şifre en az 6 karakter olmalıdır
+          </small>
+          
+          <small class="password-note" *ngIf="!isPasswordEditing" style="color: #6b7280; font-size: 0.8rem; font-style: italic; display: block; margin-top: 0.25rem;">
+            <i class="pi pi-shield" style="margin-right: 0.25rem;"></i>
+            Şifre güvenlik nedeniyle gizlenmektedir
+          </small>
+          
+          <small class="error-message" *ngIf="isFieldInvalid('password')">
+            {{getFieldError('password')}}
+          </small>
+        </div>
+
         <!-- Email -->
         <div class="form-field">
           <label for="email">E-posta *</label>

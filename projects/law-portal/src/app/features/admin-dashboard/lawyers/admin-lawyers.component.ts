@@ -16,6 +16,10 @@ export class AdminLawyersComponent implements OnInit {
   isEditMode = false;
   selectedUser: User | null = null;
   
+  // Password management
+  isPasswordEditing = false;
+  originalPasswordValue = '';
+  
   userForm: FormGroup;
 
   constructor(
@@ -94,10 +98,14 @@ export class AdminLawyersComponent implements OnInit {
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
       address: user.address,
+      password: '', // Şifre alanını boş bırak
       role: 'LAWYER' // Always set to LAWYER for this page
     });
     this.userForm.get('password')?.clearValidators();
     this.userForm.get('password')?.updateValueAndValidity();
+    // Reset password editing state
+    this.isPasswordEditing = false;
+    this.originalPasswordValue = '';
     this.showDialog = true;
   }
 
@@ -185,6 +193,9 @@ export class AdminLawyersComponent implements OnInit {
     this.showDialog = false;
     this.userForm.reset();
     this.selectedUser = null;
+    // Reset password editing state
+    this.isPasswordEditing = false;
+    this.originalPasswordValue = '';
   }
 
   private markFormGroupTouched(): void {
@@ -227,5 +238,110 @@ export class AdminLawyersComponent implements OnInit {
       if (field.errors['minlength']) return `En az ${field.errors['minlength'].requiredLength} karakter olmalıdır`;
     }
     return '';
+  }
+
+  // Password Management Methods
+  togglePasswordEdit(): void {
+    this.isPasswordEditing = true;
+    this.originalPasswordValue = this.userForm.get('password')?.value || '';
+    this.userForm.get('password')?.setValue('');
+    this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
+    this.userForm.get('password')?.updateValueAndValidity();
+  }
+
+  confirmPasswordEdit(): void {
+    const newPassword = this.userForm.get('password')?.value;
+    
+    if (!newPassword || newPassword.length < 6) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Uyarı',
+        detail: 'Şifre en az 6 karakter olmalıdır'
+      });
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: 'Şifreyi değiştirmek istediğinizden emin misiniz?',
+      header: 'Şifre Değiştir',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Evet',
+      rejectLabel: 'Hayır',
+      accept: () => {
+        this.updateUserPassword(newPassword);
+      }
+    });
+  }
+
+  cancelPasswordEdit(): void {
+    this.isPasswordEditing = false;
+    this.userForm.get('password')?.setValue(this.originalPasswordValue);
+    this.userForm.get('password')?.clearValidators();
+    this.userForm.get('password')?.updateValueAndValidity();
+    this.originalPasswordValue = '';
+  }
+
+  resetPassword(): void {
+    this.confirmationService.confirm({
+      message: 'Şifreyi varsayılan değere (123456) sıfırlamak istediğinizden emin misiniz?',
+      header: 'Şifre Sıfırla',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Evet',
+      rejectLabel: 'Hayır',
+      accept: () => {
+        this.updateUserPassword('123456');
+      }
+    });
+  }
+
+  private updateUserPassword(newPassword: string): void {
+    if (!this.selectedUser) return;
+
+    // Sadece gerekli alanları gönder
+    const updateData = {
+      id: this.selectedUser.id,
+      username: this.selectedUser.username,
+      email: this.selectedUser.email,
+      firstName: this.selectedUser.firstName,
+      lastName: this.selectedUser.lastName,
+      phoneNumber: this.selectedUser.phoneNumber,
+      address: this.selectedUser.address,
+      password: newPassword // Yeni şifre
+    };
+
+    console.log('Updating user password with data:', updateData); // Debug için
+
+    this.adminService.updateUser(this.selectedUser.id!, updateData).subscribe({
+      next: (response: any) => {
+        // Update local user data
+        const index = this.users.findIndex(u => u.id === this.selectedUser!.id);
+        if (index !== -1) {
+          this.users[index] = response;
+        }
+
+        // Reset password editing state
+        this.isPasswordEditing = false;
+        this.originalPasswordValue = '';
+        this.userForm.get('password')?.clearValidators();
+        this.userForm.get('password')?.updateValueAndValidity();
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Başarılı',
+          detail: 'Şifre başarıyla güncellendi'
+        });
+      },
+      error: (error: any) => {
+        console.error('Error updating password:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: error.error?.error || 'Şifre güncellenirken bir hata oluştu'
+        });
+        
+        // Reset to original state on error
+        this.cancelPasswordEdit();
+      }
+    });
   }
 }

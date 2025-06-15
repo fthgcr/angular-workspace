@@ -16,6 +16,10 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
   editingClient: Client | null = null;
   loading = false;
 
+  // Password management
+  isPasswordEditing = false;
+  originalPasswordValue = '';
+
   // Filter options
   statusOptions = [
     { label: 'Aktif', value: true },
@@ -193,10 +197,17 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
 
   editClient(client: Client): void {
     this.editingClient = client;
-    this.clientForm.patchValue(client);
+    // Şifre hariç diğer alanları doldur
+    this.clientForm.patchValue({
+      ...client,
+      password: '' // Şifre alanını boş bırak
+    });
     // Düzenleme modunda password alanını devre dışı bırak
     this.clientForm.get('password')?.clearValidators();
     this.clientForm.get('password')?.updateValueAndValidity();
+    // Reset password editing state
+    this.isPasswordEditing = false;
+    this.originalPasswordValue = '';
     this.showDialog = true;
   }
 
@@ -296,6 +307,9 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
     this.showDialog = false;
     this.clientForm.reset();
     this.editingClient = null;
+    // Reset password editing state
+    this.isPasswordEditing = false;
+    this.originalPasswordValue = '';
   }
 
   getFieldError(fieldName: string): string {
@@ -350,5 +364,117 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
 
   viewClientDetails(client: Client): void {
     this.router.navigate(['/admin/client', client.id]);
+  }
+
+  // Password Management Methods
+  togglePasswordEdit(): void {
+    this.isPasswordEditing = true;
+    this.originalPasswordValue = this.clientForm.get('password')?.value || '';
+    this.clientForm.get('password')?.setValue('');
+    this.clientForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
+    this.clientForm.get('password')?.updateValueAndValidity();
+  }
+
+  confirmPasswordEdit(): void {
+    const newPassword = this.clientForm.get('password')?.value;
+    
+    if (!newPassword || newPassword.length < 6) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Uyarı',
+        detail: 'Şifre en az 6 karakter olmalıdır'
+      });
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: 'Şifreyi değiştirmek istediğinizden emin misiniz?',
+      header: 'Şifre Değiştir',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Evet',
+      rejectLabel: 'Hayır',
+      accept: () => {
+        this.updateClientPassword(newPassword);
+      }
+    });
+  }
+
+  cancelPasswordEdit(): void {
+    this.isPasswordEditing = false;
+    this.clientForm.get('password')?.setValue(this.originalPasswordValue);
+    this.clientForm.get('password')?.clearValidators();
+    this.clientForm.get('password')?.updateValueAndValidity();
+    this.originalPasswordValue = '';
+  }
+
+  resetPassword(): void {
+    this.confirmationService.confirm({
+      message: 'Şifreyi varsayılan değere (123456) sıfırlamak istediğinizden emin misiniz?',
+      header: 'Şifre Sıfırla',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Evet',
+      rejectLabel: 'Hayır',
+      accept: () => {
+        this.updateClientPassword('123456');
+      }
+    });
+  }
+
+  private updateClientPassword(newPassword: string): void {
+    if (!this.editingClient) return;
+
+    // Sadece gerekli alanları gönder
+    const updateData = {
+      id: this.editingClient.id,
+      username: this.editingClient.username,
+      email: this.editingClient.email,
+      firstName: this.editingClient.firstName,
+      lastName: this.editingClient.lastName,
+      phoneNumber: this.editingClient.phoneNumber,
+      address: this.editingClient.address,
+      notes: this.editingClient.notes,
+      enabled: this.editingClient.enabled,
+      active: this.editingClient.active,
+      password: newPassword // Yeni şifre
+    };
+
+    console.log('=== PASSWORD UPDATE DEBUG ===');
+    console.log('Client ID:', this.editingClient.id);
+    console.log('New Password:', newPassword);
+    console.log('Update Data:', updateData);
+    console.log('API URL will be:', `http://localhost:8080/api/clients/${this.editingClient.id}`);
+
+    this.clientService.updateClient(this.editingClient.id!, updateData).subscribe({
+      next: (updatedClient) => {
+        // Update local client data
+        const index = this.clients.findIndex(c => c.id === this.editingClient!.id);
+        if (index !== -1) {
+          this.clients[index] = updatedClient;
+        }
+
+        // Reset password editing state
+        this.isPasswordEditing = false;
+        this.originalPasswordValue = '';
+        this.clientForm.get('password')?.clearValidators();
+        this.clientForm.get('password')?.updateValueAndValidity();
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Başarılı',
+          detail: 'Şifre başarıyla güncellendi'
+        });
+      },
+      error: (error) => {
+        console.error('Error updating password:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: error.error?.error || 'Şifre güncellenirken bir hata oluştu'
+        });
+        
+        // Reset to original state on error
+        this.cancelPasswordEdit();
+      }
+    });
   }
 } 
