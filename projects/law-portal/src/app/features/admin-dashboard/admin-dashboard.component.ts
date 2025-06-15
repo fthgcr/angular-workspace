@@ -172,40 +172,40 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
     switch (activity.type) {
       case ActivityType.CLIENT_CREATED:
-        return `${performedBy} tarafından "${targetName}" adlı müvekkil eklendi`;
+        return `${performedBy} ${this.translate('activity.client.created')} "${targetName}"`;
       
       case ActivityType.CLIENT_UPDATED:
-        return `${performedBy} tarafından "${targetName}" adlı müvekkil güncellendi`;
+        return `${performedBy} ${this.translate('activity.client.updated')} "${targetName}"`;
       
       case ActivityType.CASE_CREATED:
         if (relatedName) {
-          return `${performedBy} tarafından "${targetName}" davası "${relatedName}" müvekkiline eklendi`;
+          return `${performedBy} ${this.translate('activity.case.created.with.client')} "${targetName}" "${relatedName}"`;
         }
-        return `${performedBy} tarafından "${targetName}" davası eklendi`;
+        return `${performedBy} ${this.translate('activity.case.created')} "${targetName}"`;
       
       case ActivityType.CASE_UPDATED:
-        return `${performedBy} tarafından "${targetName}" davası güncellendi`;
+        return `${performedBy} ${this.translate('activity.case.updated')} "${targetName}"`;
       
       case ActivityType.CASE_ASSIGNED:
         if (relatedName) {
-          return `"${targetName}" davası ${performedBy} tarafından "${relatedName}" müvekkiline atandı`;
+          return `"${targetName}" ${this.translate('activity.case.assigned')} ${performedBy} "${relatedName}"`;
         }
-        return `"${targetName}" davası ${performedBy} tarafından atandı`;
+        return `"${targetName}" ${this.translate('activity.case.assigned.simple')} ${performedBy}`;
       
       case ActivityType.DOCUMENT_CREATED:
         if (relatedName) {
-          return `${performedBy} tarafından "${relatedName}" müvekkiline "${targetName}" dosyası eklendi`;
+          return `${performedBy} ${this.translate('activity.document.created')} "${relatedName}" "${targetName}"`;
         }
-        return `${performedBy} tarafından "${targetName}" dosyası eklendi`;
+        return `${performedBy} ${this.translate('activity.document.created.simple')} "${targetName}"`;
       
       case ActivityType.DOCUMENT_UPDATED:
-        return `${performedBy} tarafından "${targetName}" dosyası güncellendi`;
+        return `${performedBy} ${this.translate('activity.document.updated')} "${targetName}"`;
       
       case ActivityType.USER_CREATED:
-        return `${performedBy} tarafından "${targetName}" kullanıcısı oluşturuldu`;
+        return `${performedBy} ${this.translate('activity.user.created')} "${targetName}"`;
       
       case ActivityType.USER_UPDATED:
-        return `${performedBy} tarafından "${targetName}" kullanıcısı güncellendi`;
+        return `${performedBy} ${this.translate('activity.user.updated')} "${targetName}"`;
       
       default:
         return activity.description;

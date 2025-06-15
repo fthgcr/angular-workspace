@@ -3,12 +3,12 @@
   <div class="case-header">
     <div class="flex justify-content-between align-items-center mb-4">
       <div>
-        <h2 class="m-0 text-primary">{{ case?.title || 'Dava Detayları' }}</h2>
+        <h2 class="m-0 text-primary">{{ case?.title || translate('case.details') }}</h2>
         <p class="text-500 m-0 mt-1">{{ case?.caseNumber }}</p>
       </div>
       <div>
         <p-button 
-          label="Geri" 
+          [label]="translate('back')" 
           icon="pi pi-arrow-left" 
           severity="secondary" 
           (onClick)="goBack()">
@@ -31,11 +31,11 @@
       <div class="card-content">
         <div class="info-grid">
           <div class="info-item">
-            <label>Dava Numarası</label>
+            <label>{{ translate('case.number') }}</label>
             <span>{{ case.caseNumber }}</span>
           </div>
           <div class="info-item">
-            <label>Dava Türü</label>
+            <label>{{ translate('case.type') }}</label>
             <span>
               <p-tag 
                 [value]="getCaseTypeLabel(case.type)" 
@@ -44,15 +44,15 @@
             </span>
           </div>
           <div class="info-item">
-            <label>Açılış Tarihi</label>
+            <label>{{ translate('filing.date') }}</label>
             <span>{{ case.filingDate | date:'dd/MM/yyyy' }}</span>
           </div>
           <div class="info-item">
-            <label>Oluşturulma Tarihi</label>
+            <label>{{ translate('created.date') }}</label>
             <span>{{ case.createdDate | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="info-item full-width" *ngIf="case.description">
-            <label>Açıklama</label>
+            <label>{{ translate('description') }}</label>
             <span>{{ case.description }}</span>
           </div>
         </div>
@@ -64,11 +64,11 @@
   <div class="documents-section">
     <div class="section-header">
       <div>
-        <h3>Dava Dokümanları</h3>
-        <span class="document-count">{{ documents.length }} dosya</span>
+        <h3>{{ translate('case.documents.section') }}</h3>
+        <span class="document-count">{{ translate('documents.file.count').replace('{count}', documents.length.toString()) }}</span>
       </div>
       <p-button 
-        label="Dosya Yükle" 
+        [label]="translate('upload.file.button')" 
         icon="pi pi-upload" 
         severity="success"
         (onClick)="openUploadDialog()">
@@ -84,7 +84,7 @@
         [paginator]="true" 
         [rows]="10"
         [showCurrentPageReport]="true"
-        currentPageReportTemplate="Gösterilen: {first} - {last} / Toplam: {totalRecords}"
+        [currentPageReportTemplate]="translate('table.pagination.template')"
         [globalFilterFields]="['title', 'fileName', 'description']"
         responsiveLayout="scroll">
         
@@ -95,7 +95,7 @@
               <input 
                 pInputText 
                 type="text" 
-                placeholder="Dosyalarda ara..." 
+                [placeholder]="translate('search.in.documents')" 
                 (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
             </span>
           <!-- <div>
@@ -116,26 +116,26 @@
               <i class="pi pi-file"></i>
             </th>
             <th pSortableColumn="title">
-              Başlık
+              {{ translate('table.title') }}
               <p-sortIcon field="title"></p-sortIcon>
             </th>
             <th pSortableColumn="fileName">
-              Dosya Adı
+              {{ translate('table.file.name') }}
               <p-sortIcon field="fileName"></p-sortIcon>
             </th>
             <th pSortableColumn="type">
-              Tür
+              {{ translate('table.document.type') }}
               <p-sortIcon field="type"></p-sortIcon>
             </th>
             <th pSortableColumn="fileSize">
-              Boyut
+              {{ translate('table.file.size') }}
               <p-sortIcon field="fileSize"></p-sortIcon>
             </th>
             <th pSortableColumn="createdDate">
-              Yüklenme Tarihi
+              {{ translate('table.upload.date') }}
               <p-sortIcon field="createdDate"></p-sortIcon>
             </th>
-            <th style="width: 120px;">İşlemler</th>
+            <th style="width: 120px;">{{ translate('table.actions') }}</th>
           </tr>
         </ng-template>
 
@@ -168,14 +168,14 @@
                   severity="success"
                   [text]="true"
                   (onClick)="downloadDocument(document)"
-                  pTooltip="İndir">
+                  [pTooltip]="translate('button.download')">
                 </p-button>
                 <p-button 
                   icon="pi pi-trash" 
                   severity="danger"
                   [text]="true"
                   (onClick)="deleteDocument(document)"
-                  pTooltip="Sil">
+                  [pTooltip]="translate('button.delete')">
                 </p-button>
               </div>
             </td>
@@ -187,10 +187,10 @@
             <td colspan="7" class="text-center">
               <div class="empty-state">
                 <i class="pi pi-file-o text-4xl text-400 mb-3"></i>
-                <p class="text-500 mb-0">Bu davaya ait doküman bulunmuyor</p>
+                <p class="text-500 mb-0">{{ translate('no.documents.message') }}</p>
                 <p class="text-400 mt-2">
                   <a class="cursor-pointer text-primary" (click)="openUploadDialog()">
-                    İlk dosyayı yüklemek için tıklayın
+                    {{ translate('upload.first.file.link') }}
                   </a>
                 </p>
               </div>
@@ -204,7 +204,7 @@
 
 <!-- Upload Dialog -->
 <p-dialog 
-  header="Dosya Yükle" 
+  [header]="translate('dialog.upload.title')" 
   [(visible)]="showUploadDialog" 
   [modal]="true" 
   [style]="{ width: '600px' }"
@@ -214,7 +214,7 @@
   <form [formGroup]="uploadForm" (ngSubmit)="uploadDocuments()">
     <!-- File Upload -->
     <div class="field">
-      <label for="fileUpload">Dosya Seç *</label>
+      <label for="fileUpload">{{ translate('form.select.file.required') }}</label>
       <p-fileUpload 
         #fileUpload
         mode="advanced" 
@@ -225,24 +225,24 @@
         [auto]="false"
         [showUploadButton]="false"
         [showCancelButton]="false"
-        chooseLabel="Dosya Seç"
-        uploadLabel="Yükle"
-        cancelLabel="İptal">
+        [chooseLabel]="translate('form.choose.file')"
+        [uploadLabel]="translate('form.upload.button')"
+        [cancelLabel]="translate('form.cancel.button')">
       </p-fileUpload>
       <small class="text-500">
-        İzin verilen formatlar: PDF, Word, Excel, Resim dosyaları (Maks. 10MB)
+        {{ translate('form.allowed.formats') }}
       </small>
     </div>
 
     <!-- Title -->
     <div class="field">
-      <label for="title">Başlık *</label>
+      <label for="title">{{ translate('form.title.label') }}</label>
       <input 
         id="title"
         type="text" 
         pInputText 
         formControlName="title"
-        placeholder="Doküman başlığı"
+        [placeholder]="translate('form.title.placeholder')"
         class="w-full"
         [class.ng-invalid]="uploadForm.get('title')?.invalid && uploadForm.get('title')?.touched" />
       <small class="p-error" *ngIf="getFieldError('title')">
@@ -252,12 +252,12 @@
 
     <!-- Type -->
     <div class="field">
-      <label for="type">Doküman Türü *</label>
+      <label for="type">{{ translate('form.type.label') }}</label>
       <p-dropdown 
         id="type"
         [options]="documentTypeOptions" 
         formControlName="type"
-        placeholder="Tür seçin"
+        [placeholder]="translate('form.type.placeholder')"
         optionLabel="label" 
         optionValue="value"
         class="w-full"
@@ -270,13 +270,13 @@
 
     <!-- Description -->
     <div class="field">
-      <label for="description">Açıklama</label>
+      <label for="description">{{ translate('form.description.label') }}</label>
       <textarea 
         id="description"
         pInputTextarea 
         formControlName="description"
         rows="3"
-        placeholder="Doküman açıklaması (isteğe bağlı)"
+        [placeholder]="translate('form.description.placeholder')"
         class="w-full">
       </textarea>
     </div>
@@ -285,13 +285,13 @@
   <ng-template pTemplate="footer">
     <div class="flex justify-content-end gap-2">
       <p-button 
-        label="İptal" 
+        [label]="translate('form.cancel.button')" 
         severity="secondary" 
         (onClick)="cancelUpload()"
         [disabled]="uploading">
       </p-button>
       <p-button 
-        label="Yükle" 
+        [label]="translate('form.upload.button')" 
         severity="success"
         [icon]="uploading ? 'pi pi-spin pi-spinner' : 'pi pi-upload'"
         (onClick)="uploadDocuments()"

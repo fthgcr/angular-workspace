@@ -8,10 +8,10 @@
         icon="pi pi-arrow-left"
         (click)="goBack()"
       >
-        Geri Dön
+        {{ translate('back') }}
       </button>
       <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-text">Müvekkiller</span>
+      <span class="breadcrumb-text">{{ translate('clients') }}</span>
       <span class="breadcrumb-separator">/</span>
       <span class="breadcrumb-current">{{ client?.firstName }} {{ client?.lastName }}</span>
     </div>
@@ -21,35 +21,35 @@
   <div class="client-info-section" *ngIf="client">
     <div class="info-card">
       <div class="card-header">
-        <h2>Müvekkil Bilgileri</h2>
+        <h2>{{ translate('client.information') }}</h2>
       </div>
       <div class="card-content">
         <div class="info-grid">
           <div class="info-item">
-            <label>Ad Soyad:</label>
+            <label>{{ translate('full.name') }}:</label>
             <span>{{ client.firstName }} {{ client.lastName }}</span>
           </div>
           <div class="info-item">
-            <label>Email:</label>
+            <label>{{ translate('email') }}:</label>
             <span>{{ client.email }}</span>
           </div>
           <div class="info-item">
-            <label>Telefon:</label>
+            <label>{{ translate('phone') }}:</label>
             <span>{{ client.phoneNumber }}</span>
           </div>
           <div class="info-item">
-            <label>Durum:</label>
+            <label>{{ translate('status') }}:</label>
             <p-tag 
               [severity]="client.enabled ? 'success' : 'danger'" 
-              [value]="client.enabled ? 'Aktif' : 'Pasif'"
+              [value]="client.enabled ? translate('active') : translate('inactive')"
             ></p-tag>
           </div>
           <div class="info-item full-width">
-            <label>Adres:</label>
+            <label>{{ translate('address') }}:</label>
             <span>{{ client.address }}</span>
           </div>
           <div class="info-item full-width" *ngIf="client.notes">
-            <label>Notlar:</label>
+            <label>{{ translate('notes') }}:</label>
             <span>{{ client.notes }}</span>
           </div>
         </div>
@@ -61,12 +61,12 @@
   <div class="cases-section">
     <div class="section-header">
       <div class="section-title">
-        <h3>Davalar</h3>
-        <span class="case-count">{{ clientCases.length }} Dava</span>
+        <h3>{{ translate('cases') }}</h3>
+        <span class="case-count">{{ clientCases.length }} {{ translate('case') }}</span>
       </div>
       <div class="section-actions">
         <p-button 
-          label="Yeni Dava" 
+          [label]="translate('new.case')" 
           icon="pi pi-plus" 
           (click)="openNewCaseDialog()"
           styleClass="primary-btn"
@@ -81,7 +81,7 @@
         [paginator]="true" 
         [rows]="10"
         [showCurrentPageReport]="true"
-        currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
+        [currentPageReportTemplate]="translate('pagination.template')"
         [globalFilterFields]="['caseNumber', 'title', 'description']"
         styleClass="modern-table"
         responsiveLayout="scroll"
@@ -96,14 +96,14 @@
           <tr>
             <th pSortableColumn="caseNumber">
               <div class="header-content">
-                <span>Dava No</span>
+                <span>{{ translate('case.number') }}</span>
                 <div class="header-icons">
                   <p-sortIcon field="caseNumber"></p-sortIcon>
                   <p-columnFilter type="text" field="caseNumber" display="menu" matchMode="contains" 
                     [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                       <input type="text" pInputText [value]="value" (input)="filter($any($event.target).value)" 
-                             placeholder="Dava no arayın" class="filter-input">
+                             [placeholder]="translate('search.case.number')" class="filter-input">
                     </ng-template>
                   </p-columnFilter>
                 </div>
@@ -111,14 +111,14 @@
             </th>
             <th pSortableColumn="title">
               <div class="header-content">
-                <span>Başlık</span>
+                <span>{{ translate('title') }}</span>
                 <div class="header-icons">
                   <p-sortIcon field="title"></p-sortIcon>
                   <p-columnFilter type="text" field="title" display="menu" matchMode="contains" 
                     [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                       <input type="text" pInputText [value]="value" (input)="filter($any($event.target).value)" 
-                             placeholder="Başlık arayın" class="filter-input">
+                             [placeholder]="translate('search.title')" class="filter-input">
                     </ng-template>
                   </p-columnFilter>
                 </div>
@@ -126,14 +126,14 @@
             </th>
             <th pSortableColumn="type">
               <div class="header-content">
-                <span>Tür</span>
+                <span>{{ translate('type') }}</span>
                 <div class="header-icons">
                   <p-sortIcon field="type"></p-sortIcon>
                   <p-columnFilter field="type" matchMode="equals" display="menu" 
                     [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                       <p-dropdown [options]="caseTypeOptions" [ngModel]="value" (ngModelChange)="filter($event)" 
-                                  placeholder="Tür seçin" [showClear]="true" class="filter-dropdown"
+                                  [placeholder]="translate('select.type')" [showClear]="true" class="filter-dropdown"
                                   [scrollHeight]="'200px'"></p-dropdown>
                     </ng-template>
                   </p-columnFilter>
@@ -142,14 +142,14 @@
             </th>
             <th pSortableColumn="status">
               <div class="header-content">
-                <span>Durum</span>
+                <span>{{ translate('status') }}</span>
                 <div class="header-icons">
                   <p-sortIcon field="status"></p-sortIcon>
                   <p-columnFilter field="status" matchMode="equals" display="menu" 
                     [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                       <p-dropdown [options]="caseStatusOptions" [ngModel]="value" (ngModelChange)="filter($event)" 
-                                  placeholder="Durum seçin" [showClear]="true" class="filter-dropdown"
+                                  [placeholder]="translate('select.status')" [showClear]="true" class="filter-dropdown"
                                   [scrollHeight]="'150px'"></p-dropdown>
                     </ng-template>
                   </p-columnFilter>
@@ -158,21 +158,21 @@
             </th>
             <th pSortableColumn="filingDate">
               <div class="header-content">
-                <span>Açılış Tarihi</span>
+                <span>{{ translate('filing.date') }}</span>
                 <div class="header-icons">
                   <p-sortIcon field="filingDate"></p-sortIcon>
                   <p-columnFilter type="date" field="filingDate" display="menu" matchMode="dateAfter" 
                     [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                       <p-calendar [ngModel]="value" (ngModelChange)="filter($event)" 
-                                  dateFormat="dd/mm/yy" placeholder="Tarih seçin" [showClear]="true" 
+                                  dateFormat="dd/mm/yy" [placeholder]="translate('select.date')" [showClear]="true" 
                                   class="filter-calendar"></p-calendar>
                     </ng-template>
                   </p-columnFilter>
                 </div>
               </div>
             </th>
-            <th>İşlemler</th>
+            <th>{{ translate('actions') }}</th>
           </tr>
         </ng-template>
 
@@ -204,21 +204,21 @@
                   icon="pi pi-eye" 
                   styleClass="p-button-rounded p-button-text p-button-info"
                   (click)="viewCaseDetails(caseItem)"
-                  pTooltip="Dava Detaylarını Görüntüle"
+                  [pTooltip]="translate('view.case.details')"
                   tooltipPosition="top"
                 ></p-button>
                 <p-button 
                   icon="pi pi-pencil" 
                   styleClass="p-button-rounded p-button-text p-button-warning"
                   (click)="editCase(caseItem)"
-                  pTooltip="Davayı Düzenle"
+                  [pTooltip]="translate('edit.case')"
                   tooltipPosition="top"
                 ></p-button>
                 <p-button 
                   icon="pi pi-trash" 
                   styleClass="p-button-rounded p-button-text p-button-danger"
                   (click)="deleteCase(caseItem)"
-                  pTooltip="Davayı Sil"
+                  [pTooltip]="translate('delete.case')"
                   tooltipPosition="top"
                 ></p-button>
               </div>
@@ -231,8 +231,8 @@
             <td colspan="6" class="text-center">
               <div class="empty-state">
                 <i class="pi pi-folder-open" style="font-size: 3rem; color: #ccc;"></i>
-                <h3>Bu müvekkile ait dava bulunamadı</h3>
-                <p>İlk davayı eklemek için "Yeni Dava" butonuna tıklayın</p>
+                <h3>{{ translate('no.cases.for.client') }}</h3>
+                <p>{{ translate('add.first.case.instruction') }}</p>
               </div>
             </td>
           </tr>
@@ -244,7 +244,7 @@
 
 <!-- Case Dialog -->
 <p-dialog 
-  [header]="editingCase ? 'Dava Düzenle' : 'Yeni Dava Ekle'"
+  [header]="editingCase ? translate('edit.case') : translate('add.new.case')"
   [(visible)]="showCaseDialog"
   [modal]="true"
   [responsive]="true"
@@ -259,19 +259,19 @@
       <div class="form-section">
         <h4 class="section-title">
           <i class="pi pi-file"></i>
-          Dava Bilgileri
+          {{ translate('case.information') }}
         </h4>
         
         <div class="form-row">
           <div class="form-group">
-            <label for="caseNumber">Dava No *</label>
+            <label for="caseNumber">{{ translate('case.number') }} *</label>
             <div class="case-number-container">
               <input 
                 id="caseNumber"
                 type="text" 
                 pInputText 
                 formControlName="caseNumber"
-                placeholder="Dava numarasını girin"
+                [placeholder]="translate('enter.case.number')"
                 class="w-full"
                 readonly
               />
@@ -279,7 +279,7 @@
                 icon="pi pi-refresh" 
                 (click)="generateCaseNumber()"
                 styleClass="p-button-text"
-                pTooltip="Yeni numara oluştur"
+                [pTooltip]="translate('generate.new.number')"
               ></p-button>
             </div>
             <small class="error-message" *ngIf="getFieldError('caseNumber')">
@@ -288,11 +288,11 @@
           </div>
           
           <div class="form-group">
-            <label for="filingDate">Açılış Tarihi *</label>
+            <label for="filingDate">{{ translate('filing.date') }} *</label>
             <p-calendar 
               id="filingDate"
               formControlName="filingDate"
-              placeholder="Tarih seçin"
+              [placeholder]="translate('select.date')"
               dateFormat="dd/mm/yy"
               [showIcon]="true"
               class="w-full"
@@ -304,13 +304,13 @@
         </div>
         <br>
         <div class="form-group">
-          <label for="title">Dava Başlığı *</label>
+          <label for="title">{{ translate('case.title') }} *</label>
           <input 
             id="title"
             type="text" 
             pInputText 
             formControlName="title"
-            placeholder="Dava başlığını girin"
+            [placeholder]="translate('enter.case.title')"
             class="w-full"
           />
           <small class="error-message" *ngIf="getFieldError('title')">
@@ -319,12 +319,12 @@
         </div>
         <br>
         <div class="form-group">
-          <label for="description">Açıklama</label>
+          <label for="description">{{ translate('description') }}</label>
           <textarea 
             id="description"
             pInputTextarea 
             formControlName="description"
-            placeholder="Dava açıklamasını girin"
+            [placeholder]="translate('enter.case.description')"
             [rows]="4"
             class="w-full"
           ></textarea>
@@ -335,43 +335,43 @@
       <div class="form-section">
         <h4 class="section-title">
           <i class="pi pi-tags"></i>
-          Dava Özellikleri
+          {{ translate('case.properties') }}
         </h4>
         
         <div class="form-row">
-                     <div class="form-group">
-             <label for="type">Dava Türü *</label>
-             <p-dropdown 
-               id="type"
-               formControlName="type"
-               [options]="caseTypeOptions"
-               placeholder="Dava türünü seçin"
-               optionLabel="label"
-               optionValue="value"
-               class="w-full dropdown-fixed"
-               [scrollHeight]="'200px'"
-             ></p-dropdown>
-             <small class="error-message" *ngIf="getFieldError('type')">
-               {{ getFieldError('type') }}
-             </small>
-           </div>
-           
-           <div class="form-group">
-             <label for="status">Dava Durumu *</label>
-             <p-dropdown 
-               id="status"
-               formControlName="status"
-               [options]="caseStatusOptions"
-               placeholder="Dava durumunu seçin"
-               optionLabel="label"
-               optionValue="value"
-               class="w-full dropdown-fixed"
-               [scrollHeight]="'150px'"
-             ></p-dropdown>
-             <small class="error-message" *ngIf="getFieldError('status')">
-               {{ getFieldError('status') }}
-             </small>
-           </div>
+          <div class="form-group">
+            <label for="type">{{ translate('case.type') }} *</label>
+            <p-dropdown 
+              id="type"
+              formControlName="type"
+              [options]="caseTypeOptions"
+              [placeholder]="translate('select.case.type')"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full dropdown-fixed"
+              [scrollHeight]="'200px'"
+            ></p-dropdown>
+            <small class="error-message" *ngIf="getFieldError('type')">
+              {{ getFieldError('type') }}
+            </small>
+          </div>
+          
+          <div class="form-group">
+            <label for="status">{{ translate('case.status') }} *</label>
+            <p-dropdown 
+              id="status"
+              formControlName="status"
+              [options]="caseStatusOptions"
+              [placeholder]="translate('select.case.status')"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full dropdown-fixed"
+              [scrollHeight]="'150px'"
+            ></p-dropdown>
+            <small class="error-message" *ngIf="getFieldError('status')">
+              {{ getFieldError('status') }}
+            </small>
+          </div>
         </div>
       </div>
     </div>
@@ -380,13 +380,13 @@
   <ng-template pTemplate="footer">
     <div class="dialog-footer">
       <p-button 
-        label="İptal" 
+        [label]="translate('cancel')" 
         icon="pi pi-times" 
         (click)="cancelCaseDialog()"
         styleClass="p-button-text"
       ></p-button>
       <p-button 
-        [label]="editingCase ? 'Güncelle' : 'Ekle'"
+        [label]="editingCase ? translate('update') : translate('add')"
         icon="pi pi-check" 
         (click)="saveCase()"
         [disabled]="caseForm.invalid"

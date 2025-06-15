@@ -1,18 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Case, CaseService, CaseType, CaseStatus } from '../../../../core/services/case.service';
 import { Document, DocumentType, DocumentService, DocumentCreateRequest } from '../../../../core/services/document.service';
 import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
+import { LanguageService } from '../../../../services/language.service';
 
 @Component({
   selector: 'app-case-detail',
   templateUrl: './case-detail.component.html',
   styleUrls: ['./case-detail.component.scss']
 })
-export class CaseDetailComponent implements OnInit {
+export class CaseDetailComponent implements OnInit, OnDestroy {
   case: Case | null = null;
   documents: Document[] = [];
   loading = false;
@@ -24,15 +25,10 @@ export class CaseDetailComponent implements OnInit {
   selectedFiles: File[] = [];
 
   // Document type options
-  documentTypeOptions = [
-    { label: 'Dava Dilekçesi', value: DocumentType.COMPLAINT },
-    { label: 'Cevap', value: DocumentType.ANSWER },
-    { label: 'Dilekçe', value: DocumentType.MOTION },
-    { label: 'Delil', value: DocumentType.EXHIBIT },
-    { label: 'Sözleşme', value: DocumentType.CONTRACT },
-    { label: 'Yazışma', value: DocumentType.CORRESPONDENCE },
-    { label: 'Diğer', value: DocumentType.OTHER }
-  ];
+  documentTypeOptions: any[] = [];
+  
+  // Subscription
+  private languageSubscription: Subscription = new Subscription();
 
   constructor(
     private route: ActivatedRoute,
@@ -41,7 +37,9 @@ export class CaseDetailComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private caseService: CaseService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private languageService: LanguageService,
+    private cdr: ChangeDetectorRef
   ) {
     this.uploadForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -50,10 +48,37 @@ export class CaseDetailComponent implements OnInit {
     });
   }
 
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
+
   ngOnInit(): void {
     const caseId = this.route.snapshot.params['id'];
     this.loadCase(caseId);
     this.loadDocuments(caseId);
+    this.updateDocumentTypeOptions();
+    
+    // Listen to language changes
+    this.languageSubscription = this.languageService.currentLanguage$.subscribe(() => {
+      this.updateDocumentTypeOptions();
+      this.cdr.detectChanges();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.languageSubscription.unsubscribe();
+  }
+
+  private updateDocumentTypeOptions(): void {
+    this.documentTypeOptions = [
+      { label: this.translate('document.type.complaint'), value: DocumentType.COMPLAINT },
+      { label: this.translate('document.type.answer'), value: DocumentType.ANSWER },
+      { label: this.translate('document.type.motion'), value: DocumentType.MOTION },
+      { label: this.translate('document.type.exhibit'), value: DocumentType.EXHIBIT },
+      { label: this.translate('document.type.contract'), value: DocumentType.CONTRACT },
+      { label: this.translate('document.type.correspondence'), value: DocumentType.CORRESPONDENCE },
+      { label: this.translate('document.type.other'), value: DocumentType.OTHER }
+    ];
   }
 
   loadCase(caseId: number): void {
@@ -66,16 +91,16 @@ export class CaseDetailComponent implements OnInit {
           console.error('CaseDetailComponent: Error message:', error.message);
           this.messageService.add({
             severity: 'error',
-            summary: 'Hata',
-            detail: 'Dava bilgileri yüklenirken hata oluştu'
+            summary: this.translate('error'),
+            detail: this.translate('error.loading.case')
           });
           return of(null);
         }),
         finalize(() => this.loading = false)
       )
-             .subscribe(caseData => {
-         this.case = caseData;
-       });
+      .subscribe(caseData => {
+        this.case = caseData;
+      });
   }
 
   loadDocuments(caseId: number): void {
@@ -88,8 +113,8 @@ export class CaseDetailComponent implements OnInit {
           console.error('Error loading documents:', error);
           this.messageService.add({
             severity: 'error',
-            summary: 'Hata',
-            detail: 'Dokümanlar yüklenirken hata oluştu'
+            summary: this.translate('error'),
+            detail: this.translate('error.loading.documents')
           });
           return of([]);
         }),
@@ -143,8 +168,8 @@ export class CaseDetailComponent implements OnInit {
     } else {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Uyarı',
-        detail: 'Lütfen gerekli alanları doldurun ve en az bir dosya seçin'
+        summary: this.translate('warning'),
+        detail: this.translate('warning.fill.required.fields')
       });
     }
   }
@@ -159,8 +184,8 @@ export class CaseDetailComponent implements OnInit {
       this.loadDocuments(this.case!.id!); // Reload documents
       this.messageService.add({
         severity: 'success',
-        summary: 'Başarılı',
-        detail: `${uploadRequests.length} dosya başarıyla yüklendi`
+        summary: this.translate('success'),
+        detail: this.translate('success.files.uploaded').replace('{count}', uploadRequests.length.toString())
       });
       return;
     }
@@ -171,8 +196,8 @@ export class CaseDetailComponent implements OnInit {
           console.error('Error uploading document:', error);
           this.messageService.add({
             severity: 'error',
-            summary: 'Hata',
-            detail: `Dosya yüklenirken hata oluştu: ${this.selectedFiles[index]?.name}`
+            summary: this.translate('error'),
+            detail: this.translate('error.uploading.file').replace('{filename}', this.selectedFiles[index]?.name || '')
           });
           return of(null);
         })
@@ -197,8 +222,8 @@ export class CaseDetailComponent implements OnInit {
           console.error('Error downloading document:', error);
           this.messageService.add({
             severity: 'error',
-            summary: 'Hata',
-            detail: 'Dosya indirilirken hata oluştu'
+            summary: this.translate('error'),
+            detail: this.translate('error.downloading.file')
           });
           return of(null);
         })
@@ -215,8 +240,8 @@ export class CaseDetailComponent implements OnInit {
 
           this.messageService.add({
             severity: 'success',
-            summary: 'Başarılı',
-            detail: 'Dosya başarıyla indirildi'
+            summary: this.translate('success'),
+            detail: this.translate('success.file.downloaded')
           });
         }
       });
@@ -224,11 +249,11 @@ export class CaseDetailComponent implements OnInit {
 
   deleteDocument(document: Document): void {
     this.confirmationService.confirm({
-      message: `${document.fileName} dosyasını silmek istediğinizden emin misiniz?`,
-      header: 'Dosya Sil',
+      message: this.translate('confirm.delete.document').replace('{filename}', document.fileName),
+      header: this.translate('delete.document'),
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Evet',
-      rejectLabel: 'Hayır',
+      acceptLabel: this.translate('yes'),
+      rejectLabel: this.translate('no'),
       accept: () => {
         if (!document.id) return;
 
@@ -238,8 +263,8 @@ export class CaseDetailComponent implements OnInit {
               console.error('Error deleting document:', error);
               this.messageService.add({
                 severity: 'error',
-                summary: 'Hata',
-                detail: 'Dosya silinirken hata oluştu'
+                summary: this.translate('error'),
+                detail: this.translate('error.deleting.file')
               });
               return of(null);
             })
@@ -248,8 +273,8 @@ export class CaseDetailComponent implements OnInit {
             this.documents = this.documents.filter(d => d.id !== document.id);
             this.messageService.add({
               severity: 'success',
-              summary: 'Başarılı',
-              detail: 'Dosya başarıyla silindi'
+              summary: this.translate('success'),
+              detail: this.translate('success.file.deleted')
             });
           });
       }
@@ -263,24 +288,24 @@ export class CaseDetailComponent implements OnInit {
 
   getCaseTypeLabel(type: CaseType): string {
     switch (type) {
-      case CaseType.CAR_DEPRECIATION: return 'Değer Kaybı';
-      case CaseType.CIVIL: return 'Hukuk';
-      case CaseType.CRIMINAL: return 'Ceza';
-      case CaseType.FAMILY: return 'Aile';
-      case CaseType.CORPORATE: return 'Kurumsal';
-      case CaseType.REAL_ESTATE: return 'Emlak';
-      case CaseType.INTELLECTUAL_PROPERTY: return 'Fikri Mülkiyet';
-      case CaseType.OTHER: return 'Diğer';
+      case CaseType.CAR_DEPRECIATION: return this.translate('case.type.car.depreciation');
+      case CaseType.CIVIL: return this.translate('case.type.civil');
+      case CaseType.CRIMINAL: return this.translate('case.type.criminal');
+      case CaseType.FAMILY: return this.translate('case.type.family');
+      case CaseType.CORPORATE: return this.translate('case.type.corporate');
+      case CaseType.REAL_ESTATE: return this.translate('case.type.real.estate');
+      case CaseType.INTELLECTUAL_PROPERTY: return this.translate('case.type.intellectual.property');
+      case CaseType.OTHER: return this.translate('case.type.other');
       default: return type as string;
     }
   }
 
   getStatusLabel(status: CaseStatus): string {
     switch (status) {
-      case CaseStatus.OPEN: return 'Açık';
-      case CaseStatus.IN_PROGRESS: return 'Devam Ediyor';
-      case CaseStatus.PENDING: return 'Beklemede';
-      case CaseStatus.CLOSED: return 'Kapalı';
+      case CaseStatus.OPEN: return this.translate('status.open');
+      case CaseStatus.IN_PROGRESS: return this.translate('status.in.progress');
+      case CaseStatus.PENDING: return this.translate('status.pending');
+      case CaseStatus.CLOSED: return this.translate('status.closed');
       default: return status as string;
     }
   }
@@ -322,12 +347,12 @@ export class CaseDetailComponent implements OnInit {
     if (field && field.errors && field.touched) {
       if (field.errors['required']) {
         switch(fieldName) {
-          case 'title': return 'Başlık gereklidir';
-          case 'type': return 'Doküman türü gereklidir';
-          default: return `${fieldName} gereklidir`;
+          case 'title': return this.translate('error.title.required');
+          case 'type': return this.translate('error.document.type.required');
+          default: return this.translate('error.field.required').replace('{field}', fieldName);
         }
       }
     }
     return '';
   }
-} 
+}

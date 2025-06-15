@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Client, ClientService } from '../../../../core/services/client.service';
 import { Case, CaseStatus, CaseType, CaseService, CaseCreateRequest } from '../../../../core/services/case.service';
+import { LanguageService } from '../../../../services/language.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-client-detail',
   templateUrl: './client-detail.component.html',
   styleUrls: ['./client-detail.component.scss']
 })
-export class ClientDetailComponent implements OnInit {
+export class ClientDetailComponent implements OnInit, OnDestroy {
   client: Client | null = null;
   clientCases: Case[] = [];
   loading = false;
@@ -23,23 +25,11 @@ export class ClientDetailComponent implements OnInit {
   editingCase: Case | null = null;
   
   // Filter options
-  caseStatusOptions = [
-    { label: 'Açık', value: CaseStatus.OPEN },
-    { label: 'Devam Ediyor', value: CaseStatus.IN_PROGRESS },
-    { label: 'Beklemede', value: CaseStatus.PENDING },
-    { label: 'Kapalı', value: CaseStatus.CLOSED }
-  ];
-
-  caseTypeOptions = [
-    { label: 'Değer Kaybı', value: CaseType.CAR_DEPRECIATION },
-    { label: 'Hukuk', value: CaseType.CIVIL },
-    { label: 'Ceza', value: CaseType.CRIMINAL },
-    { label: 'Aile', value: CaseType.FAMILY },
-    { label: 'Kurumsal', value: CaseType.CORPORATE },
-    { label: 'Emlak', value: CaseType.REAL_ESTATE },
-    { label: 'Fikri Mülkiyet', value: CaseType.INTELLECTUAL_PROPERTY },
-    { label: 'Diğer', value: CaseType.OTHER }
-  ];
+  caseStatusOptions: any[] = [];
+  caseTypeOptions: any[] = [];
+  
+  // Subscription
+  private languageSubscription: Subscription = new Subscription();
 
   constructor(
     private route: ActivatedRoute,
@@ -48,7 +38,9 @@ export class ClientDetailComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private clientService: ClientService,
-    private caseService: CaseService
+    private caseService: CaseService,
+    private languageService: LanguageService,
+    private cdr: ChangeDetectorRef
   ) {
     this.caseForm = this.fb.group({
       caseNumber: ['', [Validators.required]],
@@ -60,10 +52,51 @@ export class ClientDetailComponent implements OnInit {
     });
   }
 
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
+
   ngOnInit(): void {
     this.clientId = this.route.snapshot.params['id'];
     this.loadClient(this.clientId);
     this.loadClientCases(this.clientId);
+    this.updateOptions();
+    
+    // Listen to language changes
+    this.languageSubscription = this.languageService.currentLanguage$.subscribe(() => {
+      this.updateOptions();
+      this.cdr.detectChanges(); // Force change detection to update dropdown options
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.languageSubscription.unsubscribe();
+  }
+
+  private updateOptions(): void {
+    // Create new arrays to ensure Angular detects the change
+    this.caseStatusOptions = [
+      { label: this.translate('status.open'), value: CaseStatus.OPEN },
+      { label: this.translate('status.in.progress'), value: CaseStatus.IN_PROGRESS },
+      { label: this.translate('status.pending'), value: CaseStatus.PENDING },
+      { label: this.translate('status.closed'), value: CaseStatus.CLOSED }
+    ];
+
+    this.caseTypeOptions = [
+      { label: this.translate('case.type.car.depreciation'), value: CaseType.CAR_DEPRECIATION },
+      { label: this.translate('case.type.civil'), value: CaseType.CIVIL },
+      { label: this.translate('case.type.criminal'), value: CaseType.CRIMINAL },
+      { label: this.translate('case.type.family'), value: CaseType.FAMILY },
+      { label: this.translate('case.type.corporate'), value: CaseType.CORPORATE },
+      { label: this.translate('case.type.real.estate'), value: CaseType.REAL_ESTATE },
+      { label: this.translate('case.type.intellectual.property'), value: CaseType.INTELLECTUAL_PROPERTY },
+      { label: this.translate('case.type.other'), value: CaseType.OTHER }
+    ];
+    
+    // Force change detection for dropdown updates
+    setTimeout(() => {
+      this.cdr.markForCheck();
+    }, 0);
   }
 
   loadClient(clientId: number): void {
@@ -127,24 +160,24 @@ export class ClientDetailComponent implements OnInit {
 
   getStatusLabel(status: CaseStatus): string {
     switch (status) {
-      case CaseStatus.OPEN: return 'Açık';
-      case CaseStatus.IN_PROGRESS: return 'Devam Ediyor';
-      case CaseStatus.PENDING: return 'Beklemede';
-      case CaseStatus.CLOSED: return 'Kapalı';
+      case CaseStatus.OPEN: return this.translate('status.open');
+      case CaseStatus.IN_PROGRESS: return this.translate('status.in.progress');
+      case CaseStatus.PENDING: return this.translate('status.pending');
+      case CaseStatus.CLOSED: return this.translate('status.closed');
       default: return status;
     }
   }
 
   getTypeLabel(type: CaseType): string {
     switch (type) {
-      case CaseType.CAR_DEPRECIATION: return 'Değer Kaybı';
-      case CaseType.CIVIL: return 'Hukuk';
-      case CaseType.CRIMINAL: return 'Ceza';
-      case CaseType.FAMILY: return 'Aile';
-      case CaseType.CORPORATE: return 'Kurumsal';
-      case CaseType.REAL_ESTATE: return 'Emlak';
-      case CaseType.INTELLECTUAL_PROPERTY: return 'Fikri Mülkiyet';
-      case CaseType.OTHER: return 'Diğer';
+      case CaseType.CAR_DEPRECIATION: return this.translate('case.type.car.depreciation');
+      case CaseType.CIVIL: return this.translate('case.type.civil');
+      case CaseType.CRIMINAL: return this.translate('case.type.criminal');
+      case CaseType.FAMILY: return this.translate('case.type.family');
+      case CaseType.CORPORATE: return this.translate('case.type.corporate');
+      case CaseType.REAL_ESTATE: return this.translate('case.type.real.estate');
+      case CaseType.INTELLECTUAL_PROPERTY: return this.translate('case.type.intellectual.property');
+      case CaseType.OTHER: return this.translate('case.type.other');
       default: return type;
     }
   }
@@ -172,11 +205,11 @@ export class ClientDetailComponent implements OnInit {
 
   deleteCase(caseItem: Case): void {
     this.confirmationService.confirm({
-      message: `${caseItem.caseNumber} numaralı davayı silmek istediğinizden emin misiniz?`,
-      header: 'Dava Sil',
+      message: this.translate('confirm.delete.case').replace('{caseNumber}', caseItem.caseNumber),
+      header: this.translate('delete.case'),
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Evet',
-      rejectLabel: 'Hayır',
+      acceptLabel: this.translate('yes'),
+      rejectLabel: this.translate('no'),
       accept: () => {
         if (caseItem.id) {
           this.caseService.deleteCase(caseItem.id).subscribe({
@@ -184,16 +217,16 @@ export class ClientDetailComponent implements OnInit {
               this.clientCases = this.clientCases.filter(c => c.id !== caseItem.id);
               this.messageService.add({
                 severity: 'success',
-                summary: 'Başarılı',
-                detail: 'Dava başarıyla silindi'
+                summary: this.translate('success'),
+                detail: this.translate('case.deleted.successfully')
               });
             },
             error: (error) => {
               console.error('Error deleting case:', error);
               this.messageService.add({
                 severity: 'error',
-                summary: 'Hata',
-                detail: error.error?.error || 'Dava silinirken bir hata oluştu'
+                summary: this.translate('error'),
+                detail: error.error?.error || this.translate('error.deleting.case')
               });
             }
           });
@@ -224,8 +257,8 @@ export class ClientDetailComponent implements OnInit {
             }
             this.messageService.add({
               severity: 'success',
-              summary: 'Başarılı',
-              detail: 'Dava bilgileri güncellendi'
+              summary: this.translate('success'),
+              detail: this.translate('case.updated.successfully')
             });
             this.showCaseDialog = false;
             this.caseForm.reset();
@@ -236,8 +269,8 @@ export class ClientDetailComponent implements OnInit {
             console.error('Error updating case:', error);
             this.messageService.add({
               severity: 'error',
-              summary: 'Hata',
-              detail: error.error?.error || 'Dava güncellenirken bir hata oluştu'
+              summary: this.translate('error'),
+              detail: error.error?.error || this.translate('error.updating.case')
             });
           }
         });
@@ -252,8 +285,8 @@ export class ClientDetailComponent implements OnInit {
             this.clientCases.unshift(caseWithDate); // Add to beginning for descending order
             this.messageService.add({
               severity: 'success',
-              summary: 'Başarılı',
-              detail: 'Yeni dava eklendi'
+              summary: this.translate('success'),
+              detail: this.translate('case.added.successfully')
             });
             this.showCaseDialog = false;
             this.caseForm.reset();
@@ -264,8 +297,8 @@ export class ClientDetailComponent implements OnInit {
             console.error('Error creating case:', error);
             this.messageService.add({
               severity: 'error',
-              summary: 'Hata',
-              detail: error.error?.error || 'Dava oluşturulurken bir hata oluştu'
+              summary: this.translate('error'),
+              detail: error.error?.error || this.translate('error.creating.case')
             });
           }
         });
@@ -273,8 +306,8 @@ export class ClientDetailComponent implements OnInit {
     } else {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Uyarı',
-        detail: 'Lütfen gerekli alanları doldurun'
+        summary: this.translate('warning'),
+        detail: this.translate('please.fill.required.fields')
       });
     }
   }
@@ -311,12 +344,12 @@ export class ClientDetailComponent implements OnInit {
     if (field && field.errors && field.touched) {
       if (field.errors['required']) {
         switch(fieldName) {
-          case 'caseNumber': return 'Dava numarası gereklidir';
-          case 'title': return 'Dava başlığı gereklidir';
-          case 'status': return 'Dava durumu gereklidir';
-          case 'type': return 'Dava türü gereklidir';
-          case 'filingDate': return 'Açılış tarihi gereklidir';
-          default: return `${fieldName} gereklidir`;
+          case 'caseNumber': return this.translate('case.number.required');
+          case 'title': return this.translate('case.title.required');
+          case 'status': return this.translate('case.status.required');
+          case 'type': return this.translate('case.type.required');
+          case 'filingDate': return this.translate('filing.date.required');
+          default: return this.translate('field.required').replace('{field}', fieldName);
         }
       }
     }
