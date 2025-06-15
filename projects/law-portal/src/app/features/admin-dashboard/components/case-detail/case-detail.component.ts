@@ -126,7 +126,13 @@ export class CaseDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/admin'], { queryParams: { tab: 'clients' } });
+    if (this.case?.client?.id) {
+      // Navigate back to the client detail page
+      this.router.navigate(['/admin/client', this.case.client.id]);
+    } else {
+      // Fallback to admin dashboard clients tab if no client info
+      this.router.navigate(['/admin'], { queryParams: { tab: 'clients' } });
+    }
   }
 
   openUploadDialog(): void {
@@ -360,5 +366,15 @@ export class CaseDetailComponent implements OnInit, OnDestroy {
     if (!text) return '';
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
+  }
+
+  getClientFullName(): string {
+    if (!this.case?.client) return '';
+    return `${this.case.client.firstName || ''} ${this.case.client.lastName || ''}`.trim();
+  }
+
+  getAssignedUserFullName(): string {
+    if (!this.case?.assignedUser) return '';
+    return `${this.case.assignedUser.firstName || ''} ${this.case.assignedUser.lastName || ''}`.trim();
   }
 }

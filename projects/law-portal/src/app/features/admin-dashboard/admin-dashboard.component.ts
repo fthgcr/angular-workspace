@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from 'shared-lib';
 import { MenuItem } from 'primeng/api';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DashboardService, DashboardStats, ClientStatusSummary, CaseTypeDistribution, CaseStatusDistribution, RecentActivity, ActivityType } from '../../core/services/dashboard.service';
 import { LanguageService } from '../../services/language.service';
 import { Subscription } from 'rxjs';
@@ -38,6 +38,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService, 
     private router: Router,
+    private route: ActivatedRoute,
     private dashboardService: DashboardService,
     private languageService: LanguageService
   ) { }
@@ -46,6 +47,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.currentUser = this.authService.getCurrentUser();
     this.initializeMenu();
     this.loadDashboardStats();
+    
+    // Check for query parameters to set active tab
+    this.subscriptions.add(
+      this.route.queryParams.subscribe(params => {
+        if (params['tab']) {
+          this.switchTab(params['tab']);
+        }
+      })
+    );
     
     // Subscribe to language changes
     this.subscriptions.add(

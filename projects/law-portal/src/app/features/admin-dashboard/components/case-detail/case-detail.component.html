@@ -3,6 +3,13 @@
   <div class="case-header">
     <div class="flex justify-content-between align-items-center mb-4">
       <div>
+        <div class="breadcrumb mb-2" *ngIf="getClientFullName()">
+          <span class="text-400">{{ translate('clients') }}</span>
+          <span class="breadcrumb-separator mx-2">/</span>
+          <span class="text-600">{{ getClientFullName() }}</span>
+          <span class="breadcrumb-separator mx-2">/</span>
+          <span class="text-primary">{{ translate('case.details') }}</span>
+        </div>
         <h2 class="m-0 text-primary">{{ case?.title || translate('case.details') }}</h2>
         <p class="text-500 m-0 mt-1">{{ case?.caseNumber }}</p>
       </div>
@@ -50,6 +57,14 @@
           <div class="info-item">
             <label>{{ translate('created.date') }}</label>
             <span>{{ case.createdDate | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="info-item" *ngIf="getClientFullName()">
+            <label>{{ translate('client') }}</label>
+            <span>{{ getClientFullName() }}</span>
+          </div>
+          <div class="info-item" *ngIf="getAssignedUserFullName()">
+            <label>{{ translate('assigned.lawyer') }}</label>
+            <span>{{ getAssignedUserFullName() }}</span>
           </div>
           <div class="info-item full-width" *ngIf="case.description">
             <label>{{ translate('description') }}</label>
