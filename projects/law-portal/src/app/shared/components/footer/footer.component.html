@@ -1,0 +1,40 @@
+<footer class="app-footer" *ngIf="shouldShowFooter()">
+  <div class="footer-container">
+    <!-- Footer Content -->
+    <div class="footer-content">
+      <!-- Left Section: Copyright -->
+      <div class="footer-left">
+        <span class="copyright-text">{{ getCopyrightText() }}</span>
+      </div>
+
+      <!-- Center Section: Links 
+      <div class="footer-center">
+        <nav class="footer-nav">
+          <a 
+            *ngFor="let link of getFooterLinks(); let last = last"
+            class="footer-link"
+            [class.last]="last"
+            (click)="onLinkClick(link)"
+            [title]="link.label"
+          >
+            {{ link.label }}
+          </a>
+        </nav>
+      </div> -->
+
+      <!-- Right Section: Version & Powered By -->
+      <div class="footer-right">
+        <span *ngIf="shouldShowVersion()" class="version-text">
+          v{{ getVersion() }}
+        </span>
+        <span 
+          *ngIf="shouldShowPoweredBy()" 
+          class="powered-by-text"
+          [class.with-version]="shouldShowVersion()"
+        >
+          {{ getPoweredByText() }}
+        </span>
+      </div>
+    </div>
+  </div>
+</footer> 

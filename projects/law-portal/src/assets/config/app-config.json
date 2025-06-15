@@ -26,5 +26,29 @@
   "THEME": {
     "primary_color": "#667eea",
     "secondary_color": "#764ba2"
+  },
+  "FOOTER": {
+    "show_footer": true,
+    "copyright_text": "© 2024 {COMPANY_NAME}. Tüm hakları saklıdır.",
+    "links": [
+      {
+        "label": "Gizlilik Politikası",
+        "url": "/privacy-policy",
+        "external": false
+      },
+      {
+        "label": "Kullanım Şartları",
+        "url": "/terms-of-service",
+        "external": false
+      },
+      {
+        "label": "İletişim",
+        "url": "/contact",
+        "external": false
+      }
+    ],
+    "show_version": true,
+    "show_powered_by": false,
+    "powered_by_text": "Powered by LawPortal"
   }
 } 

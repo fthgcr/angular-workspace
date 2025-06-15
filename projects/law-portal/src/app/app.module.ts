@@ -27,6 +27,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ClientComponent } from './features/client/client.component';
 import { TopbarComponent } from './shared/components/topbar/topbar.component';
+import { FooterComponent } from './shared/components/footer/footer.component';
 import { ProfileComponent } from './features/profile/profile.component';
 
 @NgModule({
@@ -34,6 +35,7 @@ import { ProfileComponent } from './features/profile/profile.component';
     AppComponent,
     ClientComponent,
     TopbarComponent,
+    FooterComponent,
     ProfileComponent
   ],
   imports: [

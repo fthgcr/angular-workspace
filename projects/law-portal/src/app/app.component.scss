@@ -1,14 +1,31 @@
-main {
+// App layout with flexbox for sticky footer
+:host {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   
   &.with-topbar {
     padding-top: 70px; // Topbar yüksekliği kadar padding
   }
+  
+  &.with-footer {
+    padding-bottom: 50px; // Footer yüksekliği kadar padding
+  }
 }
 
-// Global topbar responsive adjustment
+// Global responsive adjustments
 @media (max-width: 768px) {
   main.with-topbar {
     padding-top: 60px; // Mobile'da topbar daha kısa
+  }
+  
+  main.with-footer {
+    padding-bottom: 80px; // Mobile'da footer daha yüksek olabilir
   }
 }

@@ -32,6 +32,18 @@ export interface AppConfig {
     primary_color: string;
     secondary_color: string;
   };
+  FOOTER: {
+    show_footer: boolean;
+    copyright_text: string;
+    links: Array<{
+      label: string;
+      url: string;
+      external: boolean;
+    }>;
+    show_version: boolean;
+    show_powered_by: boolean;
+    powered_by_text: string;
+  };
 }
 
 @Injectable({
@@ -69,6 +81,30 @@ export class AppConfigService {
     THEME: {
       primary_color: '#667eea',
       secondary_color: '#764ba2'
+    },
+    FOOTER: {
+      show_footer: true,
+      copyright_text: '© 2024 {COMPANY_NAME}. Tüm hakları saklıdır.',
+      links: [
+        {
+          label: 'Gizlilik Politikası',
+          url: '/privacy-policy',
+          external: false
+        },
+        {
+          label: 'Kullanım Şartları',
+          url: '/terms-of-service',
+          external: false
+        },
+        {
+          label: 'İletişim',
+          url: '/contact',
+          external: false
+        }
+      ],
+      show_version: true,
+      show_powered_by: false,
+      powered_by_text: 'Powered by LawPortal'
     }
   };
 
@@ -201,5 +237,36 @@ export class AppConfigService {
       }
     }
     return this.getFaviconUrl();
+  }
+
+  // Footer methods
+  getFooterConfig(): { show_footer: boolean; copyright_text: string; links: Array<{ label: string; url: string; external: boolean; }>; show_version: boolean; show_powered_by: boolean; powered_by_text: string; } {
+    return this.getConfig()?.FOOTER || this.defaultConfig.FOOTER;
+  }
+
+  shouldShowFooter(): boolean {
+    return this.getFooterConfig().show_footer;
+  }
+
+  getFooterCopyright(): string {
+    const copyrightText = this.getFooterConfig().copyright_text;
+    const companyName = this.getCompanyName();
+    return copyrightText.replace('{COMPANY_NAME}', companyName);
+  }
+
+  getFooterLinks(): Array<{ label: string; url: string; external: boolean; }> {
+    return this.getFooterConfig().links;
+  }
+
+  shouldShowVersion(): boolean {
+    return this.getFooterConfig().show_version;
+  }
+
+  shouldShowPoweredBy(): boolean {
+    return this.getFooterConfig().show_powered_by;
+  }
+
+  getPoweredByText(): string {
+    return this.getFooterConfig().powered_by_text;
   }
 } 

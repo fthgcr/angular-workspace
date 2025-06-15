@@ -1,5 +1,6 @@
 <app-topbar *ngIf="showTopbar"></app-topbar>
-<main [class.with-topbar]="showTopbar">
+<main [class.with-topbar]="showTopbar" [class.with-footer]="true">
   <router-outlet></router-outlet>
 </main>
+<app-footer></app-footer>
 <p-toast></p-toast>
