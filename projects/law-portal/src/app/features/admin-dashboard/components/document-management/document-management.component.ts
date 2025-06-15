@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { Subscription } from 'rxjs';
 import { DocumentService, Document, DocumentType } from '../../../../core/services/document.service';
 import { CaseService } from '../../../../core/services/case.service';
 import { Case } from '../case-management/case-management.component';
+import { LanguageService } from '../../../../services/language.service';
 
 @Component({
   selector: 'app-document-management',
@@ -11,7 +13,7 @@ import { Case } from '../case-management/case-management.component';
   styleUrls: ['./document-management.component.scss'],
   providers: [MessageService, ConfirmationService]
 })
-export class DocumentManagementComponent implements OnInit {
+export class DocumentManagementComponent implements OnInit, OnDestroy {
   documents: Document[] = [];
   cases: Case[] = [];
   documentForm: FormGroup;
@@ -20,6 +22,9 @@ export class DocumentManagementComponent implements OnInit {
   loading = false;
   selectedFile: File | null = null;
   uploadProgress = 0;
+  
+  // Language subscription
+  private languageSubscription: Subscription = new Subscription();
   
   documentTypeOptions = [
     { label: 'Şikayet/Dava Dilekçesi', value: DocumentType.COMPLAINT },
@@ -36,7 +41,8 @@ export class DocumentManagementComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private documentService: DocumentService,
-    private caseService: CaseService
+    private caseService: CaseService,
+    private languageService: LanguageService
   ) {
     this.documentForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -49,6 +55,14 @@ export class DocumentManagementComponent implements OnInit {
   ngOnInit(): void {
     this.loadDocuments();
     this.loadCases();
+    this.updateDocumentTypeOptions();
+    
+    // Subscribe to language changes
+    this.languageSubscription.add(
+      this.languageService.currentLanguage$.subscribe(() => {
+        this.updateDocumentTypeOptions();
+      })
+    );
   }
 
   loadDocuments(): void {
@@ -294,5 +308,25 @@ export class DocumentManagementComponent implements OnInit {
       if (field.errors['required']) return `${fieldName} gereklidir`;
     }
     return '';
+  }
+
+  ngOnDestroy(): void {
+    this.languageSubscription.unsubscribe();
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
+
+  private updateDocumentTypeOptions(): void {
+    this.documentTypeOptions = [
+      { label: this.translate('document.type.complaint'), value: DocumentType.COMPLAINT },
+      { label: this.translate('document.type.answer'), value: DocumentType.ANSWER },
+      { label: this.translate('document.type.motion'), value: DocumentType.MOTION },
+      { label: this.translate('document.type.exhibit'), value: DocumentType.EXHIBIT },
+      { label: this.translate('document.type.contract'), value: DocumentType.CONTRACT },
+      { label: this.translate('document.type.correspondence'), value: DocumentType.CORRESPONDENCE },
+      { label: this.translate('document.type.other'), value: DocumentType.OTHER }
+    ];
   }
 } 

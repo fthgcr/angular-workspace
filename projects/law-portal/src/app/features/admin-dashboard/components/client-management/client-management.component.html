@@ -4,13 +4,13 @@
     <div class="title-section">
       <h2 class="page-title">
         <i class="pi pi-users"></i>
-        Müvekkil Yönetimi
+        {{ translate('client.management.title') }}
       </h2>
-      <p class="page-subtitle">Müvekkillerinizi buradan yönetebilirsiniz</p>
+      <p class="page-subtitle">{{ translate('client.management.subtitle') }}</p>
     </div>
     <div class="action-section">
       <p-button 
-        label="Yeni Müvekkil" 
+        [label]="translate('new.client')" 
         icon="pi pi-plus" 
         (click)="openNewClientDialog()"
         styleClass="primary-btn"
@@ -26,7 +26,7 @@
       [paginator]="true" 
       [rows]="10"
       [showCurrentPageReport]="true"
-      currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
+      [currentPageReportTemplate]="translate('pagination.template')"
       [globalFilterFields]="['firstName', 'lastName', 'email', 'username']"
       styleClass="modern-table"
       responsiveLayout="scroll"
@@ -53,14 +53,14 @@
         <tr>
           <th pSortableColumn="firstName">
             <div class="header-content">
-              <span>Ad Soyad</span>
+              <span>{{ translate('full.name') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="firstName"></p-sortIcon>
                 <p-columnFilter type="text" field="firstName" display="menu" matchMode="contains" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <input type="text" pInputText [value]="value" (input)="filter($any($event.target).value)" 
-                           placeholder="Ad veya soyadı arayın" class="filter-input">
+                           [placeholder]="translate('search.name')" class="filter-input">
                   </ng-template>
                 </p-columnFilter>
               </div>
@@ -68,14 +68,14 @@
           </th>
           <th pSortableColumn="email">
             <div class="header-content">
-              <span>Email</span>
+              <span>{{ translate('email') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="email"></p-sortIcon>
                 <p-columnFilter type="text" field="email" display="menu" matchMode="contains" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <input type="text" pInputText [value]="value" (input)="filter($any($event.target).value)" 
-                           placeholder="Email arayın" class="filter-input">
+                           [placeholder]="translate('search.email')" class="filter-input">
                   </ng-template>
                 </p-columnFilter>
               </div>
@@ -83,14 +83,14 @@
           </th>
           <th pSortableColumn="username">
             <div class="header-content">
-              <span>Kullanıcı Adı</span>
+              <span>{{ translate('username') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="username"></p-sortIcon>
                 <p-columnFilter type="text" field="username" display="menu" matchMode="contains" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <input type="text" pInputText [value]="value" (input)="filter($any($event.target).value)" 
-                           placeholder="Kullanıcı adı arayın" class="filter-input">
+                           [placeholder]="translate('search.username')" class="filter-input">
                   </ng-template>
                 </p-columnFilter>
               </div>
@@ -98,13 +98,13 @@
           </th>
           <th>
             <div class="header-content">
-              <span>İletişim</span>
+              <span>{{ translate('contact') }}</span>
               <div class="header-icons">
                 <p-columnFilter type="text" field="phoneNumber" display="menu" matchMode="contains" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <input type="text" pInputText [value]="value" (input)="filter($any($event.target).value)" 
-                           placeholder="Telefon veya adres arayın" class="filter-input">
+                           [placeholder]="translate('search.contact')" class="filter-input">
                   </ng-template>
                 </p-columnFilter>
               </div>
@@ -112,14 +112,14 @@
           </th>
           <th pSortableColumn="enabled">
             <div class="header-content">
-              <span>Durum</span>
+              <span>{{ translate('status') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="enabled"></p-sortIcon>
                 <p-columnFilter field="enabled" matchMode="equals" display="menu" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <p-dropdown [options]="statusOptions" [ngModel]="value" (ngModelChange)="filter($event)" 
-                                placeholder="Durum seçin" [showClear]="true" class="filter-dropdown"></p-dropdown>
+                                [placeholder]="translate('select.status')" [showClear]="true" class="filter-dropdown"></p-dropdown>
                   </ng-template>
                 </p-columnFilter>
               </div>
@@ -127,21 +127,21 @@
           </th>
           <th pSortableColumn="createdDate">
             <div class="header-content">
-              <span>Kayıt Tarihi</span>
+              <span>{{ translate('registration.date') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="createdDate"></p-sortIcon>
                 <p-columnFilter type="date" field="createdDate" display="menu" matchMode="dateAfter" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <p-calendar [ngModel]="value" (ngModelChange)="filter($event)" 
-                                dateFormat="dd/mm/yy" placeholder="Tarih seçin" [showClear]="true" 
+                                dateFormat="dd/mm/yy" [placeholder]="translate('select.date')" [showClear]="true" 
                                 class="filter-calendar"></p-calendar>
                   </ng-template>
                 </p-columnFilter>
               </div>
             </div>
           </th>
-          <th>İşlemler</th>
+          <th>{{ translate('operations') }}</th>
         </tr>
       </ng-template>
 
@@ -173,7 +173,7 @@
           </td>
           <td>
             <p-tag 
-              [value]="client.enabled ? 'Aktif' : 'Pasif'" 
+              [value]="client.enabled ? translate('active.status') : translate('inactive.status')" 
               [severity]="client.enabled ? 'success' : 'danger'"
             ></p-tag>
           </td>

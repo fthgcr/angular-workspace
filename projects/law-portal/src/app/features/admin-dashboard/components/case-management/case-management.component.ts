@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { Subscription } from 'rxjs';
 import { CaseService, CaseStatus, CaseType } from '../../../../core/services/case.service';
 import { ClientService } from '../../../../core/services/client.service';
+import { LanguageService } from '../../../../services/language.service';
 
 export interface Case {
   id?: number;
@@ -49,13 +51,16 @@ export interface User {
   styleUrls: ['./case-management.component.scss'],
   providers: [MessageService, ConfirmationService]
 })
-export class CaseManagementComponent implements OnInit {
+export class CaseManagementComponent implements OnInit, OnDestroy {
   cases: Case[] = [];
   clients: User[] = [];
   caseForm: FormGroup;
   showDialog = false;
   editingCase: Case | null = null;
   loading = false;
+  
+  // Language subscription
+  private languageSubscription: Subscription = new Subscription();
   
   caseStatusOptions = [
     { label: 'Açık', value: CaseStatus.OPEN },
@@ -81,7 +86,8 @@ export class CaseManagementComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private caseService: CaseService,
-    private clientService: ClientService
+    private clientService: ClientService,
+    private languageService: LanguageService
   ) {
     this.caseForm = this.fb.group({
       caseNumber: ['', [Validators.required]],
@@ -98,6 +104,14 @@ export class CaseManagementComponent implements OnInit {
   ngOnInit() {
     this.loadCases();
     this.loadClients();
+    this.updateDropdownOptions();
+    
+    // Subscribe to language changes
+    this.languageSubscription.add(
+      this.languageService.currentLanguage$.subscribe(() => {
+        this.updateDropdownOptions();
+      })
+    );
   }
 
   loadCases() {
@@ -252,5 +266,33 @@ export class CaseManagementComponent implements OnInit {
     if (caseItem.id) {
       this.router.navigate(['/admin/case', caseItem.id]);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.languageSubscription.unsubscribe();
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
+
+  private updateDropdownOptions(): void {
+    this.caseStatusOptions = [
+      { label: this.translate('status.open'), value: CaseStatus.OPEN },
+      { label: this.translate('status.in.progress'), value: CaseStatus.IN_PROGRESS },
+      { label: this.translate('status.pending'), value: CaseStatus.PENDING },
+      { label: this.translate('status.closed'), value: CaseStatus.CLOSED }
+    ];
+
+    this.caseTypeOptions = [
+      { label: this.translate('case.type.car.depreciation'), value: CaseType.CAR_DEPRECIATION },
+      { label: this.translate('case.type.civil'), value: CaseType.CIVIL },
+      { label: this.translate('case.type.criminal'), value: CaseType.CRIMINAL },
+      { label: this.translate('case.type.family'), value: CaseType.FAMILY },
+      { label: this.translate('case.type.corporate'), value: CaseType.CORPORATE },
+      { label: this.translate('case.type.real.estate'), value: CaseType.REAL_ESTATE },
+      { label: this.translate('case.type.intellectual.property'), value: CaseType.INTELLECTUAL_PROPERTY },
+      { label: this.translate('case.type.other'), value: CaseType.OTHER }
+    ];
   }
 } 

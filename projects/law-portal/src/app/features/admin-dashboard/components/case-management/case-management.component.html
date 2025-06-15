@@ -4,9 +4,9 @@
     <div class="title-section">
       <h2 class="page-title">
         <i class="pi pi-briefcase"></i>
-        Dava Yönetimi
+        {{ translate('case.management.title') }}
       </h2>
-      <p class="page-subtitle">Tüm davaları buradan yönetebilirsiniz</p>
+      <p class="page-subtitle">{{ translate('case.management.subtitle') }}</p>
     </div>
    <div class="action-section">
       <!--<p-button 
@@ -26,7 +26,7 @@
       [paginator]="true" 
       [rows]="10"
       [showCurrentPageReport]="true"
-      currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
+      [currentPageReportTemplate]="translate('pagination.template')"
       [globalFilterFields]="['caseNumber', 'title', 'client.firstName', 'client.lastName']"
       styleClass="modern-table"
       responsiveLayout="scroll"
@@ -53,14 +53,14 @@
         <tr>
           <th pSortableColumn="caseNumber">
             <div class="header-content">
-              <span>Dava No</span>
+              <span>{{ translate('case.number') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="caseNumber"></p-sortIcon>
                 <p-columnFilter type="text" field="caseNumber" display="menu" matchMode="contains" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <input type="text" pInputText [value]="value" (input)="filter($any($event.target).value)" 
-                           placeholder="Dava numarası arayın" class="filter-input">
+                           [placeholder]="translate('search.case.number')" class="filter-input">
                   </ng-template>
                 </p-columnFilter>
               </div>
@@ -68,14 +68,14 @@
           </th>
           <th pSortableColumn="title">
             <div class="header-content">
-              <span>Başlık</span>
+              <span>{{ translate('title') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="title"></p-sortIcon>
                 <p-columnFilter type="text" field="title" display="menu" matchMode="contains" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <input type="text" pInputText [value]="value" (input)="filter($any($event.target).value)" 
-                           placeholder="Başlık arayın" class="filter-input">
+                           [placeholder]="translate('search.case.title')" class="filter-input">
                   </ng-template>
                 </p-columnFilter>
               </div>
@@ -83,13 +83,13 @@
           </th>
           <th>
             <div class="header-content">
-              <span>Müvekkil</span>
+              <span>{{ translate('client') }}</span>
               <div class="header-icons">
                 <p-columnFilter type="text" field="client.firstName" display="menu" matchMode="contains" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <input type="text" pInputText [value]="value" (input)="filter($any($event.target).value)" 
-                           placeholder="Müvekkil adı arayın" class="filter-input">
+                           [placeholder]="translate('search.client.name')" class="filter-input">
                   </ng-template>
                 </p-columnFilter>
               </div>
@@ -97,14 +97,14 @@
           </th>
           <th pSortableColumn="status">
             <div class="header-content">
-              <span>Durum</span>
+              <span>{{ translate('status') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="status"></p-sortIcon>
                 <p-columnFilter field="status" matchMode="equals" display="menu" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <p-dropdown [options]="caseStatusOptions" [ngModel]="value" (ngModelChange)="filter($event)" 
-                                placeholder="Durum seçin" [showClear]="true" optionLabel="label" optionValue="value" 
+                                [placeholder]="translate('select.case.status')" [showClear]="true" optionLabel="label" optionValue="value" 
                                 class="filter-dropdown"></p-dropdown>
                   </ng-template>
                 </p-columnFilter>
@@ -113,14 +113,14 @@
           </th>
           <th pSortableColumn="type">
             <div class="header-content">
-              <span>Tür</span>
+              <span>{{ translate('type') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="type"></p-sortIcon>
                 <p-columnFilter field="type" matchMode="equals" display="menu" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <p-dropdown [options]="caseTypeOptions" [ngModel]="value" (ngModelChange)="filter($event)" 
-                                placeholder="Tür seçin" [showClear]="true" optionLabel="label" optionValue="value" 
+                                [placeholder]="translate('select.case.type')" [showClear]="true" optionLabel="label" optionValue="value" 
                                 class="filter-dropdown"></p-dropdown>
                   </ng-template>
                 </p-columnFilter>
@@ -129,14 +129,14 @@
           </th>
           <th pSortableColumn="filingDate">
             <div class="header-content">
-              <span>Açılış Tarihi</span>
+              <span>{{ translate('filing.date') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="filingDate"></p-sortIcon>
                 <p-columnFilter type="date" field="filingDate" display="menu" matchMode="dateAfter" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <p-calendar [ngModel]="value" (ngModelChange)="filter($event)" 
-                                dateFormat="dd/mm/yy" placeholder="Tarih seçin" [showClear]="true" 
+                                dateFormat="dd/mm/yy" [placeholder]="translate('select.date')" [showClear]="true" 
                                 class="filter-calendar"></p-calendar>
                   </ng-template>
                 </p-columnFilter>
@@ -145,21 +145,21 @@
           </th>
           <th pSortableColumn="createdDate">
             <div class="header-content">
-              <span>Oluşturulma Tarihi</span>
+              <span>{{ translate('created.date') }}</span>
               <div class="header-icons">
                 <p-sortIcon field="createdDate"></p-sortIcon>
                 <p-columnFilter type="date" field="createdDate" display="menu" matchMode="dateAfter" 
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <p-calendar [ngModel]="value" (ngModelChange)="filter($event)" 
-                                dateFormat="dd/mm/yy" placeholder="Tarih seçin" [showClear]="true" 
+                                dateFormat="dd/mm/yy" [placeholder]="translate('select.date')" [showClear]="true" 
                                 class="filter-calendar"></p-calendar>
                   </ng-template>
                 </p-columnFilter>
               </div>
             </div>
           </th>
-          <th>İşlemler</th>
+          <th>{{ translate('operations') }}</th>
         </tr>
       </ng-template>
 
@@ -183,7 +183,7 @@
             </div>
             <div class="no-client" *ngIf="!case.client">
               <i class="pi pi-minus-circle"></i>
-              Atanmamış
+              {{ translate('unassigned') }}
             </div>
           </td>
           <td>

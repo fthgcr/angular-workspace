@@ -202,10 +202,10 @@ export class LanguageService {
       'pagination.template': 'Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor',
       'filing.date': 'Açılış Tarihi',
       'created.date': 'Oluşturulma Tarihi',
-      'document.type.complaint': 'Dava Dilekçesi',
-      'document.type.answer': 'Cevap',
-      'document.type.motion': 'Dilekçe',
-      'document.type.exhibit': 'Delil',
+      'document.type.complaint': 'Şikayet/Dava Dilekçesi',
+      'document.type.answer': 'Cevap Dilekçesi',
+      'document.type.motion': 'Dilekçe/Talep',
+      'document.type.exhibit': 'Delil/Belge',
       'document.type.contract': 'Sözleşme',
       'document.type.correspondence': 'Yazışma',
       'document.type.other': 'Diğer',
@@ -293,7 +293,34 @@ export class LanguageService {
       'form.type.label': 'Doküman Türü *',
       'form.type.placeholder': 'Tür seçin',
       'form.description.label': 'Açıklama',
-      'form.description.placeholder': 'Doküman açıklaması (isteğe bağlı)'
+      'form.description.placeholder': 'Doküman açıklaması (isteğe bağlı)',
+      
+      // Client Management translations
+      'client.management.title': 'Müvekkil Yönetimi',
+      'client.management.subtitle': 'Müvekkillerinizi buradan yönetebilirsiniz',
+      'new.client': 'Yeni Müvekkil',
+      'username': 'Kullanıcı Adı',
+      'contact': 'İletişim',
+      'registration.date': 'Kayıt Tarihi',
+      'search.name': 'Ad veya soyadı arayın',
+      'search.email': 'Email arayın',
+      'search.username': 'Kullanıcı adı arayın',
+      'search.contact': 'Telefon veya adres arayın',
+      'active.status': 'Aktif',
+      'inactive.status': 'Pasif',
+      'operations': 'İşlemler',
+      
+      // Case Management translations
+      'case.management.title': 'Dava Yönetimi',
+      'case.management.subtitle': 'Tüm davaları buradan yönetebilirsiniz',
+      'search.case.title': 'Başlık arayın',
+      'search.client.name': 'Müvekkil adı arayın',
+      
+      // Document Management translations  
+      'min.file.size': 'Min boyut (KB)',
+      'no.documents.yet': 'Henüz doküman eklenmemiş',
+      'add.first.document': 'İlk dokümanınızı eklemek için "Yeni Doküman" butonuna tıklayın',
+      'date': 'Tarih'
     },
     en: {
       'panel': 'Panel',
@@ -521,7 +548,34 @@ export class LanguageService {
       'form.type.label': 'Document Type *',
       'form.type.placeholder': 'Select type',
       'form.description.label': 'Description',
-      'form.description.placeholder': 'Document description (optional)'
+      'form.description.placeholder': 'Document description (optional)',
+      
+      // Client Management translations
+      'client.management.title': 'Client Management',
+      'client.management.subtitle': 'Manage your clients from here',
+      'new.client': 'New Client',
+      'username': 'Username',
+      'contact': 'Contact',
+      'registration.date': 'Registration Date',
+      'search.name': 'Search name or surname',
+      'search.email': 'Search email',
+      'search.username': 'Search username',
+      'search.contact': 'Search phone or address',
+      'active.status': 'Active',
+      'inactive.status': 'Inactive',
+      'operations': 'Operations',
+      
+      // Case Management translations
+      'case.management.title': 'Case Management',
+      'case.management.subtitle': 'Manage all cases from here',
+      'search.case.title': 'Search title',
+      'search.client.name': 'Search client name',
+      
+      // Document Management translations
+      'min.file.size': 'Min size (KB)',
+      'no.documents.yet': 'No documents added yet',
+      'add.first.document': 'Click "New Document" button to add your first document',
+      'date': 'Date'
     }
   };
 }

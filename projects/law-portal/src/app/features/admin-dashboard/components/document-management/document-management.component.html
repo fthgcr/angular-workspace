@@ -4,9 +4,9 @@
     <div class="title-section">
       <h2 class="page-title">
         <i class="pi pi-file"></i>
-        Doküman Yönetimi
+        {{ translate('document.management') }}
       </h2>
-      <p class="page-subtitle">Dava dokümanlarınızı buradan yönetebilirsiniz</p>
+      <p class="page-subtitle">{{ translate('document.management.subtitle') || 'Dava dokümanlarınızı buradan yönetebilirsiniz' }}</p>
     </div>
     <div class="action-section">
       <!--<p-button 
@@ -26,7 +26,7 @@
       [paginator]="true" 
       [rows]="10"
       [showCurrentPageReport]="true"
-      currentPageReportTemplate="Toplam {totalRecords} kayıttan {first} - {last} arası gösteriliyor"
+      [currentPageReportTemplate]="translate('pagination.template')"
       [globalFilterFields]="['title', 'fileName', 'description', 'type', 'legalCaseTitle', 'clientName']"
       styleClass="modern-table"
       responsiveLayout="scroll"
@@ -51,7 +51,7 @@
         <tr>
           <th pSortableColumn="title">
             <div class="column-header">
-              <span>Başlık</span>
+              <span>{{ translate('title') }}</span>
               <div class="header-controls">
                 <p-sortIcon field="title"></p-sortIcon>
                 <p-columnFilter 
@@ -69,7 +69,7 @@
                       pInputText 
                       [value]="value" 
                       (input)="filter($any($event.target).value)"
-                      placeholder="Başlık ara..."
+                      [placeholder]="translate('search.title')"
                       class="filter-input"
                     />
                   </ng-template>
@@ -79,7 +79,7 @@
           </th>
           <th pSortableColumn="fileName">
             <div class="column-header">
-              <span>Dosya Adı</span>
+              <span>{{ translate('file.name') }}</span>
               <div class="header-controls">
                 <p-sortIcon field="fileName"></p-sortIcon>
                 <p-columnFilter 
@@ -107,7 +107,7 @@
           </th>
           <th pSortableColumn="type">
             <div class="column-header">
-              <span>Tür</span>
+              <span>{{ translate('type') }}</span>
               <div class="header-controls">
                 <p-sortIcon field="type"></p-sortIcon>
                 <p-columnFilter 
@@ -123,7 +123,7 @@
                       [ngModel]="value" 
                       [options]="documentTypeOptions"
                       (onChange)="filter($event.value)"
-                      placeholder="Tür seçin"
+                      [placeholder]="translate('select.type')"
                       [showClear]="true"
                       optionLabel="label"
                       optionValue="value"
@@ -136,7 +136,7 @@
           </th>
           <th>
             <div class="column-header">
-              <span>Dava</span>
+              <span>{{ translate('case') || 'Dava' }}</span>
               <div class="header-controls">
                 <p-columnFilter 
                   field="legalCaseTitle" 
@@ -162,7 +162,7 @@
           </th>
           <th pSortableColumn="fileSize">
             <div class="column-header">
-              <span>Boyut</span>
+              <span>{{ translate('file.size') }}</span>
               <div class="header-controls">
                 <p-sortIcon field="fileSize"></p-sortIcon>
                 <p-columnFilter 
@@ -178,7 +178,7 @@
                     <p-inputNumber 
                       [ngModel]="value" 
                       (onInput)="filter($event.value)"
-                      placeholder="Min boyut (KB)"
+                      [placeholder]="translate('min.file.size')"
                       mode="decimal"
                       [useGrouping]="false"
                       class="filter-input"
@@ -190,7 +190,7 @@
           </th>
           <th pSortableColumn="createdDate">
             <div class="column-header">
-              <span>Tarih</span>
+              <span>{{ translate('date') }}</span>
               <div class="header-controls">
                 <p-sortIcon field="createdDate"></p-sortIcon>
                 <p-columnFilter 
@@ -207,7 +207,7 @@
                       [ngModel]="value" 
                       (onSelect)="filter($event)"
                       dateFormat="dd/mm/yy"
-                      placeholder="Tarih seçin"
+                      [placeholder]="translate('select.date')"
                       [showIcon]="true"
                       class="filter-calendar"
                     ></p-calendar>
@@ -216,7 +216,7 @@
               </div>
             </div>
           </th>
-          <th>İşlemler</th>
+          <th>{{ translate('operations') }}</th>
         </tr>
       </ng-template>
 
@@ -248,7 +248,7 @@
             </div>
             <div class="no-case" *ngIf="!document.legalCaseId">
               <i class="pi pi-minus-circle"></i>
-              Atanmamış
+              {{ translate('unassigned') }}
             </div>
           </td>
           <td>
@@ -261,7 +261,7 @@
                 icon="pi pi-download" 
                 styleClass="p-button-rounded p-button-text p-button-info"
                 (click)="downloadDocument(document)"
-                pTooltip="İndir"
+                [pTooltip]="translate('download')"
                 tooltipPosition="top"
               ></p-button>
             <!-- <p-button 
@@ -288,8 +288,8 @@
           <td colspan="7" class="empty-message">
             <div class="empty-state">
               <i class="pi pi-file"></i>
-              <h3>Henüz doküman eklenmemiş</h3>
-              <p>İlk dokümanınızı eklemek için "Yeni Doküman" butonuna tıklayın</p>
+              <h3>{{ translate('no.documents.yet') }}</h3>
+              <p>{{ translate('add.first.document') }}</p>
             </div>
           </td>
         </tr>

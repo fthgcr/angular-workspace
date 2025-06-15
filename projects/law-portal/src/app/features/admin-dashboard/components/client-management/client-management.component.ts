@@ -1,15 +1,17 @@
-import { Component, OnInit, AfterViewInit, ElementRef, Renderer2, RendererStyleFlags2 } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, Renderer2, RendererStyleFlags2, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ClientService, Client } from '../../../../core/services/client.service';
+import { LanguageService } from '../../../../services/language.service';
 
 @Component({
   selector: 'app-client-management',
   templateUrl: './client-management.component.html',
   styleUrls: ['./client-management.component.scss']
 })
-export class ClientManagementComponent implements OnInit, AfterViewInit {
+export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestroy {
   clients: Client[] = [];
   clientForm: FormGroup;
   showDialog = false;
@@ -19,6 +21,9 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
   // Password management
   isPasswordEditing = false;
   originalPasswordValue = '';
+
+  // Language subscription
+  private languageSubscription: Subscription = new Subscription();
 
   // Filter options
   statusOptions = [
@@ -33,7 +38,8 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
     private router: Router,
     private elementRef: ElementRef,
     private renderer: Renderer2,
-    private clientService: ClientService
+    private clientService: ClientService,
+    private languageService: LanguageService
   ) {
     this.clientForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -59,6 +65,14 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.loadClients();
+    this.updateStatusOptions();
+    
+    // Subscribe to language changes
+    this.languageSubscription.add(
+      this.languageService.currentLanguage$.subscribe(() => {
+        this.updateStatusOptions();
+      })
+    );
   }
 
   ngAfterViewInit(): void {
@@ -476,5 +490,20 @@ export class ClientManagementComponent implements OnInit, AfterViewInit {
         this.cancelPasswordEdit();
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.languageSubscription.unsubscribe();
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
+
+  private updateStatusOptions(): void {
+    this.statusOptions = [
+      { label: this.translate('active.status'), value: true },
+      { label: this.translate('inactive.status'), value: false }
+    ];
   }
 } 

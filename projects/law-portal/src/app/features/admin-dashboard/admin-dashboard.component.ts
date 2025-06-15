@@ -228,7 +228,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       
       case ActivityType.DOCUMENT_CREATED:
       case ActivityType.DOCUMENT_UPDATED:
-        return 'pi-file-plus';
+        return 'pi-file';
       
       case ActivityType.USER_CREATED:
       case ActivityType.USER_UPDATED:
