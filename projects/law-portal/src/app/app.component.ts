@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { PrimeNGConfig } from 'primeng/api';
 import { LanguageService } from './services/language.service';
 import { PageMetaService } from './services/page-meta.service';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +23,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private primeConfig: PrimeNGConfig,
     private languageService: LanguageService,
-    private pageMetaService: PageMetaService
+    private pageMetaService: PageMetaService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {

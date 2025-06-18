@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 // PrimeNG Modules
@@ -9,38 +9,46 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DropdownModule } from 'primeng/dropdown';
 import { MessageService } from 'primeng/api';
 
 // Components
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
+import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
 
 // Services and Interceptors
 import { AuthService } from './services/auth.service';
+import { I18nService } from './services/i18n.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
   declarations: [
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    LanguageSelectorComponent
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     HttpClientModule,
     InputTextModule,
     PasswordModule,
     ButtonModule,
     ToastModule,
-    CheckboxModule
+    CheckboxModule,
+    DropdownModule
   ],
   exports: [
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    LanguageSelectorComponent
   ],
   providers: [
     MessageService,
     AuthService,
+    I18nService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

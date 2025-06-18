@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppConfigService } from '../../../services/app-config.service';
+import { ThemeService } from '../../../services/theme.service';
 
 @Component({
   selector: 'app-footer',
@@ -13,7 +14,8 @@ export class FooterComponent implements OnInit, OnDestroy {
 
   constructor(
     private appConfigService: AppConfigService,
-    private router: Router
+    private router: Router,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -89,5 +91,18 @@ export class FooterComponent implements OnInit, OnDestroy {
 
   getContactPhone(): string {
     return this.appConfigService.getContactPhone();
+  }
+
+  // Theme methods
+  getCurrentGradient(): string {
+    return this.themeService.getCurrentGradient();
+  }
+
+  getAvailableGradients(): { [key: string]: string } {
+    return this.themeService.getAvailableGradients();
+  }
+
+  changeGradient(gradientName: string): void {
+    this.themeService.changeGradient(gradientName);
   }
 } 

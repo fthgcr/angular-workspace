@@ -3,28 +3,28 @@
     <!-- Header Section -->
     <div class="register-header">
       <div class="logo-section">
-        <i class="pi pi-balance-scale logo-icon"></i>
-        <h1 class="app-title">LawPortal</h1>
+        <i class="pi pi-building logo-icon"></i>
+        <h1 class="app-title">{{t('common.app_name')}}</h1>
       </div>
-      <h2 class="welcome-title">Create Account</h2>
-      <p class="welcome-subtitle">Join our legal workspace today</p>
+      <h2 class="welcome-title">{{t('register.create_account')}}</h2>
+      <p class="welcome-subtitle">{{t('register.subtitle')}}</p>
     </div>
 
     <!-- Progress Steps -->
     <div class="progress-steps">
       <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
         <div class="step-number">1</div>
-        <span>Personal</span>
+        <span>{{t('register.personal')}}</span>
       </div>
       <div class="step-line" [class.active]="currentStep > 1"></div>
       <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
         <div class="step-number">2</div>
-        <span>Account</span>
+        <span>{{t('register.account')}}</span>
       </div>
       <div class="step-line" [class.active]="currentStep > 2"></div>
       <div class="step" [class.active]="currentStep >= 3">
         <div class="step-number">3</div>
-        <span>Complete</span>
+        <span>{{t('register.complete')}}</span>
       </div>
     </div>
 
@@ -35,7 +35,7 @@
       <div class="form-step" *ngIf="currentStep === 1">
         <h3 class="step-title">
           <i class="pi pi-user-plus"></i>
-          Personal Information
+          {{t('register.personal_info')}}
         </h3>
         
         <div class="form-row">
@@ -51,12 +51,12 @@
                   class="modern-input"
                   placeholder=" "
                 >
-                <label for="firstName">First Name</label>
+                <label for="firstName">{{t('register.first_name')}}</label>
               </span>
             </div>
             <small class="error-message" *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched">
               <i class="pi pi-exclamation-circle"></i>
-              First name is required
+              {{t('register.first_name_required')}}
             </small>
           </div>
 
@@ -72,12 +72,12 @@
                   class="modern-input"
                   placeholder=" "
                 >
-                <label for="lastName">Last Name</label>
+                <label for="lastName">{{t('register.last_name')}}</label>
               </span>
             </div>
             <small class="error-message" *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched">
               <i class="pi pi-exclamation-circle"></i>
-              Last name is required
+              {{t('register.last_name_required')}}
             </small>
           </div>
         </div>
@@ -94,13 +94,13 @@
                 class="modern-input"
                 placeholder=" "
               >
-              <label for="email">Email Address</label>
+              <label for="email">{{t('register.email')}}</label>
             </span>
           </div>
           <small class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
             <i class="pi pi-exclamation-circle"></i>
-            <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
-            <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['required']">{{t('register.email_required')}}</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['email']">{{t('register.email_invalid')}}</span>
           </small>
         </div>
 
@@ -116,12 +116,12 @@
                 class="modern-input"
                 placeholder=" "
               >
-              <label for="phoneNumber">Phone Number</label>
+              <label for="phoneNumber">{{t('register.phone')}}</label>
             </span>
           </div>
           <small class="error-message" *ngIf="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched">
             <i class="pi pi-exclamation-circle"></i>
-            Phone number is required
+            {{t('register.phone_required')}}
           </small>
         </div>
       </div>
@@ -130,7 +130,7 @@
       <div class="form-step" *ngIf="currentStep === 2">
         <h3 class="step-title">
           <i class="pi pi-key"></i>
-          Account Setup
+          {{t('register.account_setup')}}
         </h3>
         
         <div class="form-group">
@@ -145,12 +145,12 @@
                 class="modern-input"
                 placeholder=" "
               >
-              <label for="username">Username</label>
+              <label for="username">{{t('register.username')}}</label>
             </span>
           </div>
           <small class="error-message" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
             <i class="pi pi-exclamation-circle"></i>
-            Username is required
+            {{t('register.username_required')}}
           </small>
         </div>
 
@@ -166,12 +166,12 @@
                 styleClass="modern-password"
                 placeholder=" "
               ></p-password>
-              <label for="password">Password</label>
+              <label for="password">{{t('register.password')}}</label>
             </span>
           </div>
           <small class="error-message" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
             <i class="pi pi-exclamation-circle"></i>
-            Password is required
+            {{t('register.password_required')}}
           </small>
         </div>
 
@@ -187,13 +187,13 @@
                 styleClass="modern-password"
                 placeholder=" "
               ></p-password>
-              <label for="confirmPassword">Confirm Password</label>
+              <label for="confirmPassword">{{t('register.confirm_password')}}</label>
             </span>
           </div>
           <small class="error-message" *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
             <i class="pi pi-exclamation-circle"></i>
-            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
-            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match</span>
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">{{t('register.confirm_password_required')}}</span>
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">{{t('register.passwords_not_match')}}</span>
           </small>
         </div>
       </div>
@@ -202,16 +202,16 @@
       <div class="form-step" *ngIf="currentStep === 3">
         <h3 class="step-title">
           <i class="pi pi-check-circle"></i>
-          Terms & Conditions
+          {{t('register.terms_conditions')}}
         </h3>
         
         <div class="terms-section">
           <div class="terms-text">
-            <p>By creating an account, you agree to our:</p>
+            <p>{{t('register.by_creating_account')}}</p>
             <ul>
-              <li><a href="#" class="terms-link">Terms of Service</a></li>
-              <li><a href="#" class="terms-link">Privacy Policy</a></li>
-              <li><a href="#" class="terms-link">Cookie Policy</a></li>
+              <li><a href="#" class="terms-link">{{t('register.terms_of_service')}}</a></li>
+              <li><a href="#" class="terms-link">{{t('register.privacy_policy')}}</a></li>
+              <li><a href="#" class="terms-link">{{t('register.cookie_policy')}}</a></li>
             </ul>
           </div>
           
@@ -222,11 +222,11 @@
               inputId="acceptTerms"
               styleClass="custom-checkbox"
             ></p-checkbox>
-            <label for="acceptTerms">I accept the Terms and Conditions</label>
+            <label for="acceptTerms">{{t('register.accept_terms')}}</label>
           </div>
           <small class="error-message" *ngIf="registerForm.get('acceptTerms')?.invalid && registerForm.get('acceptTerms')?.touched">
             <i class="pi pi-exclamation-circle"></i>
-            You must accept the terms and conditions
+            {{t('register.accept_terms_required')}}
           </small>
 
           <div class="checkbox-group">
@@ -236,7 +236,7 @@
               inputId="newsletter"
               styleClass="custom-checkbox"
             ></p-checkbox>
-            <label for="newsletter">Subscribe to newsletter (optional)</label>
+            <label for="newsletter">{{t('register.subscribe_newsletter')}}</label>
           </div>
         </div>
       </div>
@@ -246,7 +246,7 @@
         <p-button 
           *ngIf="currentStep > 1"
           type="button" 
-          label="Previous" 
+          [label]="t('register.previous')" 
           icon="pi pi-chevron-left"
           styleClass="previous-button"
           (click)="previousStep()"
@@ -255,7 +255,7 @@
         <p-button 
           *ngIf="currentStep < 3"
           type="button" 
-          label="Next" 
+          [label]="t('register.next')" 
           icon="pi pi-chevron-right"
           iconPos="right"
           styleClass="next-button w-full"
@@ -267,7 +267,7 @@
           *ngIf="currentStep === 3"
           type="submit" 
           [loading]="loading" 
-          label="Create Account" 
+          [label]="t('register.create_account_btn')" 
           icon="pi pi-user-plus"
           styleClass="register-button w-full"
           [disabled]="registerForm.invalid"
@@ -278,14 +278,19 @@
     <!-- Footer Section -->
     <div class="register-footer">
       <div class="divider">
-        <span>or</span>
+        <span>{{t('register.or')}}</span>
       </div>
       <div class="login-prompt">
-        <span>Already have an account?</span>
+        <span>{{t('register.have_account')}}</span>
         <a class="login-link" (click)="navigateToLogin()">
-          Sign In
+          {{t('register.sign_in')}}
           <i class="pi pi-arrow-right"></i>
         </a>
+      </div>
+      
+      <!-- Language Selector -->
+      <div class="language-footer">
+        <lib-language-selector></lib-language-selector>
       </div>
     </div>
   </div>

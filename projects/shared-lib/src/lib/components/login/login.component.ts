@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { I18nService } from '../../services/i18n.service';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { LoginRequest } from '../../models/auth.model';
@@ -17,6 +18,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private i18nService: I18nService,
     private messageService: MessageService,
     private router: Router
   ) {
@@ -33,8 +35,8 @@ export class LoginComponent implements OnInit {
       const currentUser = this.authService.getCurrentUser();
       this.messageService.add({
         severity: 'info',
-        summary: 'Already Logged In',
-        detail: `You are already logged in as ${currentUser?.username}. Redirecting...`
+        summary: this.t('login.already_logged_in'),
+        detail: `${this.t('login.already_logged_in')} ${currentUser?.username}. ${this.t('login.redirecting')}`
       });
       
       setTimeout(() => {
@@ -64,8 +66,8 @@ export class LoginComponent implements OnInit {
           
           this.messageService.add({
             severity: 'success',
-            summary: 'Login Successful',
-            detail: `Welcome back, ${username}! Logged in as ${role}. Redirecting...`
+            summary: this.t('login.login_successful'),
+            detail: `${this.t('login.welcome_back_user')}, ${username}! ${this.t('login.logged_in_as')} ${role}. ${this.t('login.redirecting')}`
           });
           
           // Navigate based on role after a short delay
@@ -76,8 +78,8 @@ export class LoginComponent implements OnInit {
         error: (error) => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Login Failed',
-            detail: error.error?.message || 'Invalid username or password'
+            summary: this.t('login.login_failed'),
+            detail: error.error?.message || this.t('login.invalid_credentials')
           });
           this.loading = false;
         },
@@ -88,9 +90,14 @@ export class LoginComponent implements OnInit {
     } else {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Validation Error',
-        detail: 'Please fill in all required fields'
+        summary: this.t('login.validation_error'),
+        detail: this.t('login.fill_required_fields')
       });
     }
+  }
+
+  // Helper method for translation
+  t(key: string): string {
+    return this.i18nService.translate(key);
   }
 }

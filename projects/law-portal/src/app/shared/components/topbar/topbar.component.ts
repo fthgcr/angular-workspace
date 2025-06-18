@@ -5,6 +5,7 @@ import { MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { LanguageService, Language } from '../../../services/language.service';
 import { AppConfigService } from '../../../services/app-config.service';
+import { ThemeService } from '../../../services/theme.service';
 
 @Component({
   selector: 'app-topbar',
@@ -29,7 +30,8 @@ export class TopbarComponent implements OnInit, OnDestroy {
     private router: Router,
     private messageService: MessageService,
     private languageService: LanguageService,
-    private appConfigService: AppConfigService
+    private appConfigService: AppConfigService,
+    private themeService: ThemeService
   ) {
     this.currentLanguage = this.languageService.getCurrentLanguage();
     this.languages = this.languageService.languages;
@@ -243,5 +245,18 @@ export class TopbarComponent implements OnInit, OnDestroy {
 
   getLogoDimensions(): { width: number; height: number; recommended_size: string } {
     return this.appConfigService.getLogoDimensions();
+  }
+
+  // Theme methods
+  getCurrentGradient(): string {
+    return this.themeService.getCurrentGradient();
+  }
+
+  getAvailableGradients(): { [key: string]: string } {
+    return this.themeService.getAvailableGradients();
+  }
+
+  changeGradient(gradientName: string): void {
+    this.themeService.changeGradient(gradientName);
   }
 } 

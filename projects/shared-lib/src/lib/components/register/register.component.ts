@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/fo
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'lib-register',
@@ -18,6 +19,7 @@ export class RegisterComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private i18nService: I18nService,
     private messageService: MessageService,
     private router: Router
   ) {}
@@ -28,8 +30,8 @@ export class RegisterComponent implements OnInit {
       const currentUser = this.authService.getCurrentUser();
       this.messageService.add({
         severity: 'info',
-        summary: 'Already Logged In',
-        detail: `You are already logged in as ${currentUser?.firstName}. Redirecting to dashboard...`
+        summary: this.t('register.already_logged_in'),
+        detail: `${this.t('register.already_logged_in')} ${currentUser?.firstName}. ${this.t('login.redirecting')}`
       });
       
       setTimeout(() => {
@@ -105,8 +107,8 @@ export class RegisterComponent implements OnInit {
         next: (response) => {
           this.messageService.add({
             severity: 'success',
-            summary: 'Success',
-            detail: 'Account created successfully! Please check your email for verification.'
+            summary: this.t('register.success'),
+            detail: this.t('register.success_message')
           });
           this.loading = false;
           this.navigateToLogin();
@@ -114,8 +116,8 @@ export class RegisterComponent implements OnInit {
         error: (error) => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: error.error?.message || 'Registration failed'
+            summary: this.t('register.error'),
+            detail: error.error?.message || this.t('register.registration_failed')
           });
           this.loading = false;
         }
@@ -127,6 +129,11 @@ export class RegisterComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  // Helper method for translation
+  t(key: string): string {
+    return this.i18nService.translate(key);
+  }
+
   private onFormValuesChanged(): void {
     if (!this.registerForm) { return; }
 
@@ -135,32 +142,32 @@ export class RegisterComponent implements OnInit {
 
     const validationMessages = {
       username: {
-        required: 'Username is required',
+        required: this.t('register.username_required'),
         minlength: 'Username must be at least 4 characters long',
         pattern: 'Username can only contain letters, numbers, dots, underscores and hyphens'
       },
       password: {
-        required: 'Password is required',
+        required: this.t('register.password_required'),
         minlength: 'Password must be at least 6 characters long'
       },
       email: {
-        required: 'Email is required',
-        email: 'Please enter a valid email address'
+        required: this.t('register.email_required'),
+        email: this.t('register.email_invalid')
       },
       firstName: {
-        required: 'First name is required',
+        required: this.t('register.first_name_required'),
         pattern: 'First name can only contain letters'
       },
       lastName: {
-        required: 'Last name is required',
+        required: this.t('register.last_name_required'),
         pattern: 'Last name can only contain letters'
       },
       confirmPassword: {
-        required: 'Please confirm your password',
-        passwordMismatch: 'Passwords do not match'
+        required: this.t('register.confirm_password_required'),
+        passwordMismatch: this.t('register.passwords_not_match')
       },
       termsAccepted: {
-        required: 'You must accept the terms and conditions'
+        required: this.t('register.accept_terms_required')
       }
     };
 

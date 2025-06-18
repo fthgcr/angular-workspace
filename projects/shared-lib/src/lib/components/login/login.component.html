@@ -3,11 +3,11 @@
     <!-- Header Section -->
     <div class="login-header">
       <div class="logo-section">
-        <i class="pi pi-balance-scale logo-icon"></i>
-        <h1 class="app-title">LawPortal</h1>
+        <i class="pi pi-building logo-icon"></i>
+        <h1 class="app-title">{{t('common.app_name')}}</h1>
       </div>
-      <h2 class="welcome-title">Welcome Back</h2>
-      <p class="welcome-subtitle">Sign in to access your legal workspace</p>
+      <h2 class="welcome-title">{{t('login.welcome_back')}}</h2>
+      <p class="welcome-subtitle">{{t('login.subtitle')}}</p>
     </div>
 
     <!-- Form Section -->
@@ -24,12 +24,12 @@
               class="modern-input"
               placeholder=" "
             >
-            <label for="username">Username or Email</label>
+            <label for="username">{{t('login.username_email')}}</label>
           </span>
         </div>
         <small class="error-message" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
           <i class="pi pi-exclamation-circle"></i>
-          Username is required
+          {{t('login.username_required')}}
         </small>
       </div>
 
@@ -45,12 +45,12 @@
               styleClass="modern-password"
               placeholder=" "
             ></p-password>
-            <label for="password">Password</label>
+            <label for="password">{{t('login.password')}}</label>
           </span>
         </div>
         <small class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
           <i class="pi pi-exclamation-circle"></i>
-          Password is required
+          {{t('login.password_required')}}
         </small>
       </div>
 
@@ -63,9 +63,9 @@
             inputId="rememberMe"
             styleClass="custom-checkbox"
           ></p-checkbox>
-          <label for="rememberMe">Remember me</label>
+          <label for="rememberMe">{{t('login.remember_me')}}</label>
         </div>
-        <a href="#" class="forgot-password">Forgot password?</a>
+        <a href="#" class="forgot-password">{{t('login.forgot_password')}}</a>
       </div>
 
       <!-- Submit Button -->
@@ -73,7 +73,7 @@
         <p-button 
           type="submit" 
           [loading]="loading" 
-          label="Sign In" 
+          [label]="t('login.sign_in')" 
           icon="pi pi-sign-in"
           styleClass="login-button w-full"
           [disabled]="loginForm.invalid"
@@ -84,14 +84,19 @@
     <!-- Footer Section -->
     <div class="login-footer">
       <div class="divider">
-        <span>or</span>
+        <span>{{t('login.or')}}</span>
       </div>
       <div class="register-prompt">
-        <span>Don't have an account?</span>
+        <span>{{t('login.no_account')}}</span>
         <a class="register-link" (click)="navigateToRegister()">
-          Create Account
+          {{t('login.create_account')}}
           <i class="pi pi-arrow-right"></i>
         </a>
+      </div>
+      
+      <!-- Language Selector -->
+      <div class="language-footer">
+        <lib-language-selector></lib-language-selector>
       </div>
     </div>
   </div>

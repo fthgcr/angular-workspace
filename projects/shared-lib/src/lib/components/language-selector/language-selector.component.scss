@@ -1,0 +1,109 @@
+.language-selector {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  .language-dropdown {
+    .p-dropdown {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(226, 232, 240, 0.5);
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      min-width: 110px;
+
+      &:hover {
+        border-color: rgba(102, 126, 234, 0.3);
+        background: rgba(255, 255, 255, 0.95);
+      }
+
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+      }
+
+      .p-dropdown-label {
+        color: #4a5568;
+        font-weight: 500;
+        padding: 6px 10px;
+        font-size: 0.875rem;
+      }
+
+      .p-dropdown-trigger {
+        color: #718096;
+        width: 28px;
+        
+        .p-icon {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+
+  .language-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba(102, 126, 234, 0.1);
+    }
+
+    .flag-image {
+      width: 20px;
+      height: 15px;
+      border-radius: 2px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .language-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-color, #333);
+    }
+
+    &.selected-language {
+      .language-name {
+        color: #4a5568;
+      }
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .language-selector {
+    .language-item {
+      .language-name {
+        color: var(--text-color-secondary, #e5e7eb);
+      }
+
+      &.selected-language {
+        .language-name {
+          color: #4a5568;
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .language-selector {
+    .language-dropdown {
+      .p-dropdown {
+        min-width: 100px !important;
+      }
+    }
+
+    .language-item {
+      .language-name {
+        font-size: 13px;
+      }
+    }
+  }
+} 

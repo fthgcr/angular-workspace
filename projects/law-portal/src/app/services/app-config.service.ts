@@ -29,8 +29,18 @@ export interface AppConfig {
     recommended_sizes: string;
   };
   THEME: {
+    text_color: string;
     primary_color: string;
     secondary_color: string;
+    gradient: {
+      direction: string;
+      start_color: string;
+      end_color: string;
+      css_value: string;
+    };
+    alternative_gradients: {
+      [key: string]: string;
+    };
   };
   FOOTER: {
     show_footer: boolean;
@@ -79,8 +89,23 @@ export class AppConfigService {
       recommended_sizes: '16x16, 32x32, 48x48 pixels for optimal browser support'
     },
     THEME: {
+      text_color: '#ffffff',
       primary_color: '#667eea',
-      secondary_color: '#764ba2'
+      secondary_color: '#764ba2',
+      gradient: {
+        direction: '135deg',
+        start_color: '#667eea',
+        end_color: '#764ba2',
+        css_value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      },
+      alternative_gradients: {
+        blue_purple: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        ocean: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
+        sunset: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
+        forest: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+        royal: 'linear-gradient(135deg, #8360c3 0%, #2ebf91 100%)',
+        fire: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+      }
     },
     FOOTER: {
       show_footer: true,
@@ -198,8 +223,51 @@ export class AppConfigService {
     return this.getConfig()?.SUPPORT_EMAIL || this.defaultConfig.SUPPORT_EMAIL;
   }
 
-  getTheme(): { primary_color: string; secondary_color: string } {
+  getTheme(): { text_color: string; primary_color: string; secondary_color: string; gradient: { direction: string; start_color: string; end_color: string; css_value: string; }; alternative_gradients: { [key: string]: string; }; } {
     return this.getConfig()?.THEME || this.defaultConfig.THEME;
+  }
+
+  getTextColor(): string {
+    return this.getTheme().text_color;
+  }
+
+  // Gradient methods
+  getPrimaryGradient(): string {
+    return this.getTheme().gradient.css_value;
+  }
+
+  getGradientDirection(): string {
+    return this.getTheme().gradient.direction;
+  }
+
+  getGradientStartColor(): string {
+    return this.getTheme().gradient.start_color;
+  }
+
+  getGradientEndColor(): string {
+    return this.getTheme().gradient.end_color;
+  }
+
+  getAlternativeGradients(): { [key: string]: string } {
+    return this.getTheme().alternative_gradients;
+  }
+
+  getAlternativeGradient(name: string): string {
+    return this.getTheme().alternative_gradients[name] || this.getPrimaryGradient();
+  }
+
+  // CSS Custom Properties için gradient değerlerini döndür
+  getGradientCSSVariables(): { [key: string]: string } {
+    const theme = this.getTheme();
+    return {
+      '--primary-gradient': theme.gradient.css_value,
+      '--gradient-start': theme.gradient.start_color,
+      '--gradient-end': theme.gradient.end_color,
+      '--gradient-direction': theme.gradient.direction,
+      '--primary-color': theme.primary_color,
+      '--secondary-color': theme.secondary_color,
+      '--text-color': theme.text_color
+    };
   }
 
   // Page Title and Favicon methods
@@ -249,9 +317,10 @@ export class AppConfigService {
   }
 
   getFooterCopyright(): string {
-    const copyrightText = this.getFooterConfig().copyright_text;
-    const companyName = this.getCompanyName();
-    return copyrightText.replace('{COMPANY_NAME}', companyName);
+    let copyrightText = this.getFooterConfig().copyright_text;
+    const pageTitle = this.getPageTitle();
+    copyrightText = copyrightText.replace('{COMPANY_NAME}', pageTitle);
+    return copyrightText.replace('{CURRENT_YEAR}', new Date().getFullYear().toString());
   }
 
   getFooterLinks(): Array<{ label: string; url: string; external: boolean; }> {

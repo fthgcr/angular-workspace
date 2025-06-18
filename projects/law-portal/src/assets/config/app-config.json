@@ -24,12 +24,27 @@
     "recommended_sizes": "16x16, 32x32, 48x48 pixels for optimal browser support"
   },
   "THEME": {
-    "primary_color": "#667eea",
-    "secondary_color": "#764ba2"
+    "text_color": "#ffffff",
+    "primary_color": "#113f67",
+    "secondary_color": "#385170",
+    "gradient": {
+      "direction": "135deg",
+      "start_color": "#113f67",
+      "end_color": "#385170",
+      "css_value": "linear-gradient(135deg, #113f67 0%, #385170 100%)"
+    },
+    "alternative_gradients": {
+      "blue_purple": "linear-gradient(135deg, #113f67 0%, #385170 100%)",
+      "ocean": "linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)",
+      "sunset": "linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)",
+      "forest": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+      "royal": "linear-gradient(135deg, #8360c3 0%, #2ebf91 100%)",
+      "fire": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+    }
   },
   "FOOTER": {
     "show_footer": true,
-    "copyright_text": "© 2024 {COMPANY_NAME}. Tüm hakları saklıdır.",
+    "copyright_text": "© {CURRENT_YEAR} {COMPANY_NAME}. Tüm hakları saklıdır.",
     "links": [
       {
         "label": "Gizlilik Politikası",
