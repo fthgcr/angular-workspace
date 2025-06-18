@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import { AuthService } from 'shared-lib';
+import { AuthService, AppConfigService } from 'shared-lib';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { PrimeNGConfig } from 'primeng/api';
@@ -21,6 +21,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private authService: AuthService,
+    private appConfigService: AppConfigService,
     private primeConfig: PrimeNGConfig,
     private languageService: LanguageService,
     private pageMetaService: PageMetaService,
@@ -28,6 +29,53 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Law-portal için özel config ayarları
+    this.appConfigService.setConfig({
+      APP_TITLE: 'AS',
+      APP_DESC: 'Hukuk & Danışmanlık',
+      PAGE_TITLE: 'AS - Hukuk & Danışmanlık',
+      LOGO_ICON: 'pi pi-balance-scale',
+      COMPANY_NAME: 'AS',
+      CONTACT_EMAIL: 'info@lawportal.com',
+      CONTACT_PHONE: '+90 (212) 123 45 67',
+      SUPPORT_EMAIL: 'support@lawportal.com',
+      CAN_SIGN_UP: false,
+      FORGOT_PASSWORD: false,
+      THEME: {
+        primary_color: '#113f67',
+        secondary_color: '#385170',
+        gradient: {
+          direction: '135deg',
+          start_color: '#113f67',
+          end_color: '#385170',
+          css_value: 'linear-gradient(135deg, #113f67 0%, #385170 100%)'
+        }
+      },
+      FOOTER: {
+        show_footer: true,
+        copyright_text: '© {CURRENT_YEAR} {COMPANY_NAME}. Tüm hakları saklıdır.',
+        links: [
+          {
+            label: 'Gizlilik Politikası',
+            url: '/privacy-policy',
+            external: false
+          },
+          {
+            label: 'Kullanım Şartları',
+            url: '/terms-of-service',
+            external: false
+          },
+          {
+            label: 'İletişim',
+            url: '/contact',
+            external: false
+          }
+        ],
+        show_version: true,
+        show_powered_by: false
+      }
+    });
+    
     // PrimeNG config'i LanguageService'e kaydet
     this.languageService.setPrimeNGConfig(this.primeConfig);
     

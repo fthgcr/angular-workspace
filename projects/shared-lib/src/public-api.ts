@@ -8,6 +8,7 @@ export * from './lib/shared-lib.module';
 export * from './lib/services/auth.service';
 export * from './lib/services/user-profile.service';
 export * from './lib/services/i18n.service';
+export * from './lib/services/app-config.service';
 export * from './lib/models/auth.model';
 export * from './lib/components/login/login.component';
 export * from './lib/components/register/register.component';

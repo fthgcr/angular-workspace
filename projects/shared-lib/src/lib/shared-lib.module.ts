@@ -20,6 +20,7 @@ import { LanguageSelectorComponent } from './components/language-selector/langua
 // Services and Interceptors
 import { AuthService } from './services/auth.service';
 import { I18nService } from './services/i18n.service';
+import { AppConfigService } from './services/app-config.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
@@ -43,12 +44,14 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
   exports: [
     LoginComponent,
     RegisterComponent,
-    LanguageSelectorComponent
+    LanguageSelectorComponent,
+    HttpClientModule
   ],
   providers: [
     MessageService,
     AuthService,
     I18nService,
+    AppConfigService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

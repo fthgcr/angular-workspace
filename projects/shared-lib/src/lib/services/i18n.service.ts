@@ -90,8 +90,7 @@ export class I18nService {
 
       // Common
       'common.language': 'Dil',
-      'common.select_language': 'Dil Seçin',
-      'common.app_name': 'Platform'
+      'common.select_language': 'Dil Seçin'
     },
     en: {
       // Login Page
@@ -163,8 +162,7 @@ export class I18nService {
 
       // Common
       'common.language': 'Language',
-      'common.select_language': 'Select Language',
-      'common.app_name': 'Platform'
+      'common.select_language': 'Select Language'
     }
   };
 

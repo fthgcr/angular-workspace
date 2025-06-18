@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../services/i18n.service';
+import { AppConfigService } from '../../services/app-config.service';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { LoginRequest } from '../../models/auth.model';
@@ -19,6 +20,7 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private i18nService: I18nService,
+    private appConfigService: AppConfigService,
     private messageService: MessageService,
     private router: Router
   ) {
@@ -96,8 +98,20 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  // Helper method for translation
+  // Helper methods for template
   t(key: string): string {
     return this.i18nService.translate(key);
+  }
+
+  getAppTitle(): string {
+    return this.appConfigService.getPageTitle();
+  }
+
+  canSignUp(): boolean {
+    return this.appConfigService.canSignUp();
+  }
+
+  canUseForgotPassword(): boolean {
+    return this.appConfigService.canUseForgotPassword();
   }
 }

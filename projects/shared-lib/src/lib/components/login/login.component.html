@@ -4,7 +4,7 @@
     <div class="login-header">
       <div class="logo-section">
         <i class="pi pi-building logo-icon"></i>
-        <h1 class="app-title">{{t('common.app_name')}}</h1>
+        <h1 class="app-title">{{getAppTitle()}}</h1>
       </div>
       <h2 class="welcome-title">{{t('login.welcome_back')}}</h2>
       <p class="welcome-subtitle">{{t('login.subtitle')}}</p>
@@ -65,7 +65,7 @@
           ></p-checkbox>
           <label for="rememberMe">{{t('login.remember_me')}}</label>
         </div>
-        <a href="#" class="forgot-password">{{t('login.forgot_password')}}</a>
+        <a href="#" class="forgot-password" *ngIf="canUseForgotPassword()">{{t('login.forgot_password')}}</a>
       </div>
 
       <!-- Submit Button -->
@@ -83,15 +83,18 @@
     
     <!-- Footer Section -->
     <div class="login-footer">
-      <div class="divider">
-        <span>{{t('login.or')}}</span>
-      </div>
-      <div class="register-prompt">
-        <span>{{t('login.no_account')}}</span>
-        <a class="register-link" (click)="navigateToRegister()">
-          {{t('login.create_account')}}
-          <i class="pi pi-arrow-right"></i>
-        </a>
+      <!-- Register Section - Only show if sign up is enabled -->
+      <div class="register-section" *ngIf="canSignUp()">
+        <div class="divider">
+          <span>{{t('login.or')}}</span>
+        </div>
+        <div class="register-prompt">
+          <span>{{t('login.no_account')}}</span>
+          <a class="register-link" (click)="navigateToRegister()">
+            {{t('login.create_account')}}
+            <i class="pi pi-arrow-right"></i>
+          </a>
+        </div>
       </div>
       
       <!-- Language Selector -->

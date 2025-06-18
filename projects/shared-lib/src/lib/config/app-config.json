@@ -1,0 +1,71 @@
+{
+  "_comment_critical": "🚨 CRITICAL: These fields MUST be changed for each production deployment",
+  "APP_TITLE": "Platform",
+  "_comment_app_title": "🔴 MUST CHANGE: Company/Project specific title",
+  "APP_DESC": "Management System",
+  "_comment_app_desc": "🔴 MUST CHANGE: Project specific description",
+  "PAGE_TITLE": "Platform - Management System",
+  "_comment_page_title": "🔴 MUST CHANGE: Browser tab title, should match APP_TITLE",
+  "LOGO_ICON": "pi pi-building",
+  "_comment_logo_icon": "🟡 SHOULD CHANGE: Company specific icon (pi pi-balance-scale for law, pi pi-hospital for health, etc.)",
+  "COMPANY_NAME": "Platform",
+  "_comment_company_name": "🔴 MUST CHANGE: Actual company name for legal/copyright purposes",
+  "VERSION": "1.0.0",
+  "_comment_version": "🟢 OPTIONAL: Can be managed by CI/CD pipeline",
+  "COPYRIGHT": "© {CURRENT_YEAR} {COMPANY_NAME}. All rights reserved.",
+  "_comment_copyright": "🟢 OPTIONAL: Auto-generated from COMPANY_NAME, but text can be customized",
+  "CONTACT_EMAIL": "info@platform.com",
+  "_comment_contact_email": "🔴 MUST CHANGE: Real company contact email for customer support",
+  "CONTACT_PHONE": "+90 (212) 123 45 67",
+  "_comment_contact_phone": "🔴 MUST CHANGE: Real company phone number for customer support",
+  "SUPPORT_EMAIL": "support@platform.com",
+  "_comment_support_email": "🔴 MUST CHANGE: Real technical support email address",
+  "CAN_SIGN_UP": true,
+  "_comment_can_sign_up": "🟡 SHOULD CHANGE: Business logic - allow new registrations or not",
+  "FORGOT_PASSWORD": true,
+  "_comment_forgot_password": "🟡 SHOULD CHANGE: Business logic - allow password reset or not",
+  "_comment_theme": "🟡 SHOULD CHANGE: Company branding colors",
+  "THEME": {
+    "primary_color": "#667eea",
+    "_comment_primary": "🟡 Company primary brand color",
+    "secondary_color": "#764ba2",
+    "_comment_secondary": "🟡 Company secondary brand color",
+    "gradient": {
+      "direction": "135deg",
+      "start_color": "#667eea",
+      "end_color": "#764ba2",
+      "css_value": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    }
+  },
+  "_comment_footer": "🟡 SHOULD CHANGE: Legal pages and company policies",
+  "FOOTER": {
+    "show_footer": true,
+    "_comment_show_footer": "🟢 OPTIONAL: Usually true for compliance",
+    "copyright_text": "© {CURRENT_YEAR} {COMPANY_NAME}. All rights reserved.",
+    "_comment_copyright_text": "🟢 OPTIONAL: Auto-generated, but can customize text",
+    "links": [
+      {
+        "label": "Privacy Policy",
+        "_comment_privacy": "🔴 MUST CHANGE: Real privacy policy URL",
+        "url": "/privacy-policy",
+        "external": false
+      },
+      {
+        "label": "Terms of Service",
+        "_comment_terms": "🔴 MUST CHANGE: Real terms of service URL",
+        "url": "/terms-of-service",
+        "external": false
+      },
+      {
+        "label": "Contact",
+        "_comment_contact": "🟢 OPTIONAL: Contact page URL",
+        "url": "/contact",
+        "external": false
+      }
+    ],
+    "show_version": true,
+    "_comment_show_version": "🟢 OPTIONAL: Show version in footer",
+    "show_powered_by": false,
+    "_comment_powered_by": "🟢 OPTIONAL: Usually false for white-label solutions"
+  }
+} 
