@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-// Environment configuration
-const environment = {
-  apiUrl: 'http://localhost:8080/api'
-};
+import { environment } from 'shared-lib';
 
 export interface Document {
   id?: number;
@@ -53,7 +49,7 @@ export interface DocumentCreateRequest {
   providedIn: 'root'
 })
 export class DocumentService {
-  private baseUrl = `${environment.apiUrl}/documents`;
+  private baseUrl = `${environment.infraCoreUrl}/documents`;
 
   constructor(private http: HttpClient) {}
 

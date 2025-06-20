@@ -40,6 +40,7 @@ export interface UpdateUserRequest {
   lastName: string;
   phoneNumber?: string;
   address?: string;
+  role?: string;
 }
 
 @Injectable({
@@ -56,6 +57,14 @@ export class AdminService {
 
   getAllLawyers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/lawyers`);
+  }
+
+  getAllClerks(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/clerks`);
+  }
+
+  getAllLegalStaff(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/legal-staff`);
   }
 
   createUser(userData: CreateUserRequest): Observable<any> {

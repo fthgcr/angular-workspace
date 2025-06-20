@@ -28,6 +28,9 @@ export class RedirectGuard implements CanActivate {
       case 'LAWYER':
         this.router.navigate(['/admin']);
         break;
+      case 'CLERK':
+        this.router.navigate(['/admin']);
+        break;
       case 'USER':
       case 'CLIENT':
         this.router.navigate(['/client']);

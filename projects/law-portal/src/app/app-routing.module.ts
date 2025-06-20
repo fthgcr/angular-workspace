@@ -32,12 +32,12 @@ export const routes: Routes = [
     data: { roles: ['USER', 'CLIENT'] } 
   },
   
-  // Admin Dashboard - ADMIN ve LAWYER rolleri erişebilir, CLIENT/USER kısıtlaması uygulanır
+  // Admin Dashboard - ADMIN, LAWYER ve CLERK rolleri erişebilir, CLIENT/USER kısıtlaması uygulanır
   { 
     path: 'admin', 
     loadChildren: () => import('./features/admin-dashboard/admin-dashboard.module').then(m => m.AdminDashboardModule),
     canActivate: [AuthGuard, RoleGuard, ClientRestrictionGuard], 
-    data: { roles: ['ADMIN', 'LAWYER'] } 
+    data: { roles: ['ADMIN', 'LAWYER', 'CLERK'] } 
   },
   
   // User Dashboard - USER rolü için (Client component'ine redirect edecek)

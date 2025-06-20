@@ -4,15 +4,15 @@
     <div class="header-content">
       <h1 class="page-title">
         <i class="pi pi-briefcase"></i>
-        Avukat Yönetimi
+        Hukuk Personeli Yönetimi
       </h1>
       <p class="page-description">
-        Sistemdeki avukatları görüntüleyin, düzenleyin ve yeni avukat ekleyin.
+        Sistemdeki avukat ve katipleri görüntüleyin, düzenleyin ve yeni personel ekleyin.
       </p>
     </div>
     <div class="header-actions">
       <p-button 
-        label="Yeni Avukat Ekle" 
+        label="Yeni Personel Ekle" 
         icon="pi pi-plus" 
         (onClick)="openNewUserDialog()"
         styleClass="p-button-success">
@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <!-- Lawyers Table -->
+  <!-- Legal Staff Table -->
   <div class="table-container">
     <p-table 
       [value]="users" 
@@ -38,14 +38,14 @@
         <div class="table-header">
           <span class="table-title">
             <i class="pi pi-users"></i>
-            Avukatlar ({{users.length}})
+            Hukuk Personeli ({{users.length}})
           </span>
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
             <input 
               pInputText 
               type="text" 
-              placeholder="Avukat ara..." 
+              placeholder="Personel ara..." 
               (input)="dt.filterGlobal($any($event.target).value, 'contains')">
           </span>
         </div>
@@ -63,6 +63,7 @@
           <th pSortableColumn="email">
             E-posta <p-sortIcon field="email"></p-sortIcon>
           </th>
+          <th>Rol</th>
           <th>Telefon</th>
           <th>Durum</th>
           <th>İşlemler</th>
@@ -85,6 +86,12 @@
             <span class="email">{{user.email}}</span>
           </td>
           <td>
+            <p-tag 
+              [value]="getUserRoleDisplay(user)" 
+              [severity]="user.roles?.includes('LAWYER') ? 'info' : 'secondary'">
+            </p-tag>
+          </td>
+          <td>
             <span class="phone">{{user.phoneNumber || '-'}}</span>
           </td>
           <td>
@@ -103,6 +110,7 @@
                 (onClick)="editUser(user)">
               </p-button>
               <p-button 
+                *ngIf="isAdmin()"
                 icon="pi pi-trash" 
                 styleClass="p-button-rounded p-button-text p-button-danger"
                 pTooltip="Devre Dışı Bırak"
@@ -117,11 +125,11 @@
       <!-- Empty State -->
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="6" class="empty-state">
+          <td colspan="7" class="empty-state">
             <div class="empty-content">
               <i class="pi pi-users empty-icon"></i>
-              <h3>Henüz avukat bulunmuyor</h3>
-              <p>Sisteme ilk avukatı eklemek için "Yeni Avukat Ekle" butonunu kullanın.</p>
+              <h3>Henüz hukuk personeli bulunmuyor</h3>
+              <p>Sisteme ilk personeli eklemek için "Yeni Personel Ekle" butonunu kullanın.</p>
             </div>
           </td>
         </tr>
@@ -132,7 +140,7 @@
   <!-- Add/Edit Dialog -->
   <p-dialog 
     [(visible)]="showDialog" 
-    [header]="isEditMode ? 'Avukat Düzenle' : 'Yeni Avukat Ekle'"
+    [header]="isEditMode ? 'Personel Düzenle' : 'Yeni Personel Ekle'"
     [modal]="true" 
     [closable]="true"
     [draggable]="false"
@@ -154,6 +162,24 @@
             placeholder="Kullanıcı adını giriniz">
           <small class="error-message" *ngIf="isFieldInvalid('username')">
             {{getFieldError('username')}}
+          </small>
+        </div>
+
+        <!-- Role Selection -->
+        <div class="form-field">
+          <label for="role">Rol *</label>
+          <p-dropdown 
+            id="role"
+            formControlName="role"
+            [options]="roleOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Rol seçiniz"
+            [class.ng-invalid]="isFieldInvalid('role')"
+            styleClass="w-full">
+          </p-dropdown>
+          <small class="error-message" *ngIf="isFieldInvalid('role')">
+            {{getFieldError('role')}}
           </small>
         </div>
 
@@ -327,9 +353,6 @@
             [rows]="3">
           </textarea>
         </div>
-
-        <!-- Role (Hidden but always LAWYER) -->
-        <input type="hidden" formControlName="role">
       </div>
     </form>
 

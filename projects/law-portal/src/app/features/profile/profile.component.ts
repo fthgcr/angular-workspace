@@ -131,6 +131,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
         return 'badge-admin';
       case 'LAWYER':
         return 'badge-lawyer';
+      case 'CLERK':
+        return 'badge-clerk';
       case 'USER':
         return 'badge-user';
       default:

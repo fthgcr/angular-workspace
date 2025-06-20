@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AdminService, User, Role } from '../../../core/services/admin.service';
+import { AuthService } from 'shared-lib';
 
 @Component({
   selector: 'app-admin-lawyers',
@@ -22,11 +23,18 @@ export class AdminLawyersComponent implements OnInit {
   
   userForm: FormGroup;
 
+  // Role options for dropdown
+  roleOptions = [
+    { label: 'Avukat', value: 'LAWYER' },
+    { label: 'Katip', value: 'CLERK' }
+  ];
+
   constructor(
     private adminService: AdminService,
     private fb: FormBuilder,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private authService: AuthService
   ) {
     this.userForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(4)]],
@@ -47,20 +55,20 @@ export class AdminLawyersComponent implements OnInit {
 
   loadUsers(): void {
     this.loading = true;
-    console.log('Loading lawyers...');
-    this.adminService.getAllLawyers().subscribe({
+    console.log('Loading legal staff...');
+    this.adminService.getAllLegalStaff().subscribe({
       next: (users: User[]) => {
-        console.log('Received lawyers:', users);
-        console.log('Number of lawyers:', users.length);
+        console.log('Received legal staff:', users);
+        console.log('Number of legal staff:', users.length);
         this.users = users;
         this.loading = false;
       },
       error: (error: any) => {
-        console.error('Error loading lawyers:', error);
+        console.error('Error loading legal staff:', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Hata',
-          detail: 'Avukatlar yüklenirken hata oluştu'
+          detail: 'Hukuk personeli yüklenirken hata oluştu'
         });
         this.loading = false;
       }
@@ -91,6 +99,15 @@ export class AdminLawyersComponent implements OnInit {
   editUser(user: User): void {
     this.isEditMode = true;
     this.selectedUser = user;
+    
+    // Get the user's current role (prioritize LAWYER if they have multiple roles)
+    let currentRole = 'LAWYER';
+    if (user.roles && user.roles.length > 0) {
+      if (user.roles.includes('CLERK') && !user.roles.includes('LAWYER')) {
+        currentRole = 'CLERK';
+      }
+    }
+    
     this.userForm.patchValue({
       username: user.username,
       email: user.email,
@@ -99,7 +116,7 @@ export class AdminLawyersComponent implements OnInit {
       phoneNumber: user.phoneNumber,
       address: user.address,
       password: '', // Şifre alanını boş bırak
-      role: 'LAWYER' // Always set to LAWYER for this page
+      role: currentRole
     });
     this.userForm.get('password')?.clearValidators();
     this.userForm.get('password')?.updateValueAndValidity();
@@ -112,6 +129,7 @@ export class AdminLawyersComponent implements OnInit {
   saveUser(): void {
     if (this.userForm.valid) {
       const formData = this.userForm.value;
+      const roleLabel = this.getRoleLabel(formData.role);
       
       if (this.isEditMode && this.selectedUser) {
         // Update user
@@ -120,7 +138,7 @@ export class AdminLawyersComponent implements OnInit {
             this.messageService.add({
               severity: 'success',
               summary: 'Başarılı',
-              detail: 'Avukat başarıyla güncellendi'
+              detail: `${roleLabel} başarıyla güncellendi`
             });
             this.loadUsers();
             this.hideDialog();
@@ -130,7 +148,7 @@ export class AdminLawyersComponent implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Hata',
-              detail: error.error?.error || 'Avukat güncellenirken hata oluştu'
+              detail: error.error?.error || `${roleLabel} güncellenirken hata oluştu`
             });
           }
         });
@@ -141,7 +159,7 @@ export class AdminLawyersComponent implements OnInit {
             this.messageService.add({
               severity: 'success',
               summary: 'Başarılı',
-              detail: 'Yeni avukat başarıyla eklendi'
+              detail: `Yeni ${roleLabel.toLowerCase()} başarıyla eklendi`
             });
             this.loadUsers();
             this.hideDialog();
@@ -151,7 +169,7 @@ export class AdminLawyersComponent implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Hata',
-              detail: error.error?.error || 'Avukat eklenirken hata oluştu'
+              detail: error.error?.error || `${roleLabel} eklenirken hata oluştu`
             });
           }
         });
@@ -162,9 +180,13 @@ export class AdminLawyersComponent implements OnInit {
   }
 
   deactivateUser(user: User): void {
+    const userRole = this.getUserRoleDisplay(user);
+    const roleForMessage = user.roles?.includes('LAWYER') ? 'Avukat' : 
+                          user.roles?.includes('CLERK') ? 'Katip' : 'Kullanıcı';
+    
     this.confirmationService.confirm({
-      message: `"${user.username}" adlı avukatı devre dışı bırakmak istediğinizden emin misiniz? Bu işlem geri alınabilir.`,
-      header: 'Avukatı Devre Dışı Bırak',
+      message: `"${user.username}" adlı ${roleForMessage.toLowerCase()}yı devre dışı bırakmak istediğinizden emin misiniz? Bu işlem geri alınabilir.`,
+      header: `${roleForMessage}yı Devre Dışı Bırak`,
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Evet, Devre Dışı Bırak',
       rejectLabel: 'İptal',
@@ -174,7 +196,7 @@ export class AdminLawyersComponent implements OnInit {
             this.messageService.add({
               severity: 'success',
               summary: 'Başarılı',
-              detail: 'Avukat başarıyla devre dışı bırakıldı'
+              detail: `${roleForMessage} başarıyla devre dışı bırakıldı`
             });
             this.loadUsers();
           },
@@ -183,7 +205,7 @@ export class AdminLawyersComponent implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Hata',
-              detail: 'Avukat devre dışı bırakılırken hata oluştu'
+              detail: `${roleForMessage} devre dışı bırakılırken hata oluştu`
             });
           }
         });
@@ -209,14 +231,33 @@ export class AdminLawyersComponent implements OnInit {
 
   getUserRoleDisplay(user: User): string {
     if (user.roles && user.roles.length > 0) {
-      return user.roles.join(', ');
+      return user.roles.map(role => this.getRoleLabel(role)).join(', ');
     }
     return 'Rol Yok';
+  }
+
+  getRoleLabel(role: string): string {
+    switch (role) {
+      case 'LAWYER':
+        return 'Avukat';
+      case 'CLERK':
+        return 'Katip';
+      case 'ADMIN':
+        return 'Admin';
+      case 'USER':
+        return 'Kullanıcı';
+      default:
+        return role;
+    }
   }
 
   isFieldInvalid(fieldName: string): boolean {
     const field = this.userForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  isAdmin(): boolean {
+    return this.authService.getCurrentRole() === 'ADMIN';
   }
 
   getFieldError(fieldName: string): string {

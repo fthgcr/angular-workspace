@@ -3,6 +3,7 @@ import { AuthService } from 'shared-lib';
 import { MenuItem } from 'primeng/api';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DashboardService, DashboardStats, ClientStatusSummary, CaseTypeDistribution, CaseStatusDistribution, RecentActivity, ActivityType } from '../../core/services/dashboard.service';
+import { EventService } from '../../core/services/event.service';
 import { LanguageService } from '../../services/language.service';
 import { Subscription } from 'rxjs';
 
@@ -40,27 +41,32 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private dashboardService: DashboardService,
+    private eventService: EventService,
     private languageService: LanguageService
   ) { }
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
-    this.initializeMenu();
     this.loadDashboardStats();
+    this.initializeMenu();
     
-    // Check for query parameters to set active tab
-    this.subscriptions.add(
-      this.route.queryParams.subscribe(params => {
-        if (params['tab']) {
-          this.switchTab(params['tab']);
-        }
-      })
-    );
-    
-    // Subscribe to language changes
+    // Query parameters'dan tab bilgisini al
+    this.route.queryParams.subscribe(params => {
+      this.activeTab = params['tab'] || 'overview';
+    });
+
+    // Language changes subscription
     this.subscriptions.add(
       this.languageService.currentLanguage$.subscribe(() => {
-        this.initializeMenu(); // Refresh menu items when language changes
+        this.initializeMenu();
+      })
+    );
+
+    // Subscribe to dashboard refresh events
+    this.subscriptions.add(
+      this.eventService.dashboardRefresh$.subscribe(() => {
+        console.log('Dashboard refresh event received, reloading stats...');
+        this.loadDashboardStats();
       })
     );
   }
@@ -72,6 +78,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   loadDashboardStats(): void {
     this.loading = true;
     
+    console.log('=== LOADING DASHBOARD STATS ===');
+    
     // Load all dashboard data in parallel
     Promise.all([
       this.dashboardService.getDashboardStats().toPromise(),
@@ -80,13 +88,39 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       this.dashboardService.getCaseStatusDistribution().toPromise(),
       this.dashboardService.getRecentActivities().toPromise()
     ]).then(([stats, clientStatus, caseTypes, caseStatus, activities]) => {
+      console.log('Dashboard API Response:', {
+        stats,
+        clientStatus,
+        caseTypes,
+        caseStatus,
+        activities
+      });
+
       // Main stats
       if (stats) {
+        console.log('Setting dashboard stats:', {
+          totalClients: stats.totalClients,
+          monthlyNewClients: stats.monthlyNewClients,
+          clientGrowthPercentage: stats.clientGrowthPercentage,
+          activeCases: stats.activeCases,
+          totalDocuments: stats.totalDocuments
+        });
+
         this.totalClients = stats.totalClients;
         this.monthlyNewClients = stats.monthlyNewClients;
         this.clientGrowthPercentage = stats.clientGrowthPercentage;
         this.totalCases = stats.activeCases; // Showing active cases instead of total
         this.totalDocuments = stats.totalDocuments;
+
+        console.log('Component values after setting:', {
+          totalClients: this.totalClients,
+          monthlyNewClients: this.monthlyNewClients,
+          clientGrowthPercentage: this.clientGrowthPercentage,
+          totalCases: this.totalCases,
+          totalDocuments: this.totalDocuments
+        });
+      } else {
+        console.warn('Stats is null or undefined!');
       }
 
       // Client status summary
@@ -102,6 +136,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       this.recentActivities = activities || [];
 
       this.loading = false;
+      console.log('=== DASHBOARD STATS LOADED ===');
     }).catch((error) => {
       console.error('Error loading dashboard stats:', error);
       this.loading = false;
@@ -141,6 +176,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const menuItem = this.menuItems.find(item => item.id === tab);
     if (menuItem) {
       this.activeMenuItem = menuItem;
+    }
+    
+    // Overview tab'ına geçildiğinde dashboard'ı yenile
+    if (tab === 'overview') {
+      console.log('Switching to overview tab, refreshing dashboard...');
+      this.loadDashboardStats();
     }
   }
 

@@ -47,6 +47,9 @@ export class RoleGuard implements CanActivate {
       case 'LAWYER':
         this.router.navigate(['/admin']);
         break;
+      case 'CLERK':
+        this.router.navigate(['/admin']); // Katip de admin paneline erişebilir
+        break;
       case 'USER':
       case 'CLIENT':
         this.router.navigate(['/client']); // USER ve CLIENT sadece /client'e erişebilir

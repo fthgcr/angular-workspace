@@ -228,6 +228,7 @@
                   tooltipPosition="top"
                 ></p-button>
                 <p-button 
+                  *ngIf="isAdmin()"
                   icon="pi pi-trash" 
                   styleClass="p-button-rounded p-button-text p-button-danger"
                   (click)="deleteCase(caseItem)"

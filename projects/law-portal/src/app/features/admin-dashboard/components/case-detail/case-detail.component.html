@@ -188,6 +188,7 @@
                   [pTooltip]="translate('button.download')">
                 </p-button>
                 <p-button 
+                  *ngIf="isAdmin()"
                   icon="pi pi-trash" 
                   severity="danger"
                   [text]="true"

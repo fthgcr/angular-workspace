@@ -7,6 +7,7 @@ import { Document, DocumentType, DocumentService, DocumentCreateRequest } from '
 import { catchError, finalize } from 'rxjs/operators';
 import { of, Subscription } from 'rxjs';
 import { LanguageService } from '../../../../services/language.service';
+import { AuthService } from 'shared-lib';
 
 @Component({
   selector: 'app-case-detail',
@@ -39,7 +40,8 @@ export class CaseDetailComponent implements OnInit, OnDestroy {
     private caseService: CaseService,
     private documentService: DocumentService,
     private languageService: LanguageService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {
     this.uploadForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -50,6 +52,10 @@ export class CaseDetailComponent implements OnInit, OnDestroy {
 
   translate(key: string): string {
     return this.languageService.translate(key);
+  }
+
+  isAdmin(): boolean {
+    return this.authService.getCurrentRole() === 'ADMIN';
   }
 
   ngOnInit(): void {

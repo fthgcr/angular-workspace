@@ -49,7 +49,8 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<JwtAuthenticationResponse> {
-    const url = `${environment.infraCoreUrl}/auth/login`;
+    // Use aslaw login endpoint for law-specific role handling
+    const url = `${environment.aslawUrl}/law/auth/login`;
     console.log('Login URL:', url);
     console.log('Credentials:', credentials);
     

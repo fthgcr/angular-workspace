@@ -221,6 +221,11 @@
     color: white;
   }
 
+  &.badge-clerk {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+  }
+
   &.badge-user {
     background: linear-gradient(135deg, #3498db, #2980b9);
     color: white;

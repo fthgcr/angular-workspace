@@ -56,7 +56,7 @@ export class ClientRestrictionGuard implements CanActivate {
       return false;
     }
 
-    // For ADMIN and LAWYER roles, allow access to all routes
+    // For ADMIN, LAWYER, and CLERK roles, allow access to all routes
     return true;
   }
 } 

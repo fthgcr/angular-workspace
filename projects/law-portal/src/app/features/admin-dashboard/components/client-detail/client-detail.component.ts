@@ -4,8 +4,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Client, ClientService } from '../../../../core/services/client.service';
 import { Case, CaseStatus, CaseType, CaseService, CaseCreateRequest } from '../../../../core/services/case.service';
+import { EventService } from '../../../../core/services/event.service';
 import { LanguageService } from '../../../../services/language.service';
 import { Subscription } from 'rxjs';
+import { AuthService } from 'shared-lib';
 
 @Component({
   selector: 'app-client-detail',
@@ -39,8 +41,10 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private clientService: ClientService,
     private caseService: CaseService,
+    private eventService: EventService,
     private languageService: LanguageService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {
     this.caseForm = this.fb.group({
       caseNumber: ['', [Validators.required]],
@@ -54,6 +58,10 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
 
   translate(key: string): string {
     return this.languageService.translate(key);
+  }
+
+  isAdmin(): boolean {
+    return this.authService.getCurrentRole() === 'ADMIN';
   }
 
   ngOnInit(): void {
@@ -125,7 +133,12 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
           this.clientCases = cases
             .map(c => this.createSafeCaseFromResponse(c))
             .sort((a, b) => new Date(b.filingDate).getTime() - new Date(a.filingDate).getTime()); // Descending by filing date
+          
+          console.log('Cases loaded successfully:', this.clientCases.length);
           this.loading = false;
+          
+          // Change detection'ı zorla
+          this.cdr.detectChanges();
         } catch (processingError) {
           console.error('Error processing cases response:', processingError);
           // Fallback: Basit mapping
@@ -142,7 +155,9 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
               updatedDate: c.updatedDate ? new Date(c.updatedDate) : undefined
             }))
             .sort((a, b) => new Date(b.filingDate).getTime() - new Date(a.filingDate).getTime());
+          
           this.loading = false;
+          this.cdr.detectChanges();
         }
       },
       error: (error) => {
@@ -153,6 +168,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
           detail: this.translate('error.loading.cases') || 'Davalar yüklenirken bir hata oluştu'
         });
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -270,69 +286,32 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
         // Update existing case
         this.caseService.updateCase(this.editingCase.id!, formData).subscribe({
           next: (updatedCase) => {
-            // Backend response'ını ignore et, kendi verilerimizi kullan
-            console.log('Case update successful, ignoring response due to lazy loading issues');
-            
-            // Form verilerini kullanarak local update yap
-            const index = this.clientCases.findIndex(c => c.id === this.editingCase!.id);
-            if (index !== -1) {
-              // Mevcut case'i form verileriyle güncelle
-              this.clientCases[index] = {
-                ...this.clientCases[index], // Mevcut veriyi koru
-                caseNumber: formData.caseNumber,
-                title: formData.title,
-                description: formData.description,
-                status: formData.status,
-                type: formData.type,
-                filingDate: new Date(formData.filingDate),
-                updatedDate: new Date() // Şu anki zamanı set et
-              };
-            }
-            
+            console.log('Case update successful');
             this.messageService.add({
               severity: 'success',
               summary: this.translate('success'),
               detail: this.translate('case.updated.successfully')
             });
-            this.showCaseDialog = false;
-            this.caseForm.reset();
-            this.editingCase = null;
+            this.closeCaseDialog();
+            // Liste yenilemeyi garanti etmek için loadClientCases çağır
             this.loadClientCases(this.clientId);
-            
-            // Veriyi yeniden yükle (opsiyonel, performans için kaldırılabilir)
-            // this.loadClientCases(this.clientId);
+            // Dashboard'ı güncelle
+            this.eventService.caseUpdated(updatedCase);
           },
           error: (error) => {
             console.error('Error updating case:', error);
             
-            // Eğer hata lazy loading ile ilgiliyse ve status 200 ise başarılı say
-            if (error.status === 200 || (error.message && error.message.includes('Could not write JSON'))) {
+            // Lazy loading hata kontrolü - status 200 ise başarılı say
+            if (error.status === 200) {
               console.log('Update successful but response serialization failed, treating as success');
-              
-              // Form verilerini kullanarak local update yap
-              const index = this.clientCases.findIndex(c => c.id === this.editingCase!.id);
-              if (index !== -1) {
-                this.clientCases[index] = {
-                  ...this.clientCases[index],
-                  caseNumber: formData.caseNumber,
-                  title: formData.title,
-                  description: formData.description,
-                  status: formData.status,
-                  type: formData.type,
-                  filingDate: new Date(formData.filingDate),
-                  updatedDate: new Date()
-                };
-              }
-              
               this.messageService.add({
                 severity: 'success',
                 summary: this.translate('success'),
                 detail: this.translate('case.updated.successfully')
               });
-              this.showCaseDialog = false;
-              this.caseForm.reset();
-              this.editingCase = null;
+              this.closeCaseDialog();
               this.loadClientCases(this.clientId);
+              this.eventService.caseUpdated(formData);
             } else {
               // Gerçek hata durumu
               this.messageService.add({
@@ -347,81 +326,32 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
         // Create new case
         this.caseService.createCase(formData).subscribe({
           next: (newCase) => {
-            // Backend response'ını ignore et, kendi verilerimizi kullan
-            console.log('Case create successful, ignoring response due to lazy loading issues');
-            
-            // Form verilerini kullanarak yeni case oluştur
-            const caseWithDate = {
-              id: Math.floor(Math.random() * 1000000), // Random temporary ID
-              caseNumber: formData.caseNumber,
-              title: formData.title,
-              description: formData.description,
-              status: formData.status,
-              type: formData.type,
-              filingDate: new Date(formData.filingDate),
-              createdDate: new Date(),
-              updatedDate: new Date(),
-              client: this.client ? {
-                id: this.client.id!,
-                firstName: this.client.firstName,
-                lastName: this.client.lastName,
-                email: this.client.email,
-                phoneNumber: this.client.phoneNumber,
-                address: this.client.address
-              } : undefined
-            };
-            
-            this.clientCases.unshift(caseWithDate); // Add to beginning for descending order
+            console.log('Case create successful');
             this.messageService.add({
               severity: 'success',
               summary: this.translate('success'),
               detail: this.translate('case.added.successfully')
             });
-            this.showCaseDialog = false;
-            this.caseForm.reset();
-            this.editingCase = null;
-            
-            // Liste zaten güncellendi, yeniden yükleme yapmaya gerek yok
-            console.log('New case added to list, total cases:', this.clientCases.length);
+            this.closeCaseDialog();
+            // Liste yenilemeyi garanti etmek için loadClientCases çağır
+            this.loadClientCases(this.clientId);
+            // Dashboard'ı güncelle
+            this.eventService.caseCreated(newCase);
           },
           error: (error) => {
             console.error('Error creating case:', error);
             
-            // Eğer hata lazy loading ile ilgiliyse ve status 200 ise başarılı say
-            if (error.status === 200 || (error.message && error.message.includes('Could not write JSON'))) {
+            // Lazy loading hata kontrolü - status 200 ise başarılı say
+            if (error.status === 200) {
               console.log('Create successful but response serialization failed, treating as success');
-              
-              // Form verilerini kullanarak yeni case oluştur
-              const caseWithDate = {
-                id: Date.now(), // Temporary ID
-                caseNumber: formData.caseNumber,
-                title: formData.title,
-                description: formData.description,
-                status: formData.status,
-                type: formData.type,
-                filingDate: new Date(formData.filingDate),
-                createdDate: new Date(),
-                updatedDate: new Date(),
-                client: this.client ? {
-                  id: this.client.id!,
-                  firstName: this.client.firstName,
-                  lastName: this.client.lastName,
-                  email: this.client.email,
-                  phoneNumber: this.client.phoneNumber,
-                  address: this.client.address
-                } : undefined
-              };
-              
-              this.clientCases.unshift(caseWithDate);
               this.messageService.add({
                 severity: 'success',
                 summary: this.translate('success'),
                 detail: this.translate('case.added.successfully')
               });
-              this.showCaseDialog = false;
-              this.caseForm.reset();
-              this.editingCase = null;
+              this.closeCaseDialog();
               this.loadClientCases(this.clientId);
+              this.eventService.caseCreated(formData);
             } else {
               // Gerçek hata durumu
               this.messageService.add({
@@ -433,7 +363,6 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
           }
         });
       }
-      
     } else {
       this.messageService.add({
         severity: 'warn',
@@ -441,10 +370,9 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
         detail: this.translate('please.fill.required.fields')
       });
     }
-    
   }
 
-  cancelCaseDialog(): void {
+  private closeCaseDialog(): void {
     this.showCaseDialog = false;
     this.caseForm.reset();
     this.editingCase = null;
@@ -533,5 +461,9 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
         email: caseData.assignedUser.email || ''
       } : undefined
     };
+  }
+
+  cancelCaseDialog(): void {
+    this.closeCaseDialog();
   }
 } 

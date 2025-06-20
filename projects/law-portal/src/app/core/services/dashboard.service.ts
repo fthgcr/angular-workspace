@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-// Environment configuration
-const environment = {
-  apiUrl: 'http://localhost:8080/api'
-};
+import { environment } from 'shared-lib';
 
 export interface DashboardStats {
   totalClients: number;
@@ -89,7 +85,7 @@ export enum ActivityType {
   providedIn: 'root'
 })
 export class DashboardService {
-  private baseUrl = `${environment.apiUrl}/dashboard`;
+  private baseUrl = `${environment.infraCoreUrl}/dashboard`;
 
   constructor(private http: HttpClient) { }
 

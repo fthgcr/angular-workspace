@@ -78,10 +78,22 @@ export class LoginComponent implements OnInit {
           }, 1500);
         },
         error: (error) => {
+          console.log('Login error:', error);
+          
+          let errorMessage = this.t('login.invalid_credentials');
+          
+          // Check if error response has messageKey for translation
+          if (error.error?.messageKey) {
+            errorMessage = this.t(error.error.messageKey);
+          } else if (error.error?.message) {
+            // Use the message from backend if no messageKey
+            errorMessage = error.error.message;
+          }
+          
           this.messageService.add({
             severity: 'error',
             summary: this.t('login.login_failed'),
-            detail: error.error?.message || this.t('login.invalid_credentials')
+            detail: errorMessage
           });
           this.loading = false;
         },

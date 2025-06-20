@@ -80,14 +80,14 @@ export class TopbarComponent implements OnInit, OnDestroy {
         label: this.translate('panel'), 
         icon: 'pi pi-home', 
         route: this.getDashboardRoute(),
-        roles: ['USER', 'LAWYER', 'ADMIN']
+        roles: ['USER', 'LAWYER', 'CLERK', 'ADMIN']
       }
       /*,
       { 
         label: 'Cases', 
         icon: 'pi pi-briefcase', 
         route: '/cases',
-        roles: ['USER', 'LAWYER', 'ADMIN']
+        roles: ['USER', 'LAWYER', 'CLERK', 'ADMIN']
       } */
     ];
 
@@ -95,7 +95,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     if (this.currentRole === 'ADMIN' || this.currentRole === 'LAWYER') {
       baseItems.push(
         { 
-          label: this.translate('lawyers'), 
+          label: 'Hukuk Personeli', 
           icon: 'pi pi-users', 
           route: '/admin/lawyers',
           roles: ['ADMIN']
@@ -105,7 +105,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
           label: 'Reports', 
           icon: 'pi pi-chart-bar', 
           route: '/admin/reports',
-          roles: ['ADMIN', 'LAWYER']
+          roles: ['ADMIN', 'LAWYER', 'CLERK']
         } */
       );
     }
@@ -145,6 +145,8 @@ export class TopbarComponent implements OnInit, OnDestroy {
       case 'ADMIN':
         return '/admin';
       case 'LAWYER':
+        return '/admin';
+      case 'CLERK':
         return '/admin';
       case 'USER':
       default:

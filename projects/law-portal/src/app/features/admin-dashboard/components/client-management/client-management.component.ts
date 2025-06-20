@@ -4,7 +4,9 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ClientService, Client } from '../../../../core/services/client.service';
+import { EventService } from '../../../../core/services/event.service';
 import { LanguageService } from '../../../../services/language.service';
+import { AuthService, environment } from 'shared-lib';
 
 @Component({
   selector: 'app-client-management',
@@ -39,7 +41,9 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
     private elementRef: ElementRef,
     private renderer: Renderer2,
     private clientService: ClientService,
-    private languageService: LanguageService
+    private eventService: EventService,
+    private languageService: LanguageService,
+    private authService: AuthService
   ) {
     this.clientForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -50,7 +54,8 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
       phoneNumber: [''],
       address: [''],
       notes: [''],
-      enabled: [true]
+      enabled: [true], // hesap kullanılabilir mi
+      active: [true] // is_active kolonu için - login kontrolü
     });
 
     // Watch for firstName and lastName changes to auto-generate username
@@ -201,6 +206,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
     this.editingClient = null;
     this.clientForm.reset({
       enabled: true,
+      active: true,
       password: '123456'
     });
     // Yeni kullanıcı eklerken password alanını etkinleştir
@@ -227,11 +233,9 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
 
   deleteClient(client: Client): void {
     this.confirmationService.confirm({
-      message: `${client.firstName} ${client.lastName} isimli müvekkili silmek istediğinizden emin misiniz?`,
-      header: 'Müvekkil Sil',
+      message: `${client.firstName} ${client.lastName} müvekkilini silmek istediğinizden emin misiniz?`,
+      header: 'Silme Onayı',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Evet',
-      rejectLabel: 'Hayır',
       accept: () => {
         this.clientService.deleteClient(client.id!).subscribe({
           next: () => {
@@ -239,15 +243,16 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
             this.messageService.add({
               severity: 'success',
               summary: 'Başarılı',
-              detail: 'Müvekkil başarıyla silindi'
+              detail: 'Müvekkil silindi'
             });
+            this.eventService.clientDeleted(client.id);
           },
           error: (error) => {
             console.error('Error deleting client:', error);
             this.messageService.add({
               severity: 'error',
               summary: 'Hata',
-              detail: error.error?.error || 'Müvekkil silinirken bir hata oluştu'
+              detail: 'Müvekkil silinirken bir hata oluştu'
             });
           }
         });
@@ -275,6 +280,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
             this.showDialog = false;
             this.clientForm.reset();
             this.editingClient = null;
+            this.eventService.clientUpdated(updatedClient);
           },
           error: (error) => {
             console.error('Error updating client:', error);
@@ -297,6 +303,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
             });
             this.showDialog = false;
             this.clientForm.reset();
+            this.eventService.clientCreated(newClient);
           },
           error: (error) => {
             console.error('Error creating client:', error);
@@ -308,6 +315,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
           }
         });
       }
+      
     } else {
       this.messageService.add({
         severity: 'warn',
@@ -315,6 +323,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
         detail: 'Lütfen gerekli alanları doldurun'
       });
     }
+    
   }
 
   cancelDialog(): void {
@@ -456,7 +465,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
     console.log('Client ID:', this.editingClient.id);
     console.log('New Password:', newPassword);
     console.log('Update Data:', updateData);
-    console.log('API URL will be:', `http://localhost:8080/api/clients/${this.editingClient.id}`);
+    console.log('API URL will be:', `${environment.infraCoreUrl}/clients/${this.editingClient.id}`);
 
     this.clientService.updateClient(this.editingClient.id!, updateData).subscribe({
       next: (updatedClient) => {
@@ -477,6 +486,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
           summary: 'Başarılı',
           detail: 'Şifre başarıyla güncellendi'
         });
+        this.eventService.clientUpdated(updatedClient);
       },
       error: (error) => {
         console.error('Error updating password:', error);
@@ -498,6 +508,10 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
 
   translate(key: string): string {
     return this.languageService.translate(key);
+  }
+
+  isAdmin(): boolean {
+    return this.authService.getCurrentRole() === 'ADMIN';
   }
 
   private updateStatusOptions(): void {

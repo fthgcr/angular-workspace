@@ -173,8 +173,8 @@
           </td>
           <td>
             <p-tag 
-              [value]="client.enabled ? translate('active.status') : translate('inactive.status')" 
-              [severity]="client.enabled ? 'success' : 'danger'"
+              [value]="client.active ? translate('active.status') : translate('inactive.status')" 
+              [severity]="client.active ? 'success' : 'danger'"
             ></p-tag>
           </td>
           <td>{{ client.createdDate | date:'dd/MM/yyyy' }}</td>
@@ -195,6 +195,7 @@
                 tooltipPosition="top"
               ></p-button>
               <p-button 
+                *ngIf="isAdmin()"
                 icon="pi pi-trash" 
                 styleClass="p-button-rounded p-button-text p-button-danger"
                 (click)="deleteClient(client)"
@@ -476,15 +477,15 @@
               class="w-full"
             ></textarea>
           </div>
-          
+          <br>
           <div class="form-group">
             <div class="checkbox-wrapper">
               <p-checkbox 
-                formControlName="enabled" 
+                formControlName="active" 
                 [binary]="true" 
-                inputId="enabled"
+                inputId="active"
               ></p-checkbox>
-              <label for="enabled">Hesap aktif</label>
+              <label for="active">&nbsp;Hesap aktif (Login kontrolü)</label>
             </div>
           </div>
         </div>

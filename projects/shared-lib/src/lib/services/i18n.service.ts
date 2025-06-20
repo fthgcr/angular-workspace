@@ -40,6 +40,7 @@ export class I18nService {
       'login.validation_error': 'Doğrulama Hatası',
       'login.fill_required_fields': 'Lütfen tüm gerekli alanları doldurun',
       'login.invalid_credentials': 'Geçersiz kullanıcı adı veya şifre',
+      'login.account_inactive': 'Hesabınız aktif değil. Lütfen yönetici ile iletişime geçin.',
       'login.welcome_back_user': 'Tekrar hoş geldiniz',
       'login.logged_in_as': 'olarak giriş yapıldı',
       'login.redirecting': 'Yönlendiriliyor...',
@@ -90,7 +91,10 @@ export class I18nService {
 
       // Common
       'common.language': 'Dil',
-      'common.select_language': 'Dil Seçin'
+      'common.select_language': 'Dil Seçin',
+
+      // Error Messages
+      'error.generic': 'Beklenmeyen bir hata oluştu'
     },
     en: {
       // Login Page
@@ -112,6 +116,7 @@ export class I18nService {
       'login.validation_error': 'Validation Error',
       'login.fill_required_fields': 'Please fill in all required fields',
       'login.invalid_credentials': 'Invalid username or password',
+      'login.account_inactive': 'Your account is not active. Please contact administrator.',
       'login.welcome_back_user': 'Welcome back',
       'login.logged_in_as': 'Logged in as',
       'login.redirecting': 'Redirecting...',
@@ -162,7 +167,10 @@ export class I18nService {
 
       // Common
       'common.language': 'Language',
-      'common.select_language': 'Select Language'
+      'common.select_language': 'Select Language',
+
+      // Error Messages
+      'error.generic': 'An unexpected error occurred'
     }
   };
 
