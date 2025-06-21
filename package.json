@@ -7,7 +7,14 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:law-portal": "node dist/law-portal/server/server.mjs"
+    "serve:ssr:law-portal": "node dist/law-portal/server/server.mjs",
+    "build:shared-lib": "ng build shared-lib",
+    "build:law-portal": "ng build law-portal",
+    "build:law-portal:prod": "ng build law-portal --configuration production",
+    "build:law-portal:netlify": "ng build law-portal --configuration netlify",
+    "build:all": "npm run build:shared-lib && npm run build:law-portal:prod",
+    "build:netlify": "npm run build:shared-lib && npm run build:law-portal:netlify",
+    "deploy:netlify": "npm run build:netlify && echo 'Ready for Netlify deployment from dist/law-portal/browser'"
   },
   "private": true,
   "dependencies": {

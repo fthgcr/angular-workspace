@@ -60,7 +60,8 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/law-portal/src/favicon.ico",
-              "projects/law-portal/src/assets"
+              "projects/law-portal/src/assets",
+              "projects/law-portal/src/_redirects"
             ],
             "styles": [
               "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
@@ -89,7 +90,13 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "projects/law-portal/src/environments/environment.ts",
+                  "with": "projects/law-portal/src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -97,6 +104,31 @@
               "sourceMap": true,
               "ssr": false,
               "prerender": false
+            },
+            "netlify": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "ssr": false,
+              "prerender": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "20kb",
+                  "maximumError": "50kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/law-portal/src/environments/environment.ts",
+                  "with": "projects/law-portal/src/environments/environment.prod.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -131,7 +163,8 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/law-portal/src/favicon.ico",
-              "projects/law-portal/src/assets"
+              "projects/law-portal/src/assets",
+              "projects/law-portal/src/_redirects"
             ],
             "styles": [
               "projects/law-portal/src/styles.scss"

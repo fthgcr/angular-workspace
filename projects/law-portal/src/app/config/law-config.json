@@ -1,0 +1,58 @@
+{
+  "APP_TITLE": "ASLAW",
+  "APP_DESC": "Legal Management System",
+  "PAGE_TITLE": "ASLAW - Legal Management System",
+  "LOGO_ICON": "pi pi-balance-scale",
+  "COMPANY_NAME": "ASLAW Legal Solutions",
+  "VERSION": "2.0.0",
+  "COPYRIGHT": "© {CURRENT_YEAR} {COMPANY_NAME}. All rights reserved.",
+  "CONTACT_EMAIL": "info@aslaw.com",
+  "CONTACT_PHONE": "+90 (212) 555 01 23",
+  "SUPPORT_EMAIL": "support@aslaw.com",
+  "CAN_SIGN_UP": false,
+  "FORGOT_PASSWORD": true,
+  "THEME": {
+    "primary_color": "#1a365d",
+    "secondary_color": "#2c5282",
+    "gradient": {
+      "direction": "135deg",
+      "start_color": "#1a365d",
+      "end_color": "#2c5282",
+      "css_value": "linear-gradient(135deg, #1a365d 0%, #2c5282 100%)"
+    }
+  },
+  "FOOTER": {
+    "show_footer": true,
+    "copyright_text": "© {CURRENT_YEAR} {COMPANY_NAME}. All rights reserved.",
+    "links": [
+      {
+        "label": "Privacy Policy",
+        "url": "/privacy-policy",
+        "external": false
+      },
+      {
+        "label": "Terms of Service",
+        "url": "/terms-of-service",
+        "external": false
+      },
+      {
+        "label": "Contact",
+        "url": "/contact",
+        "external": false
+      }
+    ],
+    "show_version": true,
+    "show_powered_by": false
+  },
+  "API": {
+    "BASE_URL": "https://vibrant-dedication-production-125e.up.railway.app/api/api",
+    "ENDPOINTS": {
+      "AUTH": "/law/auth",
+      "CLIENTS": "/clients",
+      "CASES": "/cases",
+      "DOCUMENTS": "/documents",
+      "ADMIN": "/admin",
+      "DASHBOARD": "/dashboard"
+    }
+  }
+} 
