@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'shared-lib';
+import { environment } from '../../../environments/environment';
 
 export interface Client {
   id?: number;
@@ -40,7 +40,7 @@ export interface PageResponse<T> {
   providedIn: 'root'
 })
 export class ClientService {
-  private baseUrl = `${environment.infraCoreUrl}/clients`;
+  private baseUrl = `${environment.apiUrl}/clients`;
 
   constructor(private http: HttpClient) {}
 

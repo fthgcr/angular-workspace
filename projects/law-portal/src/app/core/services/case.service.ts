@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'shared-lib';
+import { environment } from '../../../environments/environment';
 
 export interface Case {
   id?: number;
@@ -62,7 +62,7 @@ export interface CaseCreateRequest {
   providedIn: 'root'
 })
 export class CaseService {
-  private baseUrl = `${environment.infraCoreUrl}/cases`;
+  private baseUrl = `${environment.apiUrl}/cases`;
 
   constructor(private http: HttpClient) {}
 

@@ -6,7 +6,8 @@ import { Subscription } from 'rxjs';
 import { ClientService, Client } from '../../../../core/services/client.service';
 import { EventService } from '../../../../core/services/event.service';
 import { LanguageService } from '../../../../services/language.service';
-import { AuthService, environment } from 'shared-lib';
+import { AuthService } from 'shared-lib';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-client-management',
@@ -465,7 +466,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
     console.log('Client ID:', this.editingClient.id);
     console.log('New Password:', newPassword);
     console.log('Update Data:', updateData);
-    console.log('API URL will be:', `${environment.infraCoreUrl}/clients/${this.editingClient.id}`);
+    console.log('API URL will be:', `${environment.apiUrl}/clients/${this.editingClient.id}`);
 
     this.clientService.updateClient(this.editingClient.id!, updateData).subscribe({
       next: (updatedClient) => {
