@@ -13,7 +13,8 @@
     "build:law-portal:prod": "ng build law-portal --configuration production",
     "build:law-portal:netlify": "ng build law-portal --configuration netlify",
     "build:all": "npm run build:shared-lib && npm run build:law-portal:prod",
-    "build:netlify": "npm run build:shared-lib && npm run build:law-portal:netlify",
+    "build:netlify": "node build-law-portal.js",
+    "build:netlify-old": "npm run build:shared-lib && ng build law-portal --configuration=netlify --project=law-portal",
     "deploy:netlify": "npm run build:netlify && echo 'Ready for Netlify deployment from dist/law-portal/browser'"
   },
   "private": true,

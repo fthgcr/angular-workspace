@@ -87,8 +87,12 @@ npm run deploy:netlify
 ### **Method 1: Git Integration (Recommended)**
 1. Push code to GitHub repository
 2. Connect repository to Netlify
-3. Set build command: `npm run build:netlify`
-4. Set publish directory: `dist/law-portal/browser`
+3. **Environment Variables**:
+   - `ANGULAR_PROJECT` = `law-portal`
+   - `NODE_VERSION` = `18`
+4. **Build Settings**:
+   - Build command: `npm run build:netlify`
+   - Publish directory: `dist/law-portal/browser`
 5. Deploy automatically on push
 
 ### **Method 2: Manual Deploy**
