@@ -15,7 +15,7 @@ ASLAW Legal Management System - Angular frontend deployment to Netlify with Rail
 // src/environments/environment.prod.ts
 export const environment = {
   production: true,
-  apiUrl: 'https://aslaw.onrender.com',
+  apiUrl: 'https://aslaw.onrender.com/api',
   name: 'production'
 };
 ```
