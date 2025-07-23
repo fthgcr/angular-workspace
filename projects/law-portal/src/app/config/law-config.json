@@ -45,7 +45,7 @@
     "show_powered_by": false
   },
   "API": {
-    "BASE_URL": "https://aslaw.onrender.com/api/api",
+    "BASE_URL": "https://aslaw.onrender.com/api",
     "ENDPOINTS": {
       "AUTH": "/law/auth",
       "CLIENTS": "/clientsapi",
