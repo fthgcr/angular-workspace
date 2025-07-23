@@ -40,7 +40,7 @@ export interface PageResponse<T> {
   providedIn: 'root'
 })
 export class ClientService {
-  private baseUrl = `${environment.apiUrl}/clients`;
+  private baseUrl = `${environment.apiUrl}/clientsapi`;
 
   constructor(private http: HttpClient) {}
 

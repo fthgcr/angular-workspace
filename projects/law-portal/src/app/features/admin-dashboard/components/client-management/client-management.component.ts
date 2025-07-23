@@ -466,7 +466,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
     console.log('Client ID:', this.editingClient.id);
     console.log('New Password:', newPassword);
     console.log('Update Data:', updateData);
-    console.log('API URL will be:', `${environment.apiUrl}/clients/${this.editingClient.id}`);
+    console.log('API URL will be:', `${environment.apiUrl}/clientsapi/${this.editingClient.id}`);
 
     this.clientService.updateClient(this.editingClient.id!, updateData).subscribe({
       next: (updatedClient) => {

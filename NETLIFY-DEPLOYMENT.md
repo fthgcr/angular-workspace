@@ -26,7 +26,7 @@ export const environment = {
   "BASE_URL": "https://vibrant-dedication-production-125e.up.railway.app/api/api",
   "ENDPOINTS": {
     "AUTH": "/law/auth",
-    "CLIENTS": "/clients", 
+    "CLIENTS": "/clientsapi", 
     "CASES": "/cases",
     "DOCUMENTS": "/documents",
     "ADMIN": "/admin",
@@ -145,7 +145,7 @@ netlify deploy --prod --dir=dist/law-portal/browser
 // Working API endpoints format
 const API_ENDPOINTS = {
   login: '/api/api/law/auth/login',
-  clients: '/api/api/clients',
+  clients: '/api/api/clientsapi',
   cases: '/api/api/cases',
   documents: '/api/api/documents'
 };

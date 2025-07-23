@@ -48,7 +48,7 @@
     "BASE_URL": "https://vibrant-dedication-production-125e.up.railway.app/api/api",
     "ENDPOINTS": {
       "AUTH": "/law/auth",
-      "CLIENTS": "/clients",
+      "CLIENTS": "/clientsapi",
       "CASES": "/cases",
       "DOCUMENTS": "/documents",
       "ADMIN": "/admin",

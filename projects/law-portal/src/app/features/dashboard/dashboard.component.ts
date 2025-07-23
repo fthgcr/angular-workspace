@@ -58,7 +58,7 @@ export class DashboardComponent implements OnInit {
       description: 'Manage client information', 
       icon: 'pi-users', 
       color: '#48bb78',
-      route: '/clients'
+      route: '/clientsapi'
     },
     { 
       title: 'Document Library', 
