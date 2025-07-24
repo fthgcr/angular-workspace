@@ -34,11 +34,20 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     // Check if user is already authenticated
     if (this.authService.isAuthenticated()) {
+      const userProfile = this.authService.getCurrentUserProfile();
       const currentUser = this.authService.getCurrentUser();
+      
+      let displayName = 'User';
+      if (userProfile?.firstName && userProfile?.lastName) {
+        displayName = `${userProfile.firstName} ${userProfile.lastName}`;
+      } else if (currentUser?.username) {
+        displayName = currentUser.username;
+      }
+      
       this.messageService.add({
         severity: 'info',
         summary: this.t('login.already_logged_in'),
-        detail: `${this.t('login.already_logged_in')} ${currentUser?.username}. ${this.t('login.redirecting')}`
+        detail: `${this.t('login.already_logged_in')} ${displayName}. ${this.t('login.redirecting')}`
       });
       
       setTimeout(() => {
@@ -63,19 +72,33 @@ export class LoginComponent implements OnInit {
       
       this.authService.login(credentials).subscribe({
         next: (response) => {
-          const username = this.authService.getCurrentUser()?.username || 'User';
-          const role = response.role;
-          
-          this.messageService.add({
-            severity: 'success',
-            summary: this.t('login.login_successful'),
-            detail: `${this.t('login.welcome_back_user')}, ${username}! ${this.t('login.logged_in_as')} ${role}. ${this.t('login.redirecting')}`
-          });
-          
-          // Navigate based on role after a short delay
+          // AuthService otomatik olarak user profile'ı yükleyecek
+          // Kısa bir gecikme ile profile'ın yüklenmesini bekleyelim
           setTimeout(() => {
-            this.redirectBasedOnRole();
-          }, 1500);
+            const userProfile = this.authService.getCurrentUserProfile();
+            let displayName = 'User';
+            
+            if (userProfile?.firstName && userProfile?.lastName) {
+              displayName = `${userProfile.firstName} ${userProfile.lastName}`;
+            } else {
+              // Fallback olarak username kullan
+              const username = this.authService.getCurrentUser()?.username;
+              if (username) {
+                displayName = username;
+              }
+            }
+            
+            this.messageService.add({
+              severity: 'success',
+              summary: this.t('login.login_successful'),
+              detail: `${this.t('login.welcome_back_user')}, ${displayName}! ${this.t('login.redirecting')}`
+            });
+            
+            // Navigate based on role after a short delay
+            setTimeout(() => {
+              this.redirectBasedOnRole();
+            }, 1500);
+          }, 100); // User profile yüklenmesi için kısa gecikme
         },
         error: (error) => {
           console.log('Login error:', error);

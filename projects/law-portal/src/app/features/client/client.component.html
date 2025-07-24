@@ -249,62 +249,51 @@
           <i class="pi pi-file"></i>
           {{ translate('case.documents') }}
         </h3>
-        
-        <!-- Loading State -->
-        <div *ngIf="isLoadingDocuments" class="loading-state">
-          <i class="pi pi-spin pi-spinner loading-icon"></i>
+
+        <!-- Documents Loading -->
+        <div *ngIf="isLoadingDocuments" class="loading-container">
+          <i class="pi pi-spin pi-spinner"></i>
           <span>{{ translate('loading.documents') }}</span>
         </div>
 
         <!-- Documents Table -->
         <div *ngIf="!isLoadingDocuments && caseDocuments.length > 0" class="documents-table">
-          <p-table 
-            [value]="caseDocuments"
-            [paginator]="true" 
-            [rows]="5"
-            [showCurrentPageReport]="true"
-            styleClass="p-datatable-gridlines"
-            [tableStyle]="{'min-width': '50rem'}"
-          >
+          <p-table [value]="caseDocuments" styleClass="p-datatable-sm">
             <ng-template pTemplate="header">
               <tr>
-                <th style="width: 3rem"></th>
-                <th>{{ translate('file.name') }}</th>
                 <th>{{ translate('file.title') }}</th>
-                <th>{{ translate('upload.date') }}</th>
+                <th>{{ translate('file.name') }}</th>
                 <th>{{ translate('file.size') }}</th>
-                <th style="width: 8rem">{{ translate('actions') }}</th>
+                <th>{{ translate('upload.date') }}</th>
+                <th>{{ translate('actions') }}</th>
               </tr>
             </ng-template>
-            
             <ng-template pTemplate="body" let-doc>
               <tr>
                 <td>
-                  <i [class]="getDocumentIcon(doc.fileName)" class="document-icon"></i>
+                  <div style="display: flex; align-items: center;">
+                    <i [class]="getDocumentIcon(doc.fileName)" [ngClass]="{
+                      'document-icon pdf': doc.fileName.endsWith('.pdf'),
+                      'document-icon word': doc.fileName.endsWith('.doc') || doc.fileName.endsWith('.docx'),
+                      'document-icon excel': doc.fileName.endsWith('.xls') || doc.fileName.endsWith('.xlsx'),
+                      'document-icon image': doc.fileName.endsWith('.jpg') || doc.fileName.endsWith('.png') || doc.fileName.endsWith('.gif'),
+                      'document-icon default': true
+                    }"></i>
+                    <span>{{ doc.title }}</span>
+                  </div>
                 </td>
-                <td>
-                  <span class="document-name">{{ doc.fileName }}</span>
-                </td>
-                <td>
-                  <span class="document-title">{{ doc.title || '-' }}</span>
-                </td>
-                <td>
-                  <span class="upload-date">{{ doc.uploadDate | date:'dd/MM/yyyy HH:mm' }}</span>
-                </td>
-                <td>
-                  <span class="file-size">{{ formatFileSize(doc.fileSize) }}</span>
-                </td>
+                <td>{{ doc.fileName }}</td>
+                <td>{{ formatFileSize(doc.fileSize) }}</td>
+                <td>{{ doc.uploadDate | date:'dd/MM/yyyy HH:mm' }}</td>
                 <td>
                   <button 
                     pButton 
                     type="button" 
                     icon="pi pi-download" 
                     class="download-btn"
-                    [pTooltip]="translate('download.tooltip')"
-                    tooltipPosition="top"
-                    (click)="downloadDocument(doc)"
                     size="small"
-                    severity="info"
+                    (click)="downloadDocument(doc)"
+                    [pTooltip]="translate('download.tooltip')"
                   ></button>
                 </td>
               </tr>
@@ -312,23 +301,21 @@
           </p-table>
         </div>
 
-        <!-- No Documents State -->
+        <!-- No Documents -->
         <div *ngIf="!isLoadingDocuments && caseDocuments.length === 0" class="no-documents">
-          <i class="pi pi-file-o empty-icon"></i>
-          <p>{{ translate('no.documents') }}</p>
+          <i class="pi pi-file no-docs-icon"></i>
+          <h4>{{ translate('no.documents') }}</h4>
         </div>
       </div>
     </div>
-
-    <!-- Select Case Template -->
-    <ng-template #selectCaseTemplate>
-      <div class="select-case-section">
-        <div class="select-case-content">
-          <i class="pi pi-briefcase select-icon"></i>
-          <h3>{{ translate('select.case') }}</h3>
-          <p>{{ translate('select.case.description') }}</p>
-        </div>
-      </div>
-    </ng-template>
   </div>
-</div> 
+</div>
+
+<!-- Select Case Template -->
+<ng-template #selectCaseTemplate>
+  <div class="select-case-template">
+    <i class="pi pi-hand-point-up select-case-icon"></i>
+    <h3>{{ translate('select.case') }}</h3>
+    <p>{{ translate('select.case.description') }}</p>
+  </div>
+</ng-template> 

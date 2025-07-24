@@ -63,21 +63,22 @@ export class AppConfigService {
   private configSubject = new BehaviorSubject<AppConfig | null>(null);
   public config$ = this.configSubject.asObservable();
 
-  private defaultConfig: AppConfig = {
-    APP_TITLE: 'LawPortal',
-    APP_DESC: 'Legal Management System',
-    PAGE_TITLE: 'LawPortal - Legal Management System',
+  // Default configuration - can be overridden by setConfig()
+  private defaultConfig = {
+        APP_TITLE: 'LexOfis',
+    APP_DESC: 'Legal Management System', 
+    PAGE_TITLE: 'LexOfis - Legal Management System',
     FAVICON_URL: '',
     FAVICON_BASE64: '',
     LOGO_ICON: 'pi pi-balance-scale',
     LOGO_IMAGE_URL: '',
     LOGO_BASE64: '',
-    COMPANY_NAME: 'LawPortal',
+    COMPANY_NAME: 'LexOfis',
     VERSION: '1.0.0',
-    COPYRIGHT: '© 2024 LawPortal. All rights reserved.',
-    CONTACT_EMAIL: 'info@lawportal.com',
+    COPYRIGHT: '© 2024 LexOfis. All rights reserved.',
+    CONTACT_EMAIL: 'info@lexofis.com',
     CONTACT_PHONE: '+90 (212) 123 45 67',
-    SUPPORT_EMAIL: 'support@lawportal.com',
+    SUPPORT_EMAIL: 'support@lexofis.com',
     LOGO_DIMENSIONS: {
       width: 40,
       height: 40,
@@ -129,7 +130,133 @@ export class AppConfigService {
       ],
       show_version: true,
       show_powered_by: false,
-      powered_by_text: 'Powered by LawPortal'
+      powered_by_text: 'LexOfis ile güçlendirilmiştir'
+    },
+    tr: {
+      APP_TITLE: 'LexOfis',
+      APP_DESC: 'Hukuk Yönetim Sistemi',
+      COMPANY_NAME: 'LexOfis',
+      PAGE_TITLE: 'LexOfis - Hukuk Yönetim Sistemi',
+      COPYRIGHT: '© 2024 LexOfis. Tüm hakları saklıdır.',
+      CONTACT_EMAIL: 'info@lexofis.com',
+      CONTACT_PHONE: '+90 (212) 123 45 67',
+      SUPPORT_EMAIL: 'support@lexofis.com',
+      LOGO_DIMENSIONS: {
+        width: 40,
+        height: 40,
+        recommended_size: '40x40 pixels for optimal display'
+      },
+      FAVICON_DIMENSIONS: {
+        width: 32,
+        height: 32,
+        recommended_sizes: '16x16, 32x32, 48x48 pixels for optimal browser support'
+      },
+      THEME: {
+        text_color: '#ffffff',
+        primary_color: '#667eea',
+        secondary_color: '#764ba2',
+        gradient: {
+          direction: '135deg',
+          start_color: '#667eea',
+          end_color: '#764ba2',
+          css_value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        },
+        alternative_gradients: {
+          blue_purple: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          ocean: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
+          sunset: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
+          forest: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+          royal: 'linear-gradient(135deg, #8360c3 0%, #2ebf91 100%)',
+          fire: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+        }
+      },
+      FOOTER: {
+        show_footer: true,
+        copyright_text: '© 2024 {COMPANY_NAME}. Tüm hakları saklıdır.',
+        links: [
+          {
+            label: 'Gizlilik Politikası',
+            url: '/privacy-policy',
+            external: false
+          },
+          {
+            label: 'Kullanım Şartları',
+            url: '/terms-of-service',
+            external: false
+          },
+          {
+            label: 'İletişim',
+            url: '/contact',
+            external: false
+          }
+        ],
+        show_version: true,
+        show_powered_by: false,
+        powered_by_text: 'LexOfis ile güçlendirilmiştir'
+      }
+    },
+    en: {
+      APP_TITLE: 'LexOfis',
+      APP_DESC: 'Legal Management System',
+      COMPANY_NAME: 'LexOfis',
+      PAGE_TITLE: 'LexOfis - Legal Management System',
+      COPYRIGHT: '© 2024 LexOfis. All rights reserved.',
+      CONTACT_EMAIL: 'info@lexofis.com',
+      CONTACT_PHONE: '+90 (212) 123 45 67',
+      SUPPORT_EMAIL: 'support@lexofis.com',
+      LOGO_DIMENSIONS: {
+        width: 40,
+        height: 40,
+        recommended_size: '40x40 pixels for optimal display'
+      },
+      FAVICON_DIMENSIONS: {
+        width: 32,
+        height: 32,
+        recommended_sizes: '16x16, 32x32, 48x48 pixels for optimal browser support'
+      },
+      THEME: {
+        text_color: '#ffffff',
+        primary_color: '#667eea',
+        secondary_color: '#764ba2',
+        gradient: {
+          direction: '135deg',
+          start_color: '#667eea',
+          end_color: '#764ba2',
+          css_value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        },
+        alternative_gradients: {
+          blue_purple: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          ocean: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
+          sunset: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
+          forest: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+          royal: 'linear-gradient(135deg, #8360c3 0%, #2ebf91 100%)',
+          fire: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+        }
+      },
+      FOOTER: {
+        show_footer: true,
+        copyright_text: '© 2024 {COMPANY_NAME}. All rights reserved.',
+        links: [
+          {
+            label: 'Privacy Policy',
+            url: '/privacy-policy',
+            external: false
+          },
+          {
+            label: 'Terms of Service',
+            url: '/terms-of-service',
+            external: false
+          },
+          {
+            label: 'Contact',
+            url: '/contact',
+            external: false
+          }
+        ],
+        show_version: true,
+        show_powered_by: false,
+        powered_by_text: 'Powered by LexOfis'
+      }
     }
   };
 

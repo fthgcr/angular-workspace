@@ -217,50 +217,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
    * Get detailed activity description with user and entity information
    */
   getDetailedActivityDescription(activity: RecentActivity): string {
-    const performedBy = `${activity.performedBy.firstName} ${activity.performedBy.lastName}`;
-    const targetName = activity.targetEntity.name;
-    const relatedName = activity.relatedEntity?.name;
-
-    switch (activity.type) {
-      case ActivityType.CLIENT_CREATED:
-        return `${performedBy} ${this.translate('activity.client.created')} "${targetName}"`;
-      
-      case ActivityType.CLIENT_UPDATED:
-        return `${performedBy} ${this.translate('activity.client.updated')} "${targetName}"`;
-      
-      case ActivityType.CASE_CREATED:
-        if (relatedName) {
-          return `${performedBy} ${this.translate('activity.case.created.with.client')} "${targetName}" "${relatedName}"`;
-        }
-        return `${performedBy} ${this.translate('activity.case.created')} "${targetName}"`;
-      
-      case ActivityType.CASE_UPDATED:
-        return `${performedBy} ${this.translate('activity.case.updated')} "${targetName}"`;
-      
-      case ActivityType.CASE_ASSIGNED:
-        if (relatedName) {
-          return `"${targetName}" ${this.translate('activity.case.assigned')} ${performedBy} "${relatedName}"`;
-        }
-        return `"${targetName}" ${this.translate('activity.case.assigned.simple')} ${performedBy}`;
-      
-      case ActivityType.DOCUMENT_CREATED:
-        if (relatedName) {
-          return `${performedBy} ${this.translate('activity.document.created')} "${relatedName}" "${targetName}"`;
-        }
-        return `${performedBy} ${this.translate('activity.document.created.simple')} "${targetName}"`;
-      
-      case ActivityType.DOCUMENT_UPDATED:
-        return `${performedBy} ${this.translate('activity.document.updated')} "${targetName}"`;
-      
-      case ActivityType.USER_CREATED:
-        return `${performedBy} ${this.translate('activity.user.created')} "${targetName}"`;
-      
-      case ActivityType.USER_UPDATED:
-        return `${performedBy} ${this.translate('activity.user.updated')} "${targetName}"`;
-      
-      default:
-        return activity.description;
-    }
+    // Backend'den zaten Türkçe description geliyor, direkt döndür
+    return activity.description;
   }
 
   /**

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppConfigService } from '../../../services/app-config.service';
 import { ThemeService } from '../../../services/theme.service';
+import { LanguageService } from '../../../services/language.service';
 
 @Component({
   selector: 'app-footer',
@@ -15,7 +16,8 @@ export class FooterComponent implements OnInit, OnDestroy {
   constructor(
     private appConfigService: AppConfigService,
     private router: Router,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -25,6 +27,14 @@ export class FooterComponent implements OnInit, OnDestroy {
         if (config) {
           // Footer config güncellendiğinde gerekli işlemler
         }
+      })
+    );
+
+    // Dil değişikliklerini dinle ve component'i güncelle
+    this.subscriptions.add(
+      this.languageService.currentLanguage$.subscribe(() => {
+        // Component güncellemesi için change detection'ı tetikle
+        // getCopyrightText() method'u çağrıldığında yeni dil ile güncellenecek
       })
     );
   }
@@ -40,7 +50,9 @@ export class FooterComponent implements OnInit, OnDestroy {
 
   // Copyright metni
   getCopyrightText(): string {
-    return this.appConfigService.getFooterCopyright();
+    const currentYear = new Date().getFullYear();
+    const companyName = 'LexOfis';
+    return `© ${currentYear} ${companyName}. ${this.languageService.translate('copyright.text')}.`;
   }
 
   // Footer linkleri

@@ -30,18 +30,16 @@ export interface ClientCase {
 export interface ClientDocument {
   id: number;
   title: string;
-  description?: string;
   fileName: string;
   contentType: string;
   fileSize: number;
+  description?: string;
   type: string;
   createdDate: string;
   uploadDate: string;
-  legalCase: {
-    id: number;
-    title: string;
-    caseNumber: string;
-  };
+  legalCaseId: number;
+  legalCaseTitle?: string;
+  legalCaseNumber?: string;
 }
 
 @Injectable({
@@ -67,7 +65,14 @@ export class ClientService {
   }
 
   /**
-   * Download document
+   * Get documents by case ID - Client can access documents for their own cases
+   */
+  getDocumentsByCaseId(caseId: number): Observable<ClientDocument[]> {
+    return this.http.get<ClientDocument[]>(`${this.apiUrl}/documents/case/${caseId}`);
+  }
+
+  /**
+   * Download document as blob (for traditional download)
    */
   downloadDocument(documentId: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/documents/${documentId}/download`, {
@@ -76,9 +81,16 @@ export class ClientService {
   }
 
   /**
-   * Get documents by case ID
+   * Download document as base64 (for current implementation)
    */
-  getDocumentsByCaseId(caseId: number): Observable<ClientDocument[]> {
-    return this.http.get<ClientDocument[]>(`${this.apiUrl}/documents/case/${caseId}`);
+  downloadDocumentAsBase64(documentId: number): Observable<{base64Content: string}> {
+    return this.http.get<{base64Content: string}>(`${this.apiUrl}/documents/${documentId}/download-base64`);
+  }
+
+  /**
+   * Get specific case by ID (client can access their own cases)
+   */
+  getCaseById(caseId: number): Observable<ClientCase> {
+    return this.http.get<ClientCase>(`${this.apiUrl}/cases/${caseId}`);
   }
 } 

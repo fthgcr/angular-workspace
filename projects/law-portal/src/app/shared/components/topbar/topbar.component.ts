@@ -1,10 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from 'shared-lib';
+import { AuthService, AppConfigService } from 'shared-lib';
 import { MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { LanguageService, Language } from '../../../services/language.service';
-import { AppConfigService } from '../../../services/app-config.service';
 import { ThemeService } from '../../../services/theme.service';
 
 @Component({
@@ -218,11 +217,11 @@ export class TopbarComponent implements OnInit, OnDestroy {
 
   // App Config methods
   getAppTitle(): string {
-    return this.appConfigService.getAppTitle();
+    return this.languageService.translate('app.name');
   }
 
   getAppDescription(): string {
-    return this.appConfigService.getAppDescription();
+    return this.languageService.translate('app.description');
   }
 
   getLogoIcon(): string {
@@ -231,10 +230,6 @@ export class TopbarComponent implements OnInit, OnDestroy {
 
   getLogoImageUrl(): string {
     return this.appConfigService.getLogoImageUrl();
-  }
-
-  getLogoBase64(): string {
-    return this.appConfigService.getLogoBase64();
   }
 
   getEffectiveLogoUrl(): string {

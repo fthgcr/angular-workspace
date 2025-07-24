@@ -8,6 +8,7 @@ export interface AppConfig {
   APP_DESC: string;
   PAGE_TITLE: string;
   LOGO_ICON: string;
+  LOGO_IMAGE_URL?: string;
   COMPANY_NAME: string;
   VERSION: string;
   COPYRIGHT: string;
@@ -47,16 +48,17 @@ export class AppConfigService {
   public config$ = this.configSubject.asObservable();
 
   private defaultConfig: AppConfig = {
-    APP_TITLE: 'Platform',
-    APP_DESC: 'Management System',
-    PAGE_TITLE: 'Platform - Management System',
-    LOGO_ICON: 'pi pi-building',
-    COMPANY_NAME: 'Platform',
+    APP_TITLE: 'LexOfis',
+    APP_DESC: 'Legal Management System',
+    PAGE_TITLE: 'LexOfis - Legal Management System',
+    LOGO_ICON: 'pi pi-balance-scale',
+    LOGO_IMAGE_URL: '',
+    COMPANY_NAME: 'LexOfis',
     VERSION: '1.0.0',
     COPYRIGHT: '© {CURRENT_YEAR} {COMPANY_NAME}. All rights reserved.',
-    CONTACT_EMAIL: 'info@platform.com',
+    CONTACT_EMAIL: 'info@lexofis.com',
     CONTACT_PHONE: '+90 (212) 123 45 67',
-    SUPPORT_EMAIL: 'support@platform.com',
+    SUPPORT_EMAIL: 'support@lexofis.com',
     CAN_SIGN_UP: true,
     FORGOT_PASSWORD: true,
     THEME: {
@@ -228,6 +230,27 @@ export class AppConfigService {
   // Logo
   getLogoIcon(): string {
     return this.getConfig()?.LOGO_ICON || this.defaultConfig.LOGO_ICON;
+  }
+
+  getLogoImageUrl(): string {
+    return this.getConfig()?.LOGO_IMAGE_URL || this.defaultConfig.LOGO_IMAGE_URL || '';
+  }
+
+  hasLogoImage(): boolean {
+    const logoUrl = this.getLogoImageUrl();
+    return !!(logoUrl && logoUrl.trim() !== '');
+  }
+
+  getEffectiveLogoUrl(): string {
+    return this.getLogoImageUrl();
+  }
+
+  getLogoDimensions(): { width: number; height: number; recommended_size: string } {
+    return {
+      width: 40,
+      height: 40,
+      recommended_size: '40x40 pixels for optimal display'
+    };
   }
 
   // Company Info

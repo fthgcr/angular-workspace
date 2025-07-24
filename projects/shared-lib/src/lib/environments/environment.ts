@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  infraCoreUrl: 'https://aslaw.onrender.com/api',
-  aslawUrl: 'https://aslaw.onrender.com/api'
+  infraCoreUrl: 'http://localhost:8080/api',
+  aslawUrl: 'http://localhost:8080/api'
 };

@@ -172,7 +172,8 @@ export class CaseDetailComponent implements OnInit, OnDestroy {
           type: this.uploadForm.value.type
         };
 
-        return this.documentService.uploadDocument(file, request);
+        // Use base64 upload method
+        return this.documentService.uploadFileAsBase64(file, request);
       });
 
       // Upload files sequentially to avoid overwhelming the server
@@ -197,7 +198,7 @@ export class CaseDetailComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'success',
         summary: this.translate('success'),
-        detail: this.translate('success.files.uploaded').replace('{count}', uploadRequests.length.toString())
+        detail: this.translate('success.files.uploaded').replace('{count}', uploadRequests.length.toString()) + ' (Database Storage)'
       });
       return;
     }

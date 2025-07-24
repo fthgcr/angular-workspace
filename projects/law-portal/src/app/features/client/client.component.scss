@@ -1,777 +1,590 @@
-.client-dashboard {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  background: #f8f9fa;
+.client-container {
   min-height: 100vh;
-
-  .header {
-    margin-bottom: 2rem;
-    border-radius: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  position: relative;
+  
+  // Header Section
+  .header-section {
+    background: linear-gradient(135deg, #113f67 0%, #385170 100%);
+    color: white;
+    padding: 2rem 0;
+    position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-
-    .header-background {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      position: relative;
-      overflow: hidden;
-
-      .header-content {
-        padding: 3rem 2rem;
-        position: relative;
-        z-index: 2;
-
-        .header-main {
-          display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 2rem;
-          align-items: center;
-          margin-bottom: 2rem;
-
-          .header-text {
-            .welcome-section {
-              h1 {
-                color: white;
-                font-size: 2.8rem;
-                margin-bottom: 0.5rem;
-                font-weight: 700;
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-
-                i {
-                  font-size: 2.5rem;
-                  opacity: 0.9;
-                }
-              }
-
-              .subtitle {
-                color: rgba(255, 255, 255, 0.95);
-                font-size: 1.3rem;
-                margin: 0 0 0.5rem 0;
-                font-weight: 500;
-              }
-
-              .description {
-                color: rgba(255, 255, 255, 0.8);
-                font-size: 1rem;
-                margin: 0;
-                line-height: 1.5;
-              }
-            }
-          }
-
-          .header-stats {
-            display: flex;
-            gap: 1rem;
-
-            .stat-card {
-              background: rgba(255, 255, 255, 0.15);
-              backdrop-filter: blur(10px);
-              border: 1px solid rgba(255, 255, 255, 0.2);
-              border-radius: 16px;
-              padding: 1.5rem;
-              text-align: center;
-              transition: all 0.3s ease;
-              min-width: 120px;
-
-              &:hover {
-                background: rgba(255, 255, 255, 0.25);
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-              }
-
-              .stat-icon {
-                margin-bottom: 0.8rem;
-
-                i {
-                  font-size: 2rem;
-                  color: rgba(255, 255, 255, 0.9);
-                }
-              }
-
-              .stat-info {
-                .stat-number {
-                  display: block;
-                  font-size: 2rem;
-                  font-weight: 700;
-                  color: white;
-                  margin-bottom: 0.2rem;
-                }
-
-                .stat-label {
-                  display: block;
-                  font-size: 0.9rem;
-                  color: rgba(255, 255, 255, 0.8);
-                  font-weight: 500;
-                }
-              }
-            }
-          }
-        }
-
-        .header-actions {
-          display: flex;
-          gap: 1rem;
-          justify-content: center;
-
-          ::ng-deep .p-button {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-
-            &:hover {
-              background: rgba(255, 255, 255, 0.25);
-              border-color: rgba(255, 255, 255, 0.5);
-              transform: translateY(-1px);
-            }
-
-            .p-button-label {
-              font-weight: 500;
-            }
-          }
-        }
-      }
-
-      .header-decoration {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        pointer-events: none;
-        z-index: 1;
-
-        .decoration-circle {
-          position: absolute;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.1);
-          animation: float 6s ease-in-out infinite;
-
-          &.circle-1 {
-            width: 100px;
-            height: 100px;
-            top: 20%;
-            right: 10%;
-            animation-delay: 0s;
-          }
-
-          &.circle-2 {
-            width: 60px;
-            height: 60px;
-            top: 60%;
-            right: 20%;
-            animation-delay: 2s;
-          }
-
-          &.circle-3 {
-            width: 80px;
-            height: 80px;
-            bottom: 20%;
-            left: 15%;
-            animation-delay: 4s;
-          }
-        }
-      }
-    }
-  }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px) rotate(0deg);
-      opacity: 0.7;
-    }
-    50% {
-      transform: translateY(-20px) rotate(180deg);
-      opacity: 1;
-    }
-  }
-
-  // Cases Section
-  .cases-section {
     margin-bottom: 2rem;
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      padding: 0 0.5rem;
-
-      h2 {
-        color: #2c3e50;
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin: 0;
+    
+    // Floating circles for decoration
+    .floating-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      animation: float 6s ease-in-out infinite;
+      
+      &.circle-1 {
+        width: 100px;
+        height: 100px;
+        top: 10%;
+        right: 10%;
+        animation-delay: 0s;
       }
-
-      .case-count {
-        background: #e3f2fd;
-        color: #1976d2;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 500;
+      
+      &.circle-2 {
+        width: 150px;
+        height: 150px;
+        top: 60%;
+        right: 5%;
+        animation-delay: 2s;
       }
-    }
-
-    .cases-table-container {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-
-      .loading-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 3rem;
-        color: #6c757d;
-
-        p {
-          margin-top: 1rem;
-          font-size: 1.1rem;
-        }
-      }
-
-      .empty-state {
-        text-align: center;
-        padding: 3rem;
-        color: #6c757d;
-
-        h3 {
-          margin: 1rem 0 0.5rem 0;
-          color: #495057;
-        }
-
-        p {
-          margin: 0;
-          font-size: 1rem;
-        }
-      }
-
-      // PrimeNG Table Customization
-      ::ng-deep .p-datatable {
-        .p-datatable-header {
-          background: #f8f9fa;
-          border: none;
-          padding: 1rem;
-        }
-
-        .p-datatable-thead > tr > th {
-          background: #495057;
-          color: white;
-          font-weight: 600;
-          padding: 1rem;
-          border: none;
-          font-size: 0.9rem;
-        }
-
-        .p-datatable-tbody > tr {
-          transition: all 0.2s ease;
-
-          &:hover {
-            background: #e3f2fd !important;
-          }
-
-          &.p-highlight {
-            background: #bbdefb !important;
-            color: #1976d2;
-          }
-
-          > td {
-            padding: 1rem;
-            border-bottom: 1px solid #e9ecef;
-            vertical-align: middle;
-
-            .case-number {
-              font-weight: 600;
-              color: #1976d2;
-            }
-
-            .case-title {
-              font-weight: 500;
-              color: #2c3e50;
-            }
-
-            .case-type {
-              color: #495057;
-              font-size: 0.9rem;
-            }
-
-            .case-date {
-              color: #6c757d;
-              font-size: 0.9rem;
-            }
-
-            .lawyer-info {
-              .lawyer-name {
-                display: block;
-                font-weight: 500;
-                color: #2c3e50;
-              }
-
-              .lawyer-email {
-                display: block;
-                color: #6c757d;
-                font-size: 0.8rem;
-                margin-top: 0.2rem;
-              }
-            }
-
-            .text-muted {
-              color: #6c757d;
-              font-style: italic;
-            }
-          }
-        }
-
-        .p-paginator {
-          background: #f8f9fa;
-          border: none;
-          padding: 1rem;
-        }
+      
+      &.circle-3 {
+        width: 80px;
+        height: 80px;
+        top: 30%;
+        right: 20%;
+        animation-delay: 4s;
       }
     }
-  }
-
-  // Case Details Section
-  .case-details-section {
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      padding: 0 0.5rem;
-
-      h2 {
-        color: #2c3e50;
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin: 0;
-      }
-    }
-
-    .case-details-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-
-      .case-info-card,
-      .case-documents-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-
-        .card-header {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          padding: 1.5rem;
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 2;
+      
+      .welcome-section {
+        margin-bottom: 2rem;
+        
+        .page-title {
+          font-size: 2.5rem;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
           display: flex;
-          justify-content: space-between;
           align-items: center;
-
-          h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            font-weight: 600;
-          }
-
-          .document-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-          }
-        }
-
-        .card-body {
-          padding: 1.5rem;
-        }
-      }
-
-      .case-info-card {
-        .info-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
           gap: 1rem;
-          margin-bottom: 1.5rem;
-
-          .info-item {
-            label {
-              display: block;
-              font-weight: 600;
-              color: #495057;
-              margin-bottom: 0.3rem;
-              font-size: 0.9rem;
-            }
-
-            span {
-              color: #2c3e50;
-              font-size: 1rem;
-            }
-
-            .lawyer-detail {
-              span {
-                display: block;
-                font-weight: 500;
-              }
-
-              small {
-                display: block;
-                color: #6c757d;
-                font-size: 0.8rem;
-                margin-top: 0.2rem;
-              }
-            }
+          
+          .title-icon {
+            font-size: 2.2rem;
           }
         }
-
-        .description-section {
-          border-top: 1px solid #e9ecef;
-          padding-top: 1rem;
-
-          .description-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-
-            label {
-              font-weight: 600;
-              color: #495057;
-              font-size: 0.9rem;
-              margin: 0;
+        
+        .welcome-message {
+          font-size: 1.2rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+        
+        .description {
+          font-size: 1rem;
+          opacity: 0.8;
+          line-height: 1.6;
+        }
+      }
+      
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        
+        .stat-card {
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 16px;
+          padding: 1.5rem;
+          text-align: center;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          }
+          
+          .stat-icon {
+            margin-bottom: 1rem;
+            
+            i {
+              font-size: 2.5rem;
+              opacity: 0.9;
+            }
+            
+            &.active i {
+              color: #ffd700;
+            }
+            
+            &.documents i {
+              color: #87ceeb;
             }
           }
-
-          .description-text {
-            color: #2c3e50;
-            line-height: 1.6;
-            margin: 0;
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid #007bff;
-            transition: all 0.3s ease;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-
-            &.expanded {
-              max-height: none;
-            }
-
-            span {
+          
+          .stat-content {
+            .stat-number {
+              font-size: 2rem;
+              font-weight: 700;
+              margin-bottom: 0.5rem;
               display: block;
+            }
+            
+            .stat-label {
+              font-size: 0.9rem;
+              opacity: 0.8;
             }
           }
         }
       }
-
-      .case-documents-card {
-        .loading-container {
+      
+      .action-buttons {
+        display: flex;
+        justify-content: center;
+        
+        .refresh-btn {
+          background: rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          color: white;
+          padding: 0.75rem 1.5rem;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+          }
+        }
+      }
+    }
+  }
+  
+  // Main Content
+  .main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 2rem;
+    display: grid;
+    gap: 2rem;
+    
+    // Cases Section
+    .cases-section {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      
+      .section-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #dee2e6;
+        
+        .section-title {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #495057;
+          margin: 0;
           display: flex;
           align-items: center;
-          justify-content: center;
-          padding: 2rem;
-          color: #6c757d;
-
-          span {
-            margin-left: 0.5rem;
+          gap: 0.75rem;
+          
+          i {
+            color: #113f67;
           }
         }
-
-        .empty-documents {
-          text-align: center;
-          padding: 2rem;
-          color: #6c757d;
-
-          p {
-            margin-top: 1rem;
+      }
+      
+      .table-container {
+        padding: 1rem;
+        
+        ::ng-deep .p-datatable {
+          .p-datatable-header {
+            background: transparent;
+            border: none;
+            padding: 0;
           }
-        }
-
-        .documents-list {
-          .document-item {
-            display: flex;
-            align-items: flex-start;
+          
+          .p-datatable-thead > tr > th {
+            background: #f8f9fa;
+            border: none;
+            border-bottom: 2px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
             padding: 1rem;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            margin-bottom: 1rem;
+          }
+          
+          .p-datatable-tbody > tr {
             transition: all 0.2s ease;
-
+            
             &:hover {
-              background: #f8f9fa;
-              border-color: #007bff;
-              transform: translateY(-1px);
-              box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+              background: #f8f9fa !important;
             }
-
-            &:last-child {
-              margin-bottom: 0;
-            }
-
-            .document-icon {
-              margin-right: 1rem;
-              font-size: 2rem;
-              color: #007bff;
-              min-width: 40px;
-            }
-
-            .document-info {
-              flex: 1;
-
-              h4 {
-                margin: 0 0 0.3rem 0;
-                color: #2c3e50;
-                font-size: 1rem;
-                font-weight: 600;
+            
+            &.selected-row {
+              background: rgba(17, 63, 103, 0.1) !important;
+              
+              td {
+                color: #113f67;
+                font-weight: 500;
               }
-
-              .document-filename {
-                color: #6c757d;
-                font-size: 0.9rem;
-                margin: 0 0 0.5rem 0;
-                font-family: 'Courier New', monospace;
+            }
+            
+            > td {
+              border: none;
+              border-bottom: 1px solid #f1f3f4;
+              padding: 1rem;
+              vertical-align: middle;
+            }
+          }
+          
+          .loading-cell {
+            text-align: center;
+            padding: 3rem;
+            
+            .loading-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 1rem;
+              color: #6c757d;
+              
+              .loading-icon {
+                font-size: 2rem;
               }
-
-              .document-meta {
-                display: flex;
-                gap: 1rem;
+            }
+          }
+          
+          .empty-state {
+            text-align: center;
+            padding: 3rem;
+            
+            .empty-content {
+              color: #6c757d;
+              
+              .empty-icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                display: block;
+              }
+              
+              h3 {
+                font-size: 1.25rem;
                 margin-bottom: 0.5rem;
-
-                span {
-                  font-size: 0.8rem;
-                  padding: 0.2rem 0.5rem;
-                  border-radius: 4px;
-                }
-
-                .document-type {
-                  background: #e3f2fd;
-                  color: #1976d2;
-                  font-weight: 500;
-                }
-
-                .document-size {
-                  background: #f3e5f5;
-                  color: #7b1fa2;
-                }
-
-                .document-date {
-                  background: #e8f5e8;
-                  color: #388e3c;
-                }
               }
-
-              .document-description {
-                color: #495057;
-                font-size: 0.9rem;
-                line-height: 1.4;
+              
+              p {
                 margin: 0;
-                font-style: italic;
+                opacity: 0.7;
               }
             }
-
-            .document-actions {
-              margin-left: 1rem;
+          }
+        }
+        
+        .case-number {
+          font-weight: 600;
+          color: #113f67;
+        }
+        
+        .case-title {
+          font-weight: 500;
+        }
+        
+        .case-type {
+          background: #e3f2fd;
+          color: #1976d2;
+          padding: 0.25rem 0.75rem;
+          border-radius: 12px;
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
+        
+        .case-date, .lawyer-name {
+          color: #6c757d;
+        }
+      }
+    }
+    
+    // Case Details Section
+    .case-details-section {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      
+      .section-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .section-title {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #495057;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          
+          i {
+            color: #113f67;
+          }
+        }
+        
+        .clear-selection-btn {
+          background: #6c757d;
+          border: none;
+          
+          &:hover {
+            background: #5a6268;
+          }
+        }
+      }
+      
+      .case-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        padding: 2rem;
+        
+        .info-card {
+          background: #f8f9fa;
+          border-radius: 12px;
+          padding: 1.5rem;
+          border-left: 4px solid #113f67;
+          
+          .info-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #495057;
+          }
+        }
+      }
+      
+      .description-section {
+        padding: 0 2rem 2rem;
+        
+        .description-title {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #495057;
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        
+        .description-content {
+          background: #f8f9fa;
+          border-radius: 12px;
+          padding: 1.5rem;
+          
+          .description-text {
+            line-height: 1.6;
+            color: #495057;
+            margin-bottom: 1rem;
+          }
+          
+          .toggle-description-btn {
+            background: none;
+            border: none;
+            color: #113f67;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s ease;
+            
+            &:hover {
+              color: #0d2d4a;
             }
+          }
+        }
+      }
+      
+      .documents-section {
+        padding: 0 2rem 2rem;
+        
+        .documents-title {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #495057;
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          
+          i {
+            color: #113f67;
+          }
+        }
+        
+        .documents-table {
+          background: #f8f9fa;
+          border-radius: 12px;
+          overflow: hidden;
+          
+          ::ng-deep .p-datatable {
+            .p-datatable-thead > tr > th {
+              background: #e9ecef;
+              color: #495057;
+              font-weight: 600;
+              border: none;
+            }
+            
+            .p-datatable-tbody > tr > td {
+              border: none;
+              border-bottom: 1px solid #dee2e6;
+            }
+          }
+          
+          .document-icon {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin-right: 0.75rem;
+            
+            &.pdf { background: #ffebee; color: #c62828; }
+            &.word { background: #e3f2fd; color: #1976d2; }
+            &.excel { background: #e8f5e8; color: #388e3c; }
+            &.image { background: #fff3e0; color: #f57c00; }
+            &.default { background: #f5f5f5; color: #616161; }
+          }
+          
+          .download-btn {
+            background: #113f67;
+            border: none;
+            
+            &:hover {
+              background: #0d2d4a;
+            }
+          }
+        }
+        
+        .no-documents {
+          text-align: center;
+          padding: 3rem;
+          color: #6c757d;
+          
+          .no-docs-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+            opacity: 0.5;
+          }
+          
+          h4 {
+            margin-bottom: 0.5rem;
+          }
+          
+          p {
+            margin: 0;
+            opacity: 0.7;
           }
         }
       }
     }
   }
+}
 
-  // No Selection Message
-  .no-selection-message {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    padding: 3rem;
-    text-align: center;
-
-    .message-content {
-      h3 {
-        color: #2c3e50;
-        margin: 1rem 0 0.5rem 0;
-        font-size: 1.5rem;
-      }
-
-      p {
-        color: #6c757d;
-        margin: 0;
-        font-size: 1.1rem;
-      }
-    }
+// Select case template
+.select-case-template {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 3rem;
+  text-align: center;
+  color: #6c757d;
+  
+  .select-case-icon {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+    display: block;
+    opacity: 0.3;
   }
+  
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #495057;
+  }
+  
+  p {
+    margin: 0;
+    opacity: 0.7;
+    line-height: 1.6;
+  }
+}
+
+// Animations
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
 }
 
 // Responsive Design
-@media (max-width: 1200px) {
-  .client-dashboard {
-    .case-details-section {
-      .case-details-content {
+@media (max-width: 768px) {
+  .client-container {
+    .header-section {
+      .header-content {
+        padding: 0 1rem;
+        
+        .welcome-section .page-title {
+          font-size: 2rem;
+        }
+        
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+      }
+    }
+    
+    .main-content {
+      padding: 0 1rem 2rem;
+      gap: 1rem;
+      
+      .case-info-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        padding: 1rem;
+      }
+      
+      .section-header {
+        padding: 1rem !important;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
       }
     }
   }
 }
 
-@media (max-width: 768px) {
-  .client-dashboard {
-    padding: 1rem;
-
-    .header {
-      .header-background {
-        .header-content {
-          padding: 2rem 1.5rem;
-
-          .header-main {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            text-align: center;
-
-            .header-text {
-              .welcome-section {
-                h1 {
-                  font-size: 2.2rem;
-                  flex-direction: column;
-                  gap: 0.5rem;
-
-                  i {
-                    font-size: 2rem;
-                  }
-                }
-
-                .subtitle {
-                  font-size: 1.1rem;
-                }
-
-                .description {
-                  font-size: 0.9rem;
-                }
-              }
-            }
-
-            .header-stats {
-              justify-content: center;
-              flex-wrap: wrap;
-              gap: 0.8rem;
-
-              .stat-card {
-                min-width: 100px;
-                padding: 1rem;
-
-                .stat-icon i {
-                  font-size: 1.5rem;
-                }
-
-                .stat-info {
-                  .stat-number {
-                    font-size: 1.5rem;
-                  }
-
-                  .stat-label {
-                    font-size: 0.8rem;
-                  }
-                }
-              }
-            }
-          }
-
-          .header-actions {
-            flex-direction: column;
-            align-items: center;
-            gap: 0.8rem;
-
-            ::ng-deep .p-button {
-              width: 200px;
-            }
-          }
-        }
-
-        .header-decoration {
-          .decoration-circle {
-            &.circle-1 {
-              width: 60px;
-              height: 60px;
-            }
-
-            &.circle-2 {
-              width: 40px;
-              height: 40px;
-            }
-
-            &.circle-3 {
-              width: 50px;
-              height: 50px;
-            }
-          }
-        }
-      }
-    }
-
-    .cases-section {
-      .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-
-        .case-count {
-          align-self: flex-end;
-        }
-      }
-
-      .cases-table-container {
-        ::ng-deep .p-datatable {
-          .p-datatable-thead > tr > th,
-          .p-datatable-tbody > tr > td {
-            padding: 0.5rem;
-            font-size: 0.8rem;
-          }
-        }
-      }
-    }
-
-         .case-details-section {
-       .case-details-content {
-         .case-info-card {
-           .info-grid {
-             grid-template-columns: 1fr;
-             gap: 0.8rem;
-           }
-
-           .description-section {
-             .description-header {
-               flex-direction: column;
-               align-items: flex-start;
-               gap: 0.5rem;
-             }
-           }
-         }
-
-        .case-documents-card {
-          .documents-list {
-            .document-item {
-              flex-direction: column;
-              text-align: center;
-
-              .document-icon {
-                margin: 0 0 1rem 0;
-              }
-
-              .document-actions {
-                margin: 1rem 0 0 0;
-              }
-            }
-          }
-        }
-      }
-    }
+// PrimeNG Overrides
+::ng-deep {
+  .p-tag {
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+  }
+  
+  .p-button.p-button-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .p-tooltip .p-tooltip-text {
+    background: #113f67;
+    border-radius: 8px;
   }
 } 

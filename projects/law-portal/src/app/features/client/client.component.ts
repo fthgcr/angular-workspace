@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ClientService, ClientCase, ClientDocument } from '../../services/client.service';
 import { MessageService } from 'primeng/api';
+import { ClientService, ClientCase, ClientDocument } from '../../services/client.service';
 import { Subscription } from 'rxjs';
 import { LanguageService } from '../../services/language.service';
+import { DocumentService } from '../../core/services/document.service'; // Fixed import path
 
 @Component({
   selector: 'app-client',
@@ -29,7 +30,8 @@ export class ClientComponent implements OnInit, OnDestroy {
   constructor(
     private clientService: ClientService,
     private messageService: MessageService,
-    private languageService: LanguageService
+    private languageService: LanguageService,
+    private documentService: DocumentService // Added DocumentService to constructor
   ) { }
 
   ngOnInit(): void {
@@ -81,10 +83,10 @@ export class ClientComponent implements OnInit, OnDestroy {
   /**
    * Handle case selection
    */
-  onCaseSelect(caseItem: ClientCase): void {
-    this.selectedCase = caseItem;
-    this.isDescriptionExpanded = false; // Reset description state
-    this.loadCaseDocuments(caseItem.id);
+  onCaseSelect(selectedCase: ClientCase): void {
+    this.selectedCase = selectedCase;
+    this.isDescriptionExpanded = false;
+    this.loadCaseDocuments(selectedCase.id);
   }
 
   /**
@@ -102,6 +104,7 @@ export class ClientComponent implements OnInit, OnDestroy {
           uploadDate: doc.uploadDate || doc.createdDate // Use uploadDate or fallback to createdDate
         }));
         this.isLoadingDocuments = false;
+        console.log(`Loaded ${this.caseDocuments.length} documents for case ${caseId}`);
       },
       error: (error) => {
         console.error('Error loading case documents:', error);
@@ -172,41 +175,89 @@ export class ClientComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Download document
+   * Download document using base64 method
    */
-  downloadDocument(document: ClientDocument): void {
-    this.clientService.downloadDocument(document.id).subscribe({
-      next: (blob) => {
-        // Create download link
-        const url = window.URL.createObjectURL(blob);
-        const link = window.document.createElement('a');
-        link.href = url;
-        link.download = document.fileName;
-        link.click();
-        window.URL.revokeObjectURL(url);
-        
-        this.messageService.add({
-          severity: 'success',
-          summary: this.translate('success'),
-          detail: this.translate('file.downloaded')
-        });
-      },
-      error: (error) => {
-        console.error('Error downloading document:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translate('error'),
-          detail: this.translate('error.downloading')
-        });
+  downloadDocument(doc: any): void {
+    if (doc.id) {
+      // Use base64 download method for client documents
+      this.clientService.downloadDocumentAsBase64(doc.id).subscribe({
+        next: (response) => {
+          this.downloadBase64File(response.base64Content, doc.fileName, doc.contentType);
+          this.messageService.add({
+            severity: 'success',
+            summary: this.translate('success'),
+            detail: this.translate('success.file.downloaded').replace('{filename}', doc.fileName)
+          });
+        },
+        error: (error: any) => {
+          console.error('Error downloading document:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: this.translate('error'),
+            detail: this.translate('error.downloading.file').replace('{filename}', doc.fileName)
+          });
+        }
+      });
+    }
+  }
+
+  /**
+   * Download base64 file content
+   */
+  private downloadBase64File(base64Content: string, fileName: string, contentType: string): void {
+    try {
+      // Convert base64 to blob
+      const byteCharacters = atob(base64Content);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
-    });
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: contentType });
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error converting base64 to file:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translate('error'),
+        detail: 'Dosya dönüştürülürken hata oluştu'
+      });
+    }
   }
 
   /**
    * Get case type label
    */
   getCaseTypeLabel(type: string): string {
-    return this.translate(`type.${type.toLowerCase()}`);
+    switch (type?.toUpperCase()) {
+      case 'CAR_DEPRECIATION':
+        return this.translate('case.type.car.depreciation');
+      case 'CIVIL':
+        return this.translate('case.type.civil');
+      case 'CRIMINAL':
+        return this.translate('case.type.criminal');
+      case 'FAMILY':
+        return this.translate('case.type.family');
+      case 'CORPORATE':
+        return this.translate('case.type.corporate');
+      case 'REAL_ESTATE':
+        return this.translate('case.type.real.estate');
+      case 'INTELLECTUAL_PROPERTY':
+        return this.translate('case.type.intellectual.property');
+      case 'OTHER':
+        return this.translate('case.type.other');
+      default:
+        return type || this.translate('case.type.other');
+    }
   }
 
   /**

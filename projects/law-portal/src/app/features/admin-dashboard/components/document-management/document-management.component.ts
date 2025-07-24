@@ -178,8 +178,12 @@ export class DocumentManagementComponent implements OnInit, OnDestroy {
       }
 
       if (this.editingDocument) {
-        // Güncelleme
-        this.documentService.updateDocument(this.editingDocument.id!, formData).subscribe({
+        // Güncelleme - sadece metadata
+        this.documentService.updateDocument(this.editingDocument.id!, {
+          title: formData.title,
+          description: formData.description,
+          type: formData.type
+        }).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
@@ -198,22 +202,25 @@ export class DocumentManagementComponent implements OnInit, OnDestroy {
           }
         });
       } else {
-        // Yeni ekleme
-        this.documentService.uploadDocument(this.selectedFile!, formData).subscribe({
+        // Yeni ekleme - Base64 upload kullan
+        this.uploadProgress = 0;
+        this.documentService.uploadFileAsBase64(this.selectedFile!, formData).subscribe({
           next: () => {
+            this.uploadProgress = 100;
             this.messageService.add({
               severity: 'success',
               summary: 'Başarılı',
-              detail: 'Yeni doküman eklendi'
+              detail: 'Yeni doküman veritabanına kaydedildi'
             });
             this.hideDialog();
             this.loadDocuments();
           },
           error: (error) => {
+            this.uploadProgress = 0;
             this.messageService.add({
               severity: 'error',
               summary: 'Hata',
-              detail: 'Doküman yüklenirken bir hata oluştu'
+              detail: 'Doküman yüklenirken bir hata oluştu: ' + (error.error?.message || error.message)
             });
           }
         });
@@ -240,26 +247,20 @@ export class DocumentManagementComponent implements OnInit, OnDestroy {
 
   downloadDocument(document: Document): void {
     if (document.id) {
-      this.documentService.downloadDocument(document.id).subscribe({
-        next: (blob) => {
-          const url = window.URL.createObjectURL(blob);
-          const link = window.document.createElement('a');
-          link.href = url;
-          link.download = document.fileName;
-          link.click();
-          window.URL.revokeObjectURL(url);
-          
+      // Use base64 download method
+      this.documentService.downloadDocumentAsFile(document.id).subscribe({
+        next: () => {
           this.messageService.add({
             severity: 'success',
             summary: 'Başarılı',
-            detail: `${document.fileName} indirildi`
+            detail: `${document.fileName} indirildi (Base64 Database Storage)`
           });
         },
         error: (error) => {
           this.messageService.add({
             severity: 'error',
             summary: 'Hata',
-            detail: 'Dosya indirilirken bir hata oluştu'
+            detail: 'Dosya indirilirken bir hata oluştu: ' + (error.error?.message || error.message)
           });
         }
       });
