@@ -5,8 +5,8 @@ ASLAW Legal Management System - Angular frontend deployment to Netlify with Rail
 
 ## 🌐 **Production URLs**
 - **Frontend (Netlify)**: `https://your-app-name.netlify.app`
-- **Backend (Railway)**: `http://localhost:8080`
-- **API Base URL**: `http://localhost:8080`
+- **Backend (Railway)**: `https://aslaw.onrender.com`
+- **API Base URL**: `https://aslaw.onrender.com`
 
 ## 🏗️ **Build Configuration**
 
@@ -15,7 +15,7 @@ ASLAW Legal Management System - Angular frontend deployment to Netlify with Rail
 // src/environments/environment.prod.ts
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:8080/api',
+  apiUrl: 'https://aslaw.onrender.com/api',
   name: 'production'
 };
 ```
@@ -23,7 +23,7 @@ export const environment = {
 ### **API Endpoints**
 ```json
 {
-  "BASE_URL": "http://localhost:8080",
+  "BASE_URL": "https://aslaw.onrender.com",
   "ENDPOINTS": {
     "AUTH": "/law/auth",
     "CLIENTS": "/clientsapi", 
