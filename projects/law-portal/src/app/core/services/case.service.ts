@@ -125,4 +125,13 @@ export class CaseService {
   generateCaseNumber(): Observable<{caseNumber: string}> {
     return this.http.get<{caseNumber: string}>(`${this.baseUrl}/generate-number`);
   }
+
+  /**
+   * Test backend connectivity and CORS
+   */
+  testBackendConnection(): Observable<any> {
+    const url = `${this.baseUrl}/test`;
+    console.log('CaseService: Testing backend connection to:', url);
+    return this.http.get<any>(url);
+  }
 } 
