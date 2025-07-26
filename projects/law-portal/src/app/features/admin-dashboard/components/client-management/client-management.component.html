@@ -66,7 +66,7 @@
               </div>
             </div>
           </th>
-          <th pSortableColumn="email">
+          <!--<th pSortableColumn="email">
             <div class="header-content">
               <span>{{ translate('email') }}</span>
               <div class="header-icons">
@@ -80,7 +80,7 @@
                 </p-columnFilter>
               </div>
             </div>
-          </th>
+          </th>-->
           <th pSortableColumn="username">
             <div class="header-content">
               <span>{{ translate('username') }}</span>
@@ -155,7 +155,7 @@
               </div>
             </div>
           </td>
-          <td>{{ client.email }}</td>
+          <!--<td>{{ client.email }}</td>-->
           <td>
             <span class="username-badge">{{ client.username }}</span>
           </td>
@@ -502,9 +502,9 @@
         ></p-button>
         <p-button 
           [label]="editingClient ? 'Güncelle' : 'Ekle'"
-          icon="pi pi-check" 
+          [icon]="saving ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
           (click)="saveClient()"
-          [disabled]="clientForm.invalid"
+          [disabled]="saving || clientForm.invalid"
           styleClass="primary-btn"
         ></p-button>
       </div>

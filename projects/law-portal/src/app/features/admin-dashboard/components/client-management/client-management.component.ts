@@ -20,6 +20,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
   showDialog = false;
   editingClient: Client | null = null;
   loading = false;
+  saving = false;
 
   // Password management
   isPasswordEditing = false;
@@ -263,6 +264,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
 
   saveClient(): void {
     if (this.clientForm.valid) {
+      this.saving = true;
       const formData = this.clientForm.value;
       
       if (this.editingClient) {
@@ -282,6 +284,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
             this.clientForm.reset();
             this.editingClient = null;
             this.eventService.clientUpdated(updatedClient);
+            this.saving = false;
           },
           error: (error) => {
             console.error('Error updating client:', error);
@@ -290,6 +293,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
               summary: 'Hata',
               detail: error.error?.error || 'Müvekkil güncellenirken bir hata oluştu'
             });
+            this.saving = false;
           }
         });
       } else {
@@ -305,6 +309,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
             this.showDialog = false;
             this.clientForm.reset();
             this.eventService.clientCreated(newClient);
+            this.saving = false;
           },
           error: (error) => {
             console.error('Error creating client:', error);
@@ -313,6 +318,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
               summary: 'Hata',
               detail: error.error?.error || 'Müvekkil oluşturulurken bir hata oluştu'
             });
+            this.saving = false;
           }
         });
       }

@@ -18,6 +18,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
   client: Client | null = null;
   clientCases: Case[] = [];
   loading = false;
+  savingCase = false;
   selectedCase: Case | null = null;
   clientId: any;
   
@@ -270,6 +271,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
 
   saveCase(): void {
     if (this.caseForm.valid && this.client?.id) {
+      this.savingCase = true;
       // Sadece gerekli alanları açıkça belirterek CaseCreateRequest oluştur
       const formData: CaseCreateRequest = {
         caseNumber: this.caseForm.value.caseNumber,
@@ -297,6 +299,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
             this.loadClientCases(this.clientId);
             // Dashboard'ı güncelle
             this.eventService.caseUpdated(updatedCase);
+            this.savingCase = false;
           },
           error: (error) => {
             console.error('Error updating case:', error);
@@ -320,6 +323,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
                 detail: error.error?.error || this.translate('error.updating.case')
               });
             }
+            this.savingCase = false;
           }
         });
       } else {
@@ -337,6 +341,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
             this.loadClientCases(this.clientId);
             // Dashboard'ı güncelle
             this.eventService.caseCreated(newCase);
+            this.savingCase = false;
           },
           error: (error) => {
             console.error('Error creating case:', error);
@@ -360,6 +365,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
                 detail: error.error?.error || this.translate('error.creating.case')
               });
             }
+            this.savingCase = false;
           }
         });
       }

@@ -401,9 +401,9 @@
       ></p-button>
       <p-button 
         [label]="editingCase ? translate('update') : translate('add')"
-        icon="pi pi-check" 
+        [icon]="savingCase ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
         (click)="saveCase()"
-        [disabled]="caseForm.invalid"
+        [disabled]="savingCase || caseForm.invalid"
         styleClass="primary-btn"
       ></p-button>
     </div>
