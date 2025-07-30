@@ -516,4 +516,17 @@
 <p-toast position="top-right"></p-toast>
 
 <!-- Confirmation Dialog -->
-<p-confirmDialog></p-confirmDialog> 
+<p-confirmDialog></p-confirmDialog>
+
+<!-- Custom Whatsapp Dialog -->
+<app-whatsapp-dialog
+  [visible]="showWhatsappDialog"
+  title="Yeni Müvekkil Eklendi!"
+  message="Müvekkile ait giriş bilgileri WhatsApp üzerinden iletilsin mi?"
+  [phoneNumber]='phoneNumberParameter'
+  [messageBodyObject]='messageBodyObject'
+  pageName="client-management"
+  confirmButtonText="Evet"
+  cancelButtonText="Hayır"
+  (visibleChange)="showWhatsappDialog = $event">
+</app-whatsapp-dialog> 

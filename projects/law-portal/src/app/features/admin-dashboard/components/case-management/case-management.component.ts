@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { CaseService, CaseStatus, CaseType } from '../../../../core/services/case.service';
 import { ClientService } from '../../../../core/services/client.service';
 import { LanguageService } from '../../../../services/language.service';
+import { AuthService } from 'shared-lib';
 
 export interface Case {
   id?: number;
@@ -87,7 +88,8 @@ export class CaseManagementComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private caseService: CaseService,
     private clientService: ClientService,
-    private languageService: LanguageService
+    private languageService: LanguageService,
+    private authService: AuthService
   ) {
     this.caseForm = this.fb.group({
       caseNumber: ['', [Validators.required]],
@@ -105,6 +107,14 @@ export class CaseManagementComponent implements OnInit, OnDestroy {
     this.loadCases();
     this.loadClients();
     this.updateDropdownOptions();
+    
+    // Set current user as assigned user by default
+    const currentUserProfile = this.authService.getCurrentUserProfile();
+    if (currentUserProfile?.id) {
+      this.caseForm.patchValue({
+        assignedUserId: currentUserProfile.id
+      });
+    }
     
     // Subscribe to language changes
     this.languageSubscription.add(
@@ -154,10 +164,12 @@ export class CaseManagementComponent implements OnInit, OnDestroy {
 
   openNewCaseDialog(): void {
     this.editingCase = null;
+    const currentUserProfile = this.authService.getCurrentUserProfile();
     this.caseForm.reset({
       status: CaseStatus.OPEN,
       type: CaseType.CAR_DEPRECIATION,
-      filingDate: new Date()
+      filingDate: new Date(),
+      assignedUserId: currentUserProfile?.id
     });
     this.showDialog = true;
   }

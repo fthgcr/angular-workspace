@@ -4,7 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../services/i18n.service';
 import { AppConfigService } from '../../services/app-config.service';
 import { MessageService } from 'primeng/api';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { LoginRequest } from '../../models/auth.model';
 
 @Component({
@@ -22,7 +22,8 @@ export class LoginComponent implements OnInit {
     private i18nService: I18nService,
     private appConfigService: AppConfigService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
@@ -32,24 +33,36 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Check for session expiration message from query parameters
+    this.route.queryParams.subscribe(params => {
+      if (params['reason'] === 'token_expired' && params['message']) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Oturum Süresi Doldu',
+          detail: params['message'],
+          life: 8000
+        });
+      }
+    });
+
     // Check if user is already authenticated
     if (this.authService.isAuthenticated()) {
       const userProfile = this.authService.getCurrentUserProfile();
       const currentUser = this.authService.getCurrentUser();
-      
+
       let displayName = 'User';
       if (userProfile?.firstName && userProfile?.lastName) {
         displayName = `${userProfile.firstName} ${userProfile.lastName}`;
       } else if (currentUser?.username) {
         displayName = currentUser.username;
       }
-      
+
       this.messageService.add({
         severity: 'info',
         summary: this.t('login.already_logged_in'),
         detail: `${this.t('login.already_logged_in')} ${displayName}. ${this.t('login.redirecting')}`
       });
-      
+
       setTimeout(() => {
         this.redirectBasedOnRole();
       }, 2000);
@@ -69,7 +82,7 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid) {
       this.loading = true;
       const credentials: LoginRequest = this.loginForm.value;
-      
+
       this.authService.login(credentials).subscribe({
         next: (response) => {
           // AuthService otomatik olarak user profile'ı yükleyecek
@@ -77,7 +90,7 @@ export class LoginComponent implements OnInit {
           setTimeout(() => {
             const userProfile = this.authService.getCurrentUserProfile();
             let displayName = 'User';
-            
+
             if (userProfile?.firstName && userProfile?.lastName) {
               displayName = `${userProfile.firstName} ${userProfile.lastName}`;
             } else {
@@ -87,13 +100,13 @@ export class LoginComponent implements OnInit {
                 displayName = username;
               }
             }
-            
+
             this.messageService.add({
               severity: 'success',
               summary: this.t('login.login_successful'),
               detail: `${this.t('login.welcome_back_user')}, ${displayName}! ${this.t('login.redirecting')}`
             });
-            
+
             // Navigate based on role after a short delay
             setTimeout(() => {
               this.redirectBasedOnRole();
@@ -101,10 +114,8 @@ export class LoginComponent implements OnInit {
           }, 100); // User profile yüklenmesi için kısa gecikme
         },
         error: (error) => {
-          console.log('Login error:', error);
-          
           let errorMessage = this.t('login.invalid_credentials');
-          
+
           // Check if error response has messageKey for translation
           if (error.error?.messageKey) {
             errorMessage = this.t(error.error.messageKey);
@@ -112,7 +123,7 @@ export class LoginComponent implements OnInit {
             // Use the message from backend if no messageKey
             errorMessage = error.error.message;
           }
-          
+
           this.messageService.add({
             severity: 'error',
             summary: this.t('login.login_failed'),

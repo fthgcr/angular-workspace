@@ -17,11 +17,11 @@ export class ClientComponent implements OnInit, OnDestroy {
   cases: ClientCase[] = [];
   selectedCase: ClientCase | null = null;
   caseDocuments: ClientDocument[] = [];
-  
+
   // Loading states
   isLoadingCases = false;
   isLoadingDocuments = false;
-  
+
   // UI states
   isDescriptionExpanded = false;
 
@@ -36,7 +36,7 @@ export class ClientComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadMyCases();
-    
+
     // Subscribe to language changes
     this.subscriptions.add(
       this.languageService.currentLanguage$.subscribe(() => {
@@ -54,17 +54,17 @@ export class ClientComponent implements OnInit, OnDestroy {
    */
   loadMyCases(): void {
     this.isLoadingCases = true;
-    
+
     this.clientService.getMyCases().subscribe({
       next: (cases) => {
         // Map backend data to frontend interface
         this.cases = cases.map(caseItem => ({
           ...caseItem,
           startDate: caseItem.startDate || caseItem.filingDate, // Use startDate or fallback to filingDate
-          lawyerName: caseItem.lawyerName || 
-                     (caseItem.assignedUser ? 
-                      `${caseItem.assignedUser.firstName} ${caseItem.assignedUser.lastName}` : 
-                      undefined)
+          lawyerName: caseItem.lawyerName ||
+            (caseItem.assignedUser ?
+              `${caseItem.assignedUser.firstName} ${caseItem.assignedUser.lastName}` :
+              undefined)
         }));
         this.isLoadingCases = false;
       },
@@ -95,7 +95,7 @@ export class ClientComponent implements OnInit, OnDestroy {
   loadCaseDocuments(caseId: number): void {
     this.isLoadingDocuments = true;
     this.caseDocuments = [];
-    
+
     this.clientService.getDocumentsByCaseId(caseId).subscribe({
       next: (documents) => {
         // Map backend data to frontend interface
@@ -104,7 +104,6 @@ export class ClientComponent implements OnInit, OnDestroy {
           uploadDate: doc.uploadDate || doc.createdDate // Use uploadDate or fallback to createdDate
         }));
         this.isLoadingDocuments = false;
-        console.log(`Loaded ${this.caseDocuments.length} documents for case ${caseId}`);
       },
       error: (error) => {
         console.error('Error loading case documents:', error);
@@ -166,7 +165,7 @@ export class ClientComponent implements OnInit, OnDestroy {
     if (this.selectedCase) {
       this.loadCaseDocuments(this.selectedCase.id);
     }
-    
+
     this.messageService.add({
       severity: 'success',
       summary: this.translate('success'),

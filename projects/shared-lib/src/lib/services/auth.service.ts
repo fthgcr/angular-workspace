@@ -19,7 +19,7 @@ export class AuthService {
   private readonly USER_ROLE_KEY = 'user_role';
   private readonly USER_KEY = 'current_user';
   private readonly USER_PROFILE_KEY = 'current_user_profile';
-  
+
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser$: Observable<User | null>;
   private currentRoleSubject: BehaviorSubject<string | null>;
@@ -37,7 +37,7 @@ export class AuthService {
     this.currentRole$ = this.currentRoleSubject.asObservable();
     this.currentUserProfileSubject = new BehaviorSubject<UserProfile | null>(this.getCurrentUserProfile());
     this.currentUserProfile$ = this.currentUserProfileSubject.asObservable();
-    
+
     // Schedule profile loading after component initialization to avoid circular dependency
     if (this.isAuthenticated()) {
       setTimeout(() => this.loadUserProfileOnInit(), 0);
@@ -51,13 +51,9 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<JwtAuthenticationResponse> {
     // Use aslaw login endpoint for law-specific role handling
     const url = `${environment.aslawUrl}/law/auth/login`;
-    console.log('Login URL:', url);
-    console.log('Credentials:', credentials);
-    
     return this.http.post<JwtAuthenticationResponse>(url, credentials)
       .pipe(
         tap(response => {
-          console.log('Login response:', response);
           if (response.token) {
             const storage = this.getStorage();
             if (storage) {
@@ -74,7 +70,7 @@ export class AuthService {
               storage.setItem(this.USER_KEY, JSON.stringify(user));
             }
             this.currentUserSubject.next(user);
-            
+
             // Load full user profile after successful login
             this.loadUserProfile();
           }

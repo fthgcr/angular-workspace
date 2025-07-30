@@ -28,6 +28,11 @@ export class CaseDetailComponent implements OnInit, OnDestroy {
   // Document type options
   documentTypeOptions: any[] = [];
   
+  // WhatsApp Dialog properties
+  showWhatsappDialog = false;
+  phoneNumberParameter: string = '';
+  messageBodyObject: any = {};
+  
   // Subscription
   private languageSubscription: Subscription = new Subscription();
 
@@ -190,6 +195,9 @@ export class CaseDetailComponent implements OnInit, OnDestroy {
   private uploadFilesSequentially(uploadRequests: any[], index: number): void {
     if (index >= uploadRequests.length) {
       // All uploads completed
+      // Capture form values before reset
+      const documentType = this.uploadForm.value.type;
+      
       this.uploading = false;
       this.showUploadDialog = false;
       this.uploadForm.reset();
@@ -198,8 +206,22 @@ export class CaseDetailComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'success',
         summary: this.translate('success'),
-        detail: this.translate('success.files.uploaded').replace('{count}', uploadRequests.length.toString()) + ' (Database Storage)'
+        detail: this.translate('success.files.uploaded').replace('{count}', uploadRequests.length.toString())
       });
+      
+      // WhatsApp dialog açma kontrolü
+      if(this.case?.client?.phoneNumber && this.case.client.phoneNumber.length >= 10) {
+        this.phoneNumberParameter = this.case.client.phoneNumber;
+        this.messageBodyObject = {
+          clientName: `${this.case.client.firstName || ''} ${this.case.client.lastName || ''}`.trim(),
+          caseNumber: this.case.caseNumber,
+          caseTitle: this.case.title,
+          documentCount: uploadRequests.length,
+          documentType: this.getDocumentTypeLabel(documentType)
+        };
+        this.showWhatsappDialog = true;
+      }
+      
       return;
     }
 

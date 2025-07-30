@@ -30,6 +30,7 @@ import { DocumentManagementComponent } from './components/document-management/do
 import { ClientDetailComponent } from './components/client-detail/client-detail.component';
 import { CaseDetailComponent } from './components/case-detail/case-detail.component';
 import { AdminLawyersComponent } from './lawyers/admin-lawyers.component';
+import { WhatsappDialogComponent } from '../../shared/components/whatsapp-dialog/whatsapp-dialog.component';
 
 // Services
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -42,7 +43,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     DocumentManagementComponent,
     ClientDetailComponent,
     CaseDetailComponent,
-    AdminLawyersComponent
+    AdminLawyersComponent,
+    WhatsappDialogComponent
   ],
   imports: [
     CommonModule,

@@ -59,7 +59,7 @@
             <span>{{ case.createdDate | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="info-item" *ngIf="getClientFullName()">
-            <label>{{ translate('client') }}</label>
+            <label>{{ translate('client.count') }}</label>
             <span>{{ getClientFullName() }}</span>
           </div>
           <div class="info-item" *ngIf="getAssignedUserFullName()">
@@ -321,4 +321,17 @@
 
 <!-- Toast and Confirmation Dialog -->
 <p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog> 
+<p-confirmDialog></p-confirmDialog>
+
+<!-- WhatsApp Dialog -->
+<app-whatsapp-dialog
+  [visible]="showWhatsappDialog"
+  title="Belge Yüklendi!"
+  message="Müvekkile yeni belgeler yüklendiği bilgisi WhatsApp üzerinden iletilsin mi?"
+  [phoneNumber]='phoneNumberParameter'
+  [messageBodyObject]='messageBodyObject'
+  pageName="case-detail-document"
+  confirmButtonText="Evet"
+  cancelButtonText="Hayır"
+  (visibleChange)="showWhatsappDialog = $event">
+</app-whatsapp-dialog> 

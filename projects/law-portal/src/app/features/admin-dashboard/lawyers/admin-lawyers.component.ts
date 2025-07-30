@@ -16,11 +16,11 @@ export class AdminLawyersComponent implements OnInit {
   showDialog = false;
   isEditMode = false;
   selectedUser: User | null = null;
-  
+
   // Password management
   isPasswordEditing = false;
   originalPasswordValue = '';
-  
+
   userForm: FormGroup;
 
   // Role options for dropdown
@@ -55,12 +55,9 @@ export class AdminLawyersComponent implements OnInit {
 
   loadUsers(): void {
     this.loading = true;
-    console.log('Loading legal staff...');
     this.adminService.getAllLegalStaff().subscribe({
       next: (users: User[]) => {
-        console.log('Received legal staff:', users);
-        console.log('Number of legal staff:', users.length);
-        this.users = users;
+this.users = users;
         this.loading = false;
       },
       error: (error: any) => {
@@ -99,7 +96,7 @@ export class AdminLawyersComponent implements OnInit {
   editUser(user: User): void {
     this.isEditMode = true;
     this.selectedUser = user;
-    
+
     // Get the user's current role (prioritize LAWYER if they have multiple roles)
     let currentRole = 'LAWYER';
     if (user.roles && user.roles.length > 0) {
@@ -107,7 +104,7 @@ export class AdminLawyersComponent implements OnInit {
         currentRole = 'CLERK';
       }
     }
-    
+
     this.userForm.patchValue({
       username: user.username,
       email: user.email,
@@ -130,7 +127,7 @@ export class AdminLawyersComponent implements OnInit {
     if (this.userForm.valid) {
       const formData = this.userForm.value;
       const roleLabel = this.getRoleLabel(formData.role);
-      
+
       if (this.isEditMode && this.selectedUser) {
         // Update user
         this.adminService.updateUser(this.selectedUser.id!, formData).subscribe({
@@ -181,9 +178,9 @@ export class AdminLawyersComponent implements OnInit {
 
   deactivateUser(user: User): void {
     const userRole = this.getUserRoleDisplay(user);
-    const roleForMessage = user.roles?.includes('LAWYER') ? 'Avukat' : 
-                          user.roles?.includes('CLERK') ? 'Katip' : 'Kullanıcı';
-    
+    const roleForMessage = user.roles?.includes('LAWYER') ? 'Avukat' :
+      user.roles?.includes('CLERK') ? 'Katip' : 'Kullanıcı';
+
     this.confirmationService.confirm({
       message: `"${user.username}" adlı ${roleForMessage.toLowerCase()}yı devre dışı bırakmak istediğinizden emin misiniz? Bu işlem geri alınabilir.`,
       header: `${roleForMessage}yı Devre Dışı Bırak`,
@@ -281,7 +278,7 @@ export class AdminLawyersComponent implements OnInit {
 
   confirmPasswordEdit(): void {
     const newPassword = this.userForm.get('password')?.value;
-    
+
     if (!newPassword || newPassword.length < 6) {
       this.messageService.add({
         severity: 'warn',
@@ -338,8 +335,7 @@ export class AdminLawyersComponent implements OnInit {
       address: this.selectedUser.address,
       password: newPassword // Yeni şifre
     };
-
-    console.log('Updating user password with data:', updateData); // Debug için
+    // Debug için
 
     this.adminService.updateUser(this.selectedUser.id!, updateData).subscribe({
       next: (response: any) => {
@@ -368,7 +364,7 @@ export class AdminLawyersComponent implements OnInit {
           summary: 'Hata',
           detail: error.error?.error || 'Şifre güncellenirken bir hata oluştu'
         });
-        
+
         // Reset to original state on error
         this.cancelPasswordEdit();
       }

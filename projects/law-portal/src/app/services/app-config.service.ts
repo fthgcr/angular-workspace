@@ -65,8 +65,8 @@ export class AppConfigService {
 
   // Default configuration - can be overridden by setConfig()
   private defaultConfig = {
-        APP_TITLE: 'LexOfis',
-    APP_DESC: 'Legal Management System', 
+    APP_TITLE: 'LexOfis',
+    APP_DESC: 'Legal Management System',
     PAGE_TITLE: 'LexOfis - Legal Management System',
     FAVICON_URL: '',
     FAVICON_BASE64: '',
@@ -267,7 +267,6 @@ export class AppConfigService {
   private loadConfig(): void {
     this.http.get<AppConfig>('/assets/config/app-config.json').pipe(
       tap(config => {
-        console.log('App config loaded:', config);
         this.configSubject.next(config);
       })
     ).subscribe({

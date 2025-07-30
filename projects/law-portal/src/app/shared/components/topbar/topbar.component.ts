@@ -17,11 +17,11 @@ export class TopbarComponent implements OnInit, OnDestroy {
   currentUserProfile: any = null;
   menuItems: any[] = [];
   userMenuItems: any[] = [];
-  
+
   // Language properties
   currentLanguage: Language;
   languages: Language[] = [];
-  
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -75,9 +75,9 @@ export class TopbarComponent implements OnInit, OnDestroy {
   private setMenuItems(): void {
     // Rol bazlı menü öğelerini ayarla
     const baseItems = [
-      { 
-        label: this.translate('panel'), 
-        icon: 'pi pi-home', 
+      {
+        label: this.translate('panel'),
+        icon: 'pi pi-home',
         route: this.getDashboardRoute(),
         roles: ['USER', 'LAWYER', 'CLERK', 'ADMIN']
       }
@@ -93,9 +93,9 @@ export class TopbarComponent implements OnInit, OnDestroy {
     // Role özel menü öğeleri
     if (this.currentRole === 'ADMIN' || this.currentRole === 'LAWYER') {
       baseItems.push(
-        { 
-          label: 'Hukuk Personeli', 
-          icon: 'pi pi-users', 
+        {
+          label: 'Hukuk Personeli',
+          icon: 'pi pi-users',
           route: '/admin/lawyers',
           roles: ['ADMIN']
         }
@@ -110,13 +110,13 @@ export class TopbarComponent implements OnInit, OnDestroy {
     }
 
     // Kullanıcının rolüne göre menü öğelerini filtrele
-    this.menuItems = baseItems.filter(item => 
+    this.menuItems = baseItems.filter(item =>
       item.roles.includes(this.currentRole)
     );
   }
 
   private setUserMenuItems(): void {
-    console.log('Setting user menu items'); // Debug log
+    // Debug log
     this.userMenuItems = [
       /*{
         label: this.translate('profile'),
@@ -136,7 +136,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
         }
       }
     ];
-    console.log('User menu items set:', this.userMenuItems); // Debug log
+    // Debug log
   }
 
   getDashboardRoute(): string {
@@ -159,17 +159,17 @@ export class TopbarComponent implements OnInit, OnDestroy {
 
   logout(): void {
     const userName = this.getUserDisplayName();
-    
+
     // AuthService logout işlemi
     this.authService.logout();
-    
+
     // Success mesajı göster
     this.messageService.add({
       severity: 'success',
       summary: this.translate('logout.successful'),
       detail: `${this.translate('goodbye')} ${userName}! ${this.translate('logout.message')}`
     });
-    
+
     // Login sayfasına yönlendir
     setTimeout(() => {
       this.router.navigate(['/login']);
@@ -184,8 +184,8 @@ export class TopbarComponent implements OnInit, OnDestroy {
   }
 
   onMenuToggle(event: Event, menu: any): void {
-    console.log('Menu toggle clicked', event); // Debug log
-    console.log('Menu items:', this.userMenuItems); // Debug log
+    // Debug log
+    // Debug log
     menu.toggle(event);
   }
 

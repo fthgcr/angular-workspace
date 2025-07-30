@@ -21,16 +21,21 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
   savingCase = false;
   selectedCase: Case | null = null;
   clientId: any;
-  
+
   // Form and Dialog
   caseForm: FormGroup;
   showCaseDialog = false;
   editingCase: Case | null = null;
-  
+
   // Filter options
   caseStatusOptions: any[] = [];
   caseTypeOptions: any[] = [];
-  
+
+  // WhatsApp Dialog properties
+  showWhatsappDialog = false;
+  phoneNumberParameter: string = '';
+  messageBodyObject: any = {};
+
   // Subscription
   private languageSubscription: Subscription = new Subscription();
 
@@ -70,7 +75,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
     this.loadClient(this.clientId);
     this.loadClientCases(this.clientId);
     this.updateOptions();
-    
+
     // Listen to language changes
     this.languageSubscription = this.languageService.currentLanguage$.subscribe(() => {
       this.updateOptions();
@@ -101,7 +106,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
       { label: this.translate('case.type.intellectual.property'), value: CaseType.INTELLECTUAL_PROPERTY },
       { label: this.translate('case.type.other'), value: CaseType.OTHER }
     ];
-    
+
     // Force change detection for dropdown updates
     setTimeout(() => {
       this.cdr.markForCheck();
@@ -134,10 +139,8 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
           this.clientCases = cases
             .map(c => this.createSafeCaseFromResponse(c))
             .sort((a, b) => new Date(b.filingDate).getTime() - new Date(a.filingDate).getTime()); // Descending by filing date
-          
-          console.log('Cases loaded successfully:', this.clientCases.length);
           this.loading = false;
-          
+
           // Change detection'ı zorla
           this.cdr.detectChanges();
         } catch (processingError) {
@@ -156,7 +159,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
               updatedDate: c.updatedDate ? new Date(c.updatedDate) : undefined
             }))
             .sort((a, b) => new Date(b.filingDate).getTime() - new Date(a.filingDate).getTime());
-          
+
           this.loading = false;
           this.cdr.detectChanges();
         }
@@ -273,6 +276,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
     if (this.caseForm.valid && this.client?.id) {
       this.savingCase = true;
       // Sadece gerekli alanları açıkça belirterek CaseCreateRequest oluştur
+      const currentUserProfile = this.authService.getCurrentUserProfile();
       const formData: CaseCreateRequest = {
         caseNumber: this.caseForm.value.caseNumber,
         title: this.caseForm.value.title,
@@ -280,15 +284,14 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
         status: this.caseForm.value.status,
         type: this.caseForm.value.type,
         filingDate: this.caseForm.value.filingDate.toISOString().split('T')[0], // Convert to ISO date string
-        assignedUserId: this.client.id,
+        assignedUserId: currentUserProfile?.id,
         clientId: this.client.id
       };
-      
+
       if (this.editingCase) {
         // Update existing case
         this.caseService.updateCase(this.editingCase.id!, formData).subscribe({
           next: (updatedCase) => {
-            console.log('Case update successful');
             this.messageService.add({
               severity: 'success',
               summary: this.translate('success'),
@@ -303,10 +306,9 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error updating case:', error);
-            
+
             // Lazy loading hata kontrolü - status 200 ise başarılı say
             if (error.status === 200) {
-              console.log('Update successful but response serialization failed, treating as success');
               this.messageService.add({
                 severity: 'success',
                 summary: this.translate('success'),
@@ -330,7 +332,6 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
         // Create new case
         this.caseService.createCase(formData).subscribe({
           next: (newCase) => {
-            console.log('Case create successful');
             this.messageService.add({
               severity: 'success',
               summary: this.translate('success'),
@@ -342,13 +343,18 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
             // Dashboard'ı güncelle
             this.eventService.caseCreated(newCase);
             this.savingCase = false;
+            if (this.client && this.client.phoneNumber && this.client.phoneNumber.length >= 10) {
+              this.phoneNumberParameter = this.client.phoneNumber;
+              this.messageBodyObject = newCase;
+              this.messageBodyObject["caseType"] = this.getTypeLabel(newCase.type);
+              this.showWhatsappDialog = true;
+            }
           },
           error: (error) => {
             console.error('Error creating case:', error);
-            
+
             // Lazy loading hata kontrolü - status 200 ise başarılı say
             if (error.status === 200) {
-              console.log('Create successful but response serialization failed, treating as success');
               this.messageService.add({
                 severity: 'success',
                 summary: this.translate('success'),
@@ -409,7 +415,7 @@ export class ClientDetailComponent implements OnInit, OnDestroy {
     const field = this.caseForm.get(fieldName);
     if (field && field.errors && field.touched) {
       if (field.errors['required']) {
-        switch(fieldName) {
+        switch (fieldName) {
           case 'caseNumber': return this.translate('case.number.required');
           case 'title': return this.translate('case.title.required');
           case 'status': return this.translate('case.status.required');

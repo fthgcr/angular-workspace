@@ -27,8 +27,6 @@ export class ThemeService {
     Object.entries(cssVariables).forEach(([property, value]) => {
       root.style.setProperty(property, value);
     });
-
-    console.log('Theme variables applied:', cssVariables);
   }
 
   // Tema değiştirme metodları

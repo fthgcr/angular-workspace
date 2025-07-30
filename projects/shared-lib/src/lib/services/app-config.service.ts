@@ -115,8 +115,7 @@ export class AppConfigService {
     
     this.http.get<AppConfig>(url).pipe(
       tap(config => {
-        console.log('App config loaded:', config);
-        this.configSubject.next(config);
+this.configSubject.next(config);
         this.validateProductionConfig(config);
       })
     ).subscribe({
@@ -180,8 +179,7 @@ export class AppConfigService {
     }
 
     if (criticalIssues.length === 0 && warnings.length === 0) {
-      console.log('✅ Production config validation passed!');
-    }
+}
   }
 
   // Get validation status for monitoring

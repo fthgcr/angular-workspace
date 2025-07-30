@@ -22,6 +22,11 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
   loading = false;
   saving = false;
 
+  // WhatsApp Dialog properties
+  showWhatsappDialog = false;
+  phoneNumberParameter: string = '';
+  messageBodyObject: any = {};
+
   // Password management
   isPasswordEditing = false;
   originalPasswordValue = '';
@@ -130,49 +135,6 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
           detail: 'Müvekkiller yüklenirken bir hata oluştu'
         });
         this.loading = false;
-        
-        // Fallback to mock data for development
-        this.clients = [
-          {
-            id: 1,
-            username: 'ahmet.yilmaz',
-            email: 'ahmet.yilmaz@email.com',
-            firstName: 'Ahmet',
-            lastName: 'Yılmaz',
-            enabled: true,
-            active: true,
-            phoneNumber: '+90 555 123 4567',
-            address: 'Beşiktaş, İstanbul',
-            notes: 'İş hukuku uzmanı avukat',
-            createdDate: new Date('2024-01-15')
-          },
-          {
-            id: 2,
-            username: 'zeynep.kaya',
-            email: 'zeynep.kaya@email.com',
-            firstName: 'Zeynep',
-            lastName: 'Kaya',
-            enabled: true,
-            active: true,
-            phoneNumber: '+90 555 987 6543',
-            address: 'Çankaya, Ankara',
-            notes: 'Aile hukuku davalarında müvekkil',
-            createdDate: new Date('2024-02-10')
-          },
-          {
-            id: 3,
-            username: 'mehmet.celik',
-            email: 'mehmet.celik@email.com',
-            firstName: 'Mehmet',
-            lastName: 'Çelik',
-            enabled: true,
-            active: true,
-            phoneNumber: '+90 555 555 1234',
-            address: 'Konak, İzmir',
-            notes: 'Ticaret hukuku müvekkili',
-            createdDate: new Date('2024-03-05')
-          }
-        ];
       }
     });
   }
@@ -310,6 +272,11 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
             this.clientForm.reset();
             this.eventService.clientCreated(newClient);
             this.saving = false;
+            if(newClient && newClient.phoneNumber && newClient.phoneNumber.length >= 10){
+              this.phoneNumberParameter = newClient.phoneNumber;
+              this.messageBodyObject = formData;
+              this.showWhatsappDialog = true;
+            }
           },
           error: (error) => {
             console.error('Error creating client:', error);
@@ -467,14 +434,7 @@ export class ClientManagementComponent implements OnInit, AfterViewInit, OnDestr
       active: this.editingClient.active,
       password: newPassword // Yeni şifre
     };
-
-    console.log('=== PASSWORD UPDATE DEBUG ===');
-    console.log('Client ID:', this.editingClient.id);
-    console.log('New Password:', newPassword);
-    console.log('Update Data:', updateData);
-    console.log('API URL will be:', `${environment.apiUrl}/clientsapi/${this.editingClient.id}`);
-
-    this.clientService.updateClient(this.editingClient.id!, updateData).subscribe({
+this.clientService.updateClient(this.editingClient.id!, updateData).subscribe({
       next: (updatedClient) => {
         // Update local client data
         const index = this.clients.findIndex(c => c.id === this.editingClient!.id);

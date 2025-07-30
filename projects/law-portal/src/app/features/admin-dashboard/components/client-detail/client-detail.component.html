@@ -415,3 +415,16 @@
 
 <!-- Confirmation Dialog -->
 <p-confirmDialog></p-confirmDialog> 
+
+<!-- Custom Whatsapp Dialog -->
+<app-whatsapp-dialog
+  [visible]="showWhatsappDialog"
+  title="Yeni Dava Eklendi!"
+  message="Müvekkile ait yeni dava bilgileri WhatsApp üzerinden iletilsin mi?"
+  [phoneNumber]='phoneNumberParameter'
+  [messageBodyObject]='messageBodyObject'
+  pageName="client-detail"
+  confirmButtonText="Evet"
+  cancelButtonText="Hayır"
+  (visibleChange)="showWhatsappDialog = $event">
+</app-whatsapp-dialog> 

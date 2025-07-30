@@ -1,0 +1,35 @@
+<p-dialog 
+  [header]="title"
+  [(visible)]="visible"
+  [modal]="true"
+  [responsive]="true"
+  [style]="{width: '450px'}"
+  [maximizable]="false"
+  [closable]="true"
+  styleClass="whatsapp-dialog"
+  (onHide)="onDialogHide()"
+>
+  <div class="dialog-content">
+    <div class="message-section">
+      <i class="pi pi-phone dialog-icon"></i>
+      <p class="dialog-message">{{ message }}</p>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button 
+        [label]="cancelButtonText" 
+        icon="pi pi-times" 
+        (click)="cancel()"
+        styleClass="p-button-text"
+      ></p-button>
+      <p-button 
+        [label]="confirmButtonText"
+        icon="pi pi-check"
+        (click)="confirm()"
+        styleClass="p-button-primary"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog> 

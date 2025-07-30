@@ -64,7 +64,7 @@ export interface CaseCreateRequest {
 export class CaseService {
   private baseUrl = `${environment.apiUrl}/cases`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Get all cases
@@ -92,9 +92,6 @@ export class CaseService {
    */
   getCaseById(id: number): Observable<Case> {
     const url = `${this.baseUrl}/${id}`;
-    console.log('CaseService: Making request to:', url);
-    console.log('CaseService: Base URL is:', this.baseUrl);
-    console.log('CaseService: Full environment:', environment);
     return this.http.get<Case>(url);
   }
 
@@ -122,8 +119,8 @@ export class CaseService {
   /**
    * Generate case number
    */
-  generateCaseNumber(): Observable<{caseNumber: string}> {
-    return this.http.get<{caseNumber: string}>(`${this.baseUrl}/generate-number`);
+  generateCaseNumber(): Observable<{ caseNumber: string }> {
+    return this.http.get<{ caseNumber: string }>(`${this.baseUrl}/generate-number`);
   }
 
   /**
@@ -131,7 +128,6 @@ export class CaseService {
    */
   testBackendConnection(): Observable<any> {
     const url = `${this.baseUrl}/test`;
-    console.log('CaseService: Testing backend connection to:', url);
     return this.http.get<any>(url);
   }
 } 
